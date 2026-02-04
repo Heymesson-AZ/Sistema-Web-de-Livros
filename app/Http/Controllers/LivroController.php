@@ -1,7 +1,7 @@
 <?php
-
+// o namespace do controlador e a importação da classe Request
 namespace App\Http\Controllers;
-
+// Importa a classe base do controlador. o illuminate é o núcleo do framework laravel
 use Illuminate\Http\Request;
 
 class LivroController extends Controller

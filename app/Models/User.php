@@ -1,22 +1,27 @@
 <?php
 
 namespace App\Models;
+// Bibliotecas necessárias para o modelo User
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+// definição da classe User que estende Authenticatable
+// o Authenticatable fornece funcionalidades de autenticação para o modelo User(usuário)
+
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+   // os Traits HAsFactory e Notifiable são usados para adicionar funcionalidades ao modelo User.
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Os atributos que são atribuíveis em massa.
      *
      * @var list<string>
      */
+    // Atributos que podem ser atribuídos em massa
     protected $fillable = [
         'name',
         'email',
@@ -24,7 +29,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Os atributos que devem ser ocultados para arrays.
      *
      * @var list<string>
      */
@@ -34,10 +39,11 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Os atributos que devem ser convertidos para tipos nativos.
      *
      * @return array<string, string>
      */
+
     protected function casts(): array
     {
         return [

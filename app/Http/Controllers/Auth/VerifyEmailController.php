@@ -1,5 +1,6 @@
 <?php
-
+// Controlador responsável por lidar com a verificação de email dos usuários,
+// incluindo a marcação do email como verificado e o redirecionamento para a dashboard
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

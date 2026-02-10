@@ -1,5 +1,7 @@
 <?php
 
+// FormRequest responsável por lidar com a validação e autenticação dos usuários durante o processo de login,
+// incluindo a verificação de limites de taxa para evitar tentativas de login excessivas.
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Auth\Events\Lockout;
@@ -12,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 class LoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determina se o usuário está autorizado a fazer esta solicitação.
      */
     public function authorize(): bool
     {
@@ -20,7 +22,8 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * 
+     * Obter as regras de validação que se aplicam à solicitação.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -33,7 +36,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Attempt to authenticate the request's credentials.
+     * Autenticar o usuário nas credenciais fornecidas.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -53,7 +56,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Ensure the login request is not rate limited.
+     * Garantir que a solicitação não excedeu o limite de taxa.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -76,7 +79,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Obter a chave de limitação de taxa para a solicitação.
      */
     public function throttleKey(): string
     {

@@ -1,5 +1,7 @@
 <?php
 
+// Controlador responsável por lidar com a confirmação da senha do usuário,
+// incluindo a exibição do formulário de confirmação de senha e a validação da senha fornecida
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

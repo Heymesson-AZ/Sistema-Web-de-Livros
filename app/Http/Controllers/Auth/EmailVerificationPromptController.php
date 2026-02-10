@@ -1,5 +1,7 @@
 <?php
 
+// Controlador responsável por lidar com a exibição do prompt de verificação de email para os usuários,
+// verificando se o email do usuário foi verificado e redirecionando para a dashboard
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

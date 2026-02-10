@@ -1,5 +1,7 @@
 <?php
 
+// Controlador responsável por lidar com a autenticação de usuários,
+// incluindo a exibição do formulário de login, o processamento dos dados de login e o encerramento da sessão do usuário.
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -12,7 +14,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Mostrando a tela de login.
      */
     public function create(): View
     {
@@ -20,19 +22,22 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     *  Nessa função, autenticamos o usuário usando os dados fornecidos 
+     * na solicitação de login.
      */
+    
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo
         $request->authenticate();
-
+        // Se a autenticação for bem-sucedida, limpamos as tentativas de login para o usuário.
         $request->session()->regenerate();
-
+        // Redirecionamos o usuário para a página pretendida ou para a rota 'dashboard' após o login bem-sucedido.
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**
-     * Destroy an authenticated session.
+     * Aqui, encerramos a sessão do usuário.
      */
     public function destroy(Request $request): RedirectResponse
     {

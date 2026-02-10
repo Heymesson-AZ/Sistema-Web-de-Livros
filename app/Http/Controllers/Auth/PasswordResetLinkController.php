@@ -1,5 +1,7 @@
 <?php
 
+// Controlador responsável por lidar com a solicitação de links de redefinição de senha para os usuários,
+// incluindo a exibição do formulário de solicitação de link e o processamento da solicitação para
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

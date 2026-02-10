@@ -1,8 +1,8 @@
 <?php
 // Este arquivo define as rotas de autenticação para a aplicação, incluindo registro, login, recuperação de senha, 
-//verificação de email e logout. As rotas são organizadas em grupos de middleware 
-//para garantir que apenas usuários convidados (guest) possam acessar as rotas de registro e login, 
-//enquanto apenas usuários autenticados (auth) possam acessar as rotas de verificação de email, confirmação de senha e logout.
+// verificação de email e logout. As rotas são organizadas em grupos de middleware 
+// para garantir que apenas usuários convidados (guest) possam acessar as rotas de registro e login, 
+// enquanto apenas usuários autenticados (auth) possam acessar as rotas de verificação de email, confirmação de senha e logout.
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
@@ -15,9 +15,11 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
-// Rotas de autenticação para usuários convidados (guest) e autenticados (auth)
+// Rotas de autenticação para usuários convidados (guest)
 Route::middleware('guest')->group(function () {
     // Rotas para registro, login e recuperação de senha
+
+    // Rota para exibir o formulário de registro
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
         // Rota para criar um novo usuário
@@ -41,7 +43,9 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
+// Rotas de autenticação para usuários autenticados (auth)
 Route::middleware('auth')->group(function () {
+    
     // Rotas para verificação de email, confirmação de senha e logout
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');

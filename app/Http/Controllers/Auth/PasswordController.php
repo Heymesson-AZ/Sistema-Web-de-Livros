@@ -1,5 +1,7 @@
 <?php
 
+// Controlador responsável por lidar com a atualização da senha dos usuários,
+// incluindo a validação da senha atual e a atualização para a nova senha fornecida
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

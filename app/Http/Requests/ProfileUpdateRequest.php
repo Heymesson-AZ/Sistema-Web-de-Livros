@@ -1,5 +1,7 @@
 <?php
 
+// FormRequest responsável por lidar com a validação e atualização das informações do perfil do usuário,
+// incluindo a validação do nome e email, e garantindo que o email seja único, exc
 namespace App\Http\Requests;
 
 use App\Models\User;

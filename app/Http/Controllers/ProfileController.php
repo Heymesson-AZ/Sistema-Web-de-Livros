@@ -1,5 +1,7 @@
 <?php
 
+// Controlador responsável por lidar com as ações relacionadas ao perfil do usuário,
+// incluindo a exibição do formulário de edição de perfil, a atualização das informações do perfil e
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;

@@ -1,5 +1,7 @@
 <?php
 
+// Controlador responsável por lidar com o envio de notificações de verificação de email para os usuários,
+// incluindo o envio de um novo email de verificação caso o usuário solicite.
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

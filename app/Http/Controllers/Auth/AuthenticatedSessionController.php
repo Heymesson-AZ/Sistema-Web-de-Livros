@@ -39,14 +39,16 @@ class AuthenticatedSessionController extends Controller
     /**
      * Aqui, encerramos a sessão do usuário.
      */
+
     public function destroy(Request $request): RedirectResponse
-    {
+    {   
+        // Usamos o guard 'web' para garantir que estamos encerrando a sessão do usuário autenticado.
         Auth::guard('web')->logout();
-
+        // Invalidamos a sessão atual para garantir que os dados da sessão sejam limpos.
         $request->session()->invalidate();
-
+        // Regeneramos o token CSRF para proteger contra ataques de falsificação de solicitação entre sites (CSRF).
         $request->session()->regenerateToken();
-
+        // Redirecionamos o usuário para a página inicial após o logout.
         return redirect('/');
     }
 }

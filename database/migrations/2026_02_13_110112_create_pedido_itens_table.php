@@ -6,23 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-     /**
-     * A função (Up) que será executada quando a migration for aplicada.
+    /**
+     * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('editora', function (Blueprint $table) {
+        Schema::create('pedidos_itens', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
             $table->timestamps();
         });
     }
 
     /**
-     * A função down será executada quando a migration for revertida.
+     * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('editora');
+        Schema::dropIfExists('pedidos_itens');
     }
 };

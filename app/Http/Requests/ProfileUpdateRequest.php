@@ -11,7 +11,8 @@ use Illuminate\Validation\Rule;
 class ProfileUpdateRequest extends FormRequest
 {
     /**
-     * Get the validation rules that apply to the request.
+     * Aplica as regras de validação para os campos do perfil do usuário, 
+     * garantindo que o nome seja obrigatório,
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */

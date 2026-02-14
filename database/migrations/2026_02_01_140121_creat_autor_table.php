@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * A função que será executada quando a migration for aplicada.
+     * A função (Up) que será executada quando a migration for aplicada.
      */
     public function up(): void
     {   
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('nacionalidade')->nullable(); // 'nullable' permite que o campo fique vazio
             $table->date('data_nascimento'); // Campo específico para datas
             $table->string('email')->unique(); // Campo de email único
-            $table->string('biografia', 1000)->nullable(); // Campo de biografia com limite de 1000 caracteres
+            $table->string('biografia')->nullable(); // Campo de biografia com limite de 1000 caracteres
             $table->string('foto_perfil')->nullable(); // Campo para URL ou caminho da foto de perfil
             $table->timestamps(); // Campos 'created_at' e 'updated_at'
         });

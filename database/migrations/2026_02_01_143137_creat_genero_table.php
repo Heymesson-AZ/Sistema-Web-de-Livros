@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
+     /**
+     * A função (Up) que será executada quando a migration for aplicada.
      */
     public function up(): void
     {
@@ -20,7 +20,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * A função down será executada quando a migration for revertida.
      */
     public function down(): void
     {

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('avalicaoes', function (Blueprint $table) {
+        Schema::create('avaliacoes', function (Blueprint $table) {
             $table->id();
             // chave estrangeira do vendedor
-            $table->foreignId('vendedor_id')->constrained('vendedor')->onDelete('cascade');
+            $table->foreignId('vendedor_id')->constrained('vendedores')->onDelete('cascade');
             // chave estrageira do cliente
-            $table->foreignId('cliente_id')->constrained('cliente')->onDelete('cascade');
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
             // chave estrangeira do pedido
             $table->foreignId('pedido_id')->constrained('pedidos')->onDelete('cascade');
             // campo de avaliação, pode ser um número de 1 a 5

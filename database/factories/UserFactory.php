@@ -28,17 +28,43 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+
+            'tipo' => fake()->randomElement(['cliente', 'vendedor', 'admin']),
+            'status' => fake()->randomElement(['ativo', 'inativo', 'banido']),
+
             'remember_token' => Str::random(10),
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * indica que o email do usuário não foi verificado, definindo o campo 'email_verified_at' como null.
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    // Adicionando métodos para criar usuários do tipo 'admin'
+    public function admin(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'tipo' => 'admin',
+        ]);
+    }
+    // Adicionando um método para criar usuários do tipo 'vendedor'
+    public function vendedor(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'tipo' => 'vendedor',
+        ]);
+    }
+
+    public function cliente(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'tipo' => 'cliente',
         ]);
     }
 }

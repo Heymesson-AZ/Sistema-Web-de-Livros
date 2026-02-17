@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Criando a tabela 'genero' com os campos especificados
-        Schema::create('genero', function (Blueprint $table) {
+        Schema::create('generos', function (Blueprint $table) {
             $table->id(); // Chave primária auto-incrementável
             $table->string('nome'); // Nome do gênero
             $table->timestamps(); // Campos 'created_at' e 'updated_at'

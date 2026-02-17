@@ -17,11 +17,12 @@ class AutorFactory extends Factory
     public function definition(): array
     {
         return [
-            'nome' => $this->faker->name(),
-            'nacionalidade' => $this->faker->country(),
-            'data_nascimento' => $this->faker->date(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'biografia' => $this->faker->text(200),
+            'nome' => fake()->name(),
+            'nacionalidade' => fake()->country(),
+            'data_nascimento' => fake()->date('Y-m-d', '-20 years'), // Autores com mais de 20 anos
+            'email' => fake()->unique()->safeEmail(),
+            'biografia' => fake()->paragraph(), // Gera um texto curto
+            'foto_perfil' => 'autores/default.png', // Simulando um caminho de arquivo
         ];
     }
 }

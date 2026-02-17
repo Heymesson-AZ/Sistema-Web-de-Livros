@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Estrutura da Tabela 'livro' a ser criada
-        Schema::create('livro', function (Blueprint $table) {
+        Schema::create('livros', function (Blueprint $table) {
             $table->id(); // Chave primária auto-incrementável
             $table->string('titulo'); // Título do livro
             $table->date('data_publicacao'); // Data de publicação do livro
@@ -22,13 +22,14 @@ return new class extends Migration
             $table->decimal('preco', 8, 2); // Preço do livro, com 8 dígitos no total e 2 casas decimais
             $table->integer('quantidade')->default(0); // Quantidade em estoque, valor padrão 0
              // Definindo a chave estrangeira para 'autor_id'
-            $table->foreignId('autor_id')->constrained('autor')->onDelete('cascade');
-            $table->foreignId('genero_id')->constrained('genero'); // Chave estrangeira referenciando o gênero do livro
-            $table->foreignId('editora_id')->constrained('editora'); // Chave estrangeira referenciando a editora do livro
+            $table->foreignId('autor_id')->constrained('autores')->onDelete('cascade');
+            $table->foreignId('genero_id')->constrained('generos'); // Chave estrangeira referenciando o gênero do livro
+            $table->foreignId('editora_id')->constrained('editoras'); // Chave estrangeira referenciando a editora do livro
             $table->timestamps(); // Campos 'created_at' e 'updated_at'
+            $table->softDeletes(); // Campo 'deleted_at' para soft deletes
         });
     }
-
+        
   /**
      * A função down será executada quando a migration for revertida.
      */

@@ -14,7 +14,7 @@ return new class extends Migration
         // Criando a tabela 'autor' com os campos especificados
         // blueprint é usado para definir a estrutura da tabela
 
-        Schema::create('autor', function (Blueprint $table) {
+        Schema::create('autores', function (Blueprint $table) {
             $table->id(); // Chave primária auto-incrementável
             $table->string('nome'); // Nome do autor
             $table->string('nacionalidade')->nullable(); // 'nullable' permite que o campo fique vazio

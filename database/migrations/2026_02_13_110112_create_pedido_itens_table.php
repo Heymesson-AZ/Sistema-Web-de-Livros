@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('pedidos_itens', function (Blueprint $table) {
             $table->id();
+             // quantidade de itens no pedido
+            $table->integer('quantidade_itens');
+            // valor unitarios do itens do pedido
+            $table->decimal('valor_unitario', 10, 2);
+            // id do livro
+            $table->foreignId('livro_id')->constrained('livros')->onDelete('restrict');
+            // id do pedido
+            $table->foreignId('pedido_id')->constrained('pedidos')->onDelete('restrict');
+            //timestamps para controle de criação e atualização dos registros
             $table->timestamps();
         });
     }

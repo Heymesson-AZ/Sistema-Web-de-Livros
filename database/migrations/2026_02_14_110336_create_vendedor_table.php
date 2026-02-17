@@ -11,10 +11,10 @@ return new class extends Migration
      */
         public function up(): void
         {
-            Schema::create('vendedor', function (Blueprint $table) {
+            Schema::create('vendedores', function (Blueprint $table) {
                 $table->id();
                 // chave estrageira do usuario
-                $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
+                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
                 // cnpj do vendedor
                 $table->string('cnpj')->unique();
                 // telefone do vendedor
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendedor');
+        Schema::dropIfExists('vendedores');
     }
 };

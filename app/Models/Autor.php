@@ -13,7 +13,7 @@ class Autor extends Model
      * Opcional: Por padrão, o Laravel esperaria a tabela "autors".
      * Como nossa tabela se chama "autor", precisamos definir explicitamente.
      */
-    protected $table = 'autor';
+    protected $table = 'autores';
 
     /**
      * Atributos que podem ser preenchidos em massa (Mass Assignment).

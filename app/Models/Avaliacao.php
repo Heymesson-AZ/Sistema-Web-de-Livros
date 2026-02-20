@@ -19,4 +19,21 @@ class Avaliacao extends Model
         'comentario',
         'recomenda',
     ];
+
+    public function vendedor()
+    {
+        return $this->belongsTo(Vendedor::class);
+    }
+
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
+    }
+
+    public function pedido()
+    {
+        return $this->belongsTo(Pedido::class);
+    }
+
+    
 }

@@ -28,4 +28,12 @@ class Pagamento extends Model
     protected $casts = [
         'data_confirmacao_pagamento' => 'datetime',
     ];
+
+    // um pagamento pertence a um pedido
+    public function pedido()
+    {
+        return $this->belongsTo(Pedido::class);
+    }
+
+    
 }

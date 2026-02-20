@@ -19,7 +19,7 @@ use App\Models\Avaliacao;
 use App\Models\Endereco;
 use App\Models\Carrinho;
 use App\Models\Livro;
-
+use App\Models\CartaoSalvo;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -95,30 +95,41 @@ class DatabaseSeeder extends Seeder
             ]);
         });
 
-    
+
         Avaliacao::factory(15)->create();
         Endereco::factory(20)->create();
 
-        // 6. Preenchimento de Carrinhos (Etapa Separada) 🛒
+        // 6. Preenchimento de Carrinhos 
         $clientes = User::where('tipo', 'cliente')->get();
         $livros = Livro::all();
 
+
+        // Para cada cliente, vamos criar um carrinho e adicionar livros aleatórios
+        // o each () e um método de coleção do Laravel que itera sobre cada item da coleção e executa a função fornecida
         $clientes->each(function ($cliente) use ($livros) {
             // Sorteamos quantos livros este cliente terá no carrinho (de 0 a 5)
             $quantidadeDeLivros = fake()->numberBetween(0, 5);
 
             if ($quantidadeDeLivros > 0) {
-                // Pegamos livros aleatórios para este cliente
+                // 1. Criamos UM carrinho para este cliente
+                $carrinho = Carrinho::factory()->create([
+                    'user_id' => $cliente->id,
+                ]);
+
+                // 2. Sorteamos os livros que entrarão NESSE carrinho
                 $livrosSorteados = $livros->random($quantidadeDeLivros);
 
-                $livrosSorteados->each(function ($livro) use ($cliente) {
-                    Carrinho::factory()->create([
-                        'user_id' => $cliente->id,
-                        'livro_id' => $livro->id,
-                        'quantidade' => fake()->numberBetween(1, 3), // Até 3 unidades de cada
+                // 3. Conectamos os livros ao carrinho (Tabela carrinho_livro)
+                $livrosSorteados->each(function ($livro) use ($carrinho) {
+                    // Usamos o método attach() para preencher a tabela intermediária
+                    $carrinho->livros()->attach($livro->id, [
+                        'quantidade' => fake()->numberBetween(1, 3),
                     ]);
                 });
             }
         });
+
+        // 7. Cartões Salvos (Etapa Separada) 
+        CartaoSalvo::factory(10)->create();
     }
 }

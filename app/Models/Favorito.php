@@ -14,4 +14,10 @@ class Favorito extends Model
         'user_id',
         'livro_id',
     ];
+
+    // um favorito pertence a um usuário
+    public function user()
+    {
+        return $this->belongsTo(User::class); // Relacionamento de um favorito para
+    }
 }

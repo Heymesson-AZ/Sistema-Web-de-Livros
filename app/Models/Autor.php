@@ -35,4 +35,10 @@ class Autor extends Model
     protected $casts = [
         'data_nascimento' => 'date',
     ];
+
+    // relacinamemto com livros, um autor tem muitos livros
+    public function livros()
+    {
+        return $this->hasMany(Livro::class);
+    }
 }

@@ -17,4 +17,10 @@ class Cupom extends Model
         'limite_uso',
         'validade_cupom',
     ];
+
+    // Relacionamento com a tabela de pedidos (opcional)
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class, 'cupom_id');
+    }
 }

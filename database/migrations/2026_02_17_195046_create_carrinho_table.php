@@ -15,13 +15,7 @@ return new class extends Migration
             $table->id();
             // Referência ao cliente (quem é o dono deste carrinho)
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            // Referência ao livro (o que está no carrinho)
-            $table->foreignId('livro_id')->constrained('livros')->onDelete('cascade');
-            // Quantidade desejada
-            $table->integer('quantidade')->default(1);
             $table->timestamps();
-
-            // Garante que o mesmo usuário não tenha duas linhas para o mesmo livro
             // Em vez disso, aumentamos a 'quantidade'
             $table->unique(['user_id', 'livro_id']);
         });

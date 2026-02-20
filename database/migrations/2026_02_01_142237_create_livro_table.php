@@ -25,6 +25,8 @@ return new class extends Migration
             $table->foreignId('autor_id')->constrained('autores')->onDelete('cascade');
             $table->foreignId('genero_id')->constrained('generos'); // Chave estrangeira referenciando o gênero do livro
             $table->foreignId('editora_id')->constrained('editoras'); // Chave estrangeira referenciando a editora do livro
+            // foreikey do vendedor
+            $table->foreignId('vendedor_id')->constrained('vendedores')->onDelete('cascade');
             $table->timestamps(); // Campos 'created_at' e 'updated_at'
             $table->softDeletes(); // Campo 'deleted_at' para soft deletes
         });

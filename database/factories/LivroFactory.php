@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Autor;
 use App\Models\Editora;
 use App\Models\Genero;
+use App\Models\Vendedor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LivroFactory extends Factory
@@ -25,6 +26,7 @@ class LivroFactory extends Factory
             'autor_id' => Autor::inRandomOrder()->first()?->id ?? Autor::factory(),
             'genero_id' => Genero::inRandomOrder()->first()?->id ?? Genero::factory(),
             'editora_id' => Editora::inRandomOrder()->first()?->id ?? Editora::factory(),
+            'vendedor_id' => Vendedor::inRandomOrder()->first()?->id ?? Vendedor::factory(),
         ];
     }
 }

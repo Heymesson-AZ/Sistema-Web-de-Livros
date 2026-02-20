@@ -55,8 +55,26 @@ class User extends Authenticatable
         ];
     }
 
-    // Dentro da classe User em app/Models/User.php
+    // Definição dos Perfis ( Verificar se o usuário é cliente, vendedor ou admin)
 
+    public function isCliente()
+    {
+        return $this->tipo === 'cliente';
+    }
+
+    public function isVendedor()
+    {
+        return $this->tipo === 'vendedor';
+    }
+
+    public function isAdmin()
+    {
+        return $this->tipo === 'admin';
+    }
+
+
+
+    /////////////////////////////////////////
     public function cliente()
     {
         // Um usuário possui um (hasOne) perfil de cliente
@@ -67,5 +85,41 @@ class User extends Authenticatable
     {
         // Um usuário possui um (hasOne) perfil de vendedor
         return $this->hasOne(Vendedor::class);
+    }
+
+    // um usuario pode ter varios pedidos
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class);
+    }
+
+    // um usuario pode er um carrinho
+    public function carrinho()
+    {
+        return $this->hasOne(Carrinho::class);
+    }
+
+    // um usuario pode ter varias avaliacoes
+    public function avaliacoes()
+    {
+        return $this->hasMany(Avaliacao::class);
+    }
+
+    // um usario pode ter varios favoritos
+    public function favoritos()
+    {
+        return $this->hasMany(Favorito::class);
+    }
+
+    // um usuario pode ter varios endereços
+    public function enderecos()
+    {
+        return $this->hasMany(Endereco::class);
+    }
+
+    // um usuario pode ter varios cartoes salvos
+    public function cartoesSalvos()
+    {
+        return $this->hasMany(CartaoSalvo::class);
     }
 }

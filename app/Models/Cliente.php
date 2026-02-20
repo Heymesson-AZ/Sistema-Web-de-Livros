@@ -15,4 +15,24 @@ class Cliente extends Model
         'data_nascimento',
         'cpf',
     ];
+
+
+    // o cliente pertence somente a um usuário
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // o cliente pode ter muitos pedidos
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class);
+    }
+
+    // o cliente pode ter muitas avaliações
+    public function avaliacoes()
+    {
+        return $this->hasMany(Avaliacao::class);
+    }
+
 }

@@ -34,9 +34,9 @@ class DatabaseSeeder extends Seeder
     {
         // 1. As Bases (Tabelas que não dependem de ninguém)
         //usando o caminho ja instaciado para criar os registros usando as factories
-        $autores = Autor::factory(10)->create();
-        $editoras = Editora::factory(5)->create();
-        $generos = Genero::factory(8)->create();
+        Autor::factory(10)->create();
+        Editora::factory(5)->create();
+        Genero::factory(8)->create();
         Cupom::factory(5)->create();
 
         // 2. Os Usuários e Perfis

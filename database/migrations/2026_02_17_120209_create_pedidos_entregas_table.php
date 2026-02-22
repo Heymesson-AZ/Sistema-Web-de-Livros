@@ -13,26 +13,28 @@ return new class extends Migration
     {
         Schema::create('pedido_entregas', function (Blueprint $table) {
             $table->id();
-            // foreign key para pedidos
             $table->foreignId('pedido_id')->constrained('pedidos')->onDelete('cascade');
-            //status da entrega
+
+            // --- DADOS DO ENDEREÇO (Snapshot para Segurança) ---
+            $table->string('rua');
+            $table->string('bairro');
+            $table->string('cidade');
+            $table->char('estado', 2);
+            $table->string('cep');
+            $table->string('pais');
+            $table->string('complemento')->nullable();
+
+            // --- DADOS LOGÍSTICOS  ---
             $table->enum('status', ['pendente', 'em_transito', 'entregue', 'cancelada'])->default('pendente');
-            // codigo de rastreamento
             $table->string('codigo_rastreamento')->nullable();
-            // url da nota fiscal
             $table->string('url_nota_fiscal')->nullable();
-            // data de previsao de entrega
             $table->date('data_previsao_entrega')->nullable();
-            // data de entrega (quando for entregue)
             $table->date('data_entrega')->nullable();
-            // nome do recebedor
             $table->string('nome_recebedor')->nullable();
-            // cpf do recebedor
             $table->string('cpf_recebedor')->nullable();
-            // valor do frete
             $table->decimal('valor_frete', 8, 2)->nullable();
-            // metodo de envio
             $table->enum('metodo_envio', ['correios', 'transportadora'])->default('correios');
+
             $table->timestamps();
         });
     }

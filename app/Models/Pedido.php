@@ -17,8 +17,10 @@ class Pedido extends Model
         'status',
         'total',
         'data_pedido',
-        'user_id',
+        'vendedor_id',
         'cupom_id',
+        'cliente_id',
+
     ];
 
     /**
@@ -30,39 +32,43 @@ class Pedido extends Model
     ];
 
 
-    // um pedido pedido pertence a um usuário
-    public function user()
+    // um pedido pertence a um vendedor
+    public function vendedor()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Vendedor::class);
+    }
+
+    // um pedido pedido pertence a um cliente
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 
     // um livro pode estar um muitos pedidos, e um pedido pode ter muitos livros
-    public function livros()
-    {   
-        return $this->belongsToMany(Livro::class, 'pedido_livro', 'pedido_id', 'livro_id')
-                    ->withPivot('quantidade', 'preco_unitario'); 
-                    // se quiser acessar a quantidade e preço unitário
+    public function itens()
+    {
+        return $this->hasMany(PedidoItem::class);
     }
-    
+
     // um pedido pode ter somente um cupom
     public function cupom()
     {
         return $this->belongsTo(Cupom::class);
     }
 
-    // um peido pode ter pelo menos um pagamento
+    // um pedido pode ter pelo menos um pagamento
     public function pagamentos()
     {
         return $this->hasMany(Pagamento::class);
     }
 
-    // um pedido pode ter um endereço de entrega
-    public function enderecoEntrega()
+    public function entrega()
     {
+        // O Pedido "tem uma" entrega
         return $this->hasOne(PedidoEntrega::class);
     }
 
-    // 
+    // um pedido pode ter uma avalação
     public function avaliacao()
     {
         return $this->hasOne(Avaliacao::class);

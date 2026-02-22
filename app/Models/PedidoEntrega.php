@@ -22,6 +22,13 @@ class PedidoEntrega extends Model
         'cpf_recebedor',
         'valor_frete',
         'metodo_envio',
+        'rua',
+        'bairro',
+        'cidade',
+        'estado',
+        'cep',
+        'pais',
+        'complemento',
     ];
 
 
@@ -30,4 +37,11 @@ class PedidoEntrega extends Model
         'data_previsao_entrega' => 'date',
         'data_entrega' => 'date',
     ];
+
+    public function pedido()
+    {
+        // A Entrega "pertence a" um pedido
+        return $this->belongsTo(Pedido::class);
+    }
+ 
 }

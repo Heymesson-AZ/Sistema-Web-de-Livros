@@ -38,4 +38,9 @@ class Vendedor extends Model
         return $this->hasMany(Avaliacao::class);
     }
 
+    // um vendedor pode ter muitos pedidos
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class);
+    }
 }

@@ -23,8 +23,10 @@ return new class extends Migration
             $table->decimal('total', 10, 2);
             // data do pedido
             $table->dateTime('data_pedido');
-            // referencia ao usuario que fez o pedido
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            // referencia ao vendedor que processou o pedido
+            $table->foreignId('vendedor_id')->constrained('vendedores')->onDelete('cascade');
+            // referencia ao cliente que fez o pedido
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
             // referencia ao cupom utilizado no pedido, se houver
             $table->foreignId('cupom_id')->nullable()->constrained('cupons')->onDelete('set null');
         });

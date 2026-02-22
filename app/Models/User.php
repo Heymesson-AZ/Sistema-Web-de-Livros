@@ -87,12 +87,6 @@ class User extends Authenticatable
         return $this->hasOne(Vendedor::class);
     }
 
-    // um usuario pode ter varios pedidos
-    public function pedidos()
-    {
-        return $this->hasMany(Pedido::class);
-    }
-
     // um usuario pode er um carrinho
     public function carrinho()
     {

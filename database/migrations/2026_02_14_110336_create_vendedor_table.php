@@ -29,6 +29,8 @@ return new class extends Migration
                 $table->enum('status_aprovacao', ['pendente', 'aprovado', 'rejeitado'])->default('pendente');
                 // o timestamp de criação e atualização do vendedor
                 $table->timestamps();
+                // soft deletes para o vendedor
+                $table->softDeletes();
             });
         }
 

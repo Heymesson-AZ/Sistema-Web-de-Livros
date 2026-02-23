@@ -32,6 +32,8 @@ return new class extends Migration
             $table->rememberToken();
             // Os campos 'created_at' e 'updated_at' são timestamps que registram quando o usuário foi criado e atualizado
             $table->timestamps();
+            // O campo 'deleted_at' é usado para soft deletes, permitindo que os usuários sejam "excluídos" sem serem removidos do banco de dados
+            $table->softDeletes();
         });
         
         // Tabela para armazenar tokens de redefinição de senha

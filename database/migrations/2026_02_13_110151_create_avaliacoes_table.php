@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('avaliacoes', function (Blueprint $table) {
+
             $table->id();
             // chave estrangeira do vendedor
             $table->foreignId('vendedor_id')->constrained('vendedores')->onDelete('cascade');
@@ -29,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-    
+
     /**
      * Reverse the migrations.
      */

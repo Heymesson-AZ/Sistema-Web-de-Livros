@@ -18,7 +18,8 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        // 1. Regras que SEMPRE existem (para todos)
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
@@ -26,8 +27,21 @@ class ProfileUpdateRequest extends FormRequest
                 'lowercase',
                 'email',
                 'max:255',
+                // A regra de unicidade IGNORA o email do usuário atual, permitindo que ele mantenha seu email sem erro
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
         ];
+
+        // 2. Adicionando regras específicas baseadas no tipo
+        if ($this->user()->isVendedor()) {
+            $rules['telefone'] = ['required', 'string', 'max:20'];
+            $rules['razao_social'] = ['required', 'string', 'max:255'];
+            $rules['nome_fantasia'] = ['required', 'string', 'max:255'];
+            $rules['inscricao_estadual'] = ['nullable', 'string', 'max:50'];
+        } elseif ($this->user()->isCliente()) {
+            $rules['telefone'] = ['required', 'string', 'max:20'];
+            // Note que NÃO incluímos o CPF aqui para ele não ser alterado!
+        }
+        return $rules;
     }
 }

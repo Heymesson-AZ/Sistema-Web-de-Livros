@@ -23,6 +23,8 @@ return new class extends Migration
                 $table->date('data_nascimento');
                 // o timestamp de criação e atualização do cliente
                 $table->timestamps();
+                // soft deletes para o cliente
+                $table->softDeletes();
             });
         }
 

@@ -37,29 +37,33 @@ class RegisteredUserController extends Controller
     // validar os dados, criar um novo usuário, disparar o evento Registered e autenticar o usuário recém-criado. 
     //Após o registro bem-sucedido, o usuário é redirecion
     public function store(Request $request): RedirectResponse
-    {   
-        // Valida os dados do formulário de registro usando as regras de validação definidas para o
-        // nome, email e senha do usuário
+    {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'cpf' => ['required', 'string', 'unique:clientes,cpf'],
+            'telefone' => ['required', 'string'],
+            'data_nascimento' => ['required', 'date'],
         ]);
-        
-        // Cria um novo usuário com os dados validados e criptografa a senha usando Hash::make()
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        // Dispara o evento Registered para o novo usuário criado, 
-        // o que pode ser usado para enviar um email de verificação ou 
-        // realizar outras ações relacionadas ao registro do usuário
+
+        // Agora criamos o cliente ligado a esse usuário
+        $user->cliente()->create([
+            'cpf' => $request->cpf,
+            'telefone' => $request->telefone,
+            'data_nascimento' => $request->data_nascimento,
+        ]);
+
         event(new Registered($user));
 
-        // Autentica o usuário recém-criado usando Auth::login() e redireciona para a rota 'dashboard'
         Auth::login($user);
-        // Redireciona o usuário para a rota 'dashboard' após o registro bem-sucedido
+
         return redirect(route('dashboard', absolute: false));
     }
 }

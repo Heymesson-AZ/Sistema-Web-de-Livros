@@ -7,16 +7,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Cliente;
 use App\Models\Vendedor;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 // definição da classe User que estende Authenticatable
 // o Authenticatable fornece funcionalidades de autenticação para o modelo User(usuário)
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
+
     // os Traits HAsFactory e Notifiable são usados para adicionar funcionalidades ao modelo User.
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * Os atributos que são atribuíveis em massa.
@@ -72,8 +75,6 @@ class User extends Authenticatable
         return $this->tipo === 'admin';
     }
 
-
-
     /////////////////////////////////////////
     public function cliente()
     {
@@ -115,5 +116,28 @@ class User extends Authenticatable
     public function cartoesSalvos()
     {
         return $this->hasMany(CartaoSalvo::class);
+    }
+
+
+    public function temPedidosAtivos(): bool
+    {
+        // Definimos quais status bloqueiam a exclusão
+        $statusAtivos = ['pendente', 'processando', 'enviado'];
+
+        if ($this->tipo === 'cliente') {
+            // Verifica se o cliente tem algum pedido nesses status
+            return $this->cliente->pedidos()
+                ->whereIn('status', $statusAtivos)
+                ->exists();
+        }
+
+        if ($this->tipo === 'vendedor') {
+            // Verifica se o vendedor tem algum pedido nesses status
+            return $this->vendedor->pedidos()
+                ->whereIn('status', $statusAtivos)
+                ->exists();
+        }
+
+        return false;
     }
 }

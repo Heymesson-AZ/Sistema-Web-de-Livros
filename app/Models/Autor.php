@@ -17,7 +17,6 @@ class Autor extends Model
 
     /**
      * Atributos que podem ser preenchidos em massa (Mass Assignment).
-     * Isso é essencial para que a Factory e o método Autor::create() funcionem.
      */
     protected $fillable = [
         'nome',

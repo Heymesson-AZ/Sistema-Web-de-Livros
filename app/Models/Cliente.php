@@ -17,8 +17,7 @@ class Cliente extends Model
         'data_nascimento',
         'cpf',
     ];
-
-
+    
     // o cliente pertence somente a um usuário
     public function user()
     {

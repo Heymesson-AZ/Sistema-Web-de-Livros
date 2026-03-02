@@ -12,13 +12,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-
+use Carbon\Carbon;
 
 /// Controlador responsável por lidar com o registro de novos usuários, 
 //  incluindo a exibição do formulário de registro e a 
 //criação de um novo usuário após a validação dos dados do formulário.
 class RegisteredUserController extends Controller
 {
+
+
     /**
      * formulário de registro.
      */
@@ -38,13 +40,20 @@ class RegisteredUserController extends Controller
     //Após o registro bem-sucedido, o usuário é redirecion
     public function store(Request $request): RedirectResponse
     {
+
+        $datalimite = Carbon::now()->subYears(18)->format('Y-m-d');
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'cpf' => ['required', 'string', 'unique:clientes,cpf'],
             'telefone' => ['required', 'string'],
-            'data_nascimento' => ['required', 'date'],
+            'data_nascimento' => ['required', 'date', 'before_or_equal:' . $datalimite],
+        ], [ 
+            'data_nascimento.before_or_equal' => 'Você precisa ter pelo menos 18 anos para se cadastrar.',
+            'cpf.unique' => 'Esse CPF já está cadastrado.',
+            'email.unique' => 'O email informado já está em uso.',
         ]);
 
         $user = User::create([
@@ -60,6 +69,7 @@ class RegisteredUserController extends Controller
             'data_nascimento' => $request->data_nascimento,
         ]);
 
+        // Disparar o evento Registered
         event(new Registered($user));
 
         Auth::login($user);

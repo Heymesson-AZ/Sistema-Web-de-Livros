@@ -1,7 +1,6 @@
-import './bootstrap';
+import './bootstrap'; // Importações padrão do Laravel
 
-import Alpine from 'alpinejs';
+import $ from 'jquery'; // 1. Trazemos o jQuery para dentro do maestro
+window.$ = window.jQuery = $; // 2. Tornamos o '$' famoso globalmente
 
-window.Alpine = Alpine;
-
-Alpine.start();
+import './menu'; // 3. AGORA o menu.js pode ser carregado

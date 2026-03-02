@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->admin()->create([
             'name' => 'Admin Teste',
             'email' => 'admin@teste.com',
+            'password' => bcrypt('12345678'), // Senha: password
         ]);
 
         // 3. ENDEREÇOS (Importante: Criar ANTES dos pedidos para o snapshot funcionar)

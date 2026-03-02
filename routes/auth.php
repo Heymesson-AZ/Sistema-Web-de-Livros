@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 // Rotas de autenticação para usuários convidados (guest)
 Route::middleware('guest')->group(function () {
-    // Rotas para registro, login e recuperação de senha
 
     // Rota para exibir o formulário de registro
     Route::get('register', [RegisteredUserController::class, 'create'])

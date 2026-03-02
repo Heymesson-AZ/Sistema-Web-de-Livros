@@ -5,14 +5,14 @@ use Illuminate\Support\Facades\Route;
 
 // Rotas publica(Todo mundo pode acessar)
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.inicio');
 });
 
 // rota para o dashboard, acessível apenas para usuários autenticados e verificados. 
 // Ele retorna a view 'dashboard' quando acessado.
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified'])->name('pages.dashboard');
 
 
 // Rotas para o perfil de Cliente

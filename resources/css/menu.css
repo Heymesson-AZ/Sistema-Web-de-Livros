@@ -1,98 +1,265 @@
-		body,
-		html {
-		    margin: 0;
-		    padding: 0;
-		    width: 100%;
-		    height: 100%;
-		    background-color: #26394E;
-		}
+/* ==================================================
+   FUNDO E BASE
+================================================== */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f4f8;
+}
 
-		#menu {
-		    height: 100%;
-		    position: fixed;
-		    background-color: #FED057;
-		    width: 300px;
-		    transition: 1000ms all cubic-bezier(0.19, 1, 0.22, 1);
-		    transform: translateX(-100%);
-		    left: 60px;
-		}
+/* ==================================================
+   MENU LATERAL
+================================================== */
+#menu {
+    position: fixed;
+    top: 60px; /* começa abaixo da navbar */
+    left: 60px;
+    width: 300px;
+    height: calc(100vh - 60px); /* ocupa só abaixo da navbar */
+    background-color: #243b53;
+    transform: translateX(-100%);
+    transition: 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    z-index: 999; /* abaixo da navbar */
+}
 
-		#menu.expanded {
-		    transform: translateX(0%);
-		    left: 0px;
-		}
+#menu.expanded {
+    transform: translateX(0);
+    left: 0;
+}
 
-		.menu-inner {
-		    width: 100%;
-		    height: 100%;
-		    position: relative;
-		}
+/* ==================================================
+   CONTAINER INTERNO
+================================================== */
+.menu-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 20px 20px;
+    box-sizing: border-box;
+}
 
-		#blob {
-		    top: 0;
-		    z-index: -1;
-		    right: 60px;
-		    transform: translateX(100%);
-		    height: 100%;
-		    position: absolute;
-		}
+/* ==================================================
+   EFEITO BLOB
+================================================== */
+#blob {
+    position: absolute;
+    top: 0;
+    right: 60px;
+    height: 100%;
+    transform: translateX(100%);
+    z-index: -1;
+}
 
-		#blob-path {
-		    height: 100%;
-		    fill: #FED057;
-		}
+#blob-path {
+    height: 100%;
+    fill: #243b53;
+}
 
-		.hamburger {
-		    right: 20px;
-		    position: absolute;
-		    width: 20px;
-		    height: 20px;
-		    margin-top: -10px;
-		}
+/* ==================================================
+   BOTÃO HAMBÚRGUER
+================================================== */
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    height: 40px;
+    
+}
 
-		.hamburger .line {
-		    width: 100%;
-		    height: 4px;
-		    background-color: #fff;
-		    position: absolute;
-		}
 
-		.hamburger .line:nth-child(2) {
-		    top: 50%;
-		    margin-top: -2px;
-		}
+.hamburger .line {
+    width: 25px;
+    height: 3px;
+    background-color: #bcccdc;
+}
 
-		.hamburger .line:nth-child(3) {
-		    bottom: 0;
-		}
+#menu.expanded .hamburger-label {
+    display: none;
+}
 
-		h1 {
-		    position: fixed;
-		    right: 0;
-		    margin: 0;
-		}
+nav {
+    height: 60px;
+}
 
-		ul {
-		    padding: 0;
-		    list-style: none;
-		    width: 80%;
-		    margin-left: 10%;
-		    position: absolute;
-		    top: 10px;
-		}
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+/* ==================================================
+   BUSCA
+================================================== */
+.search-box {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #334e68;
+    border-radius: 8px;
+    padding: 6px 12px;
+    transition: 0.3s ease;
+}
 
-		ul li {
-		    color: #fff;
-		    font-family: sans-serif;
-		    padding: 20px 0;
-		}
+.search-box:focus-within {
+    border-color: #bcccdc;
+    background: rgba(255, 255, 255, 0.15);
+}
 
-		h2 {
-		    position: absolute;
-		    left: 50%;
-		    color: #fff;
-		    margin: 0;
-		    font-size: 16px;
-		    font-family: sans-serif;
-		    font-weight: 100;
-		}
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    appearance: none;
+    color: #f0f4f8;
+    width: 100%;
+    margin-left: 10px;
+    padding: 0;
+}
+
+.nav-search {
+    width: 300px;
+}
+
+/* ==================================================
+   LISTA PRINCIPAL
+================================================== */
+.menu-inner ul {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin: 20px 0;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+}
+
+.menu-inner ul > li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #f0f4f8;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    transition: 0.3s ease;
+
+    /* Animação inicial */
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.menu-inner ul > li:hover {
+    background-color: #334e68;
+}
+
+.menu-inner ul > li span {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* ==================================================
+   ANIMAÇÃO CASCATA
+================================================== */
+#menu.expanded .menu-inner ul > li {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#menu.expanded .menu-inner ul > li:nth-child(1) {
+    transition-delay: 0.1s;
+}
+#menu.expanded .menu-inner ul > li:nth-child(2) {
+    transition-delay: 0.2s;
+}
+#menu.expanded .menu-inner ul > li:nth-child(3) {
+    transition-delay: 0.3s;
+}
+#menu.expanded .menu-inner ul > li:nth-child(4) {
+    transition-delay: 0.4s;
+}
+#menu.expanded .menu-inner ul > li:nth-child(5) {
+    transition-delay: 0.5s;
+}
+#menu.expanded .menu-inner ul > li:nth-child(6) {
+    transition-delay: 0.6s;
+}
+#menu.expanded .menu-inner ul > li:nth-child(7) {
+    transition-delay: 0.7s;
+}
+
+/* ==================================================
+   SUBMENUS
+================================================== */
+.menu-inner ul li ul {
+    display: none;
+    margin-top: 5px;
+    padding-left: 35px;
+    color: #9fb3c8;
+    opacity: 0.8;
+    transition: 0.3s ease;
+}
+
+.menu-inner ul li ul li {
+    padding: 8px 0;
+    font-size: 14px;
+    color: #9fb3c8;
+}
+
+.menu-inner ul li ul li:hover {
+    color: #f0f4f8;
+    opacity: 1;
+}
+
+.menu-inner ul li.open > ul {
+    display: block;
+}
+
+/* ==================================================
+   ÍCONES
+================================================== */
+[data-lucide] {
+    width: 20px;
+    height: 20px;
+    stroke: #bcccdc;
+}
+
+/* ==================================================
+   RODAPÉ
+================================================== */
+.menu-footer {
+    padding: 30px 0;
+    border-top: 1px solid rgba(159, 179, 200, 0.2);
+    text-align: center;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+.social-icons i {
+    width: 30px;
+    height: 30px;
+    stroke: #9fb3c8;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.social-icons i:hover {
+    stroke: #f0f4f8;
+}
+
+.menu-footer p {
+    font-size: 20px;
+    color: #627d98;
+}

@@ -100,7 +100,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Avaliacao::class);
     }
 
-    // um usario pode ter varios favoritos
+    // um usuario pode ter varios favoritos
     public function favoritos()
     {
         return $this->hasMany(Favorito::class);

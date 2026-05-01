@@ -18,7 +18,6 @@
             @else
             <p class="text-red-500">❌ Erro: O registro na tabela 'clientes' não foi criado.</p>
             @endif
-
         </div>
     </div>
 </div>

@@ -1,4 +1,5 @@
 @import './menu.css';
+@import './login.css';
 
 @tailwind base;
 @tailwind components;

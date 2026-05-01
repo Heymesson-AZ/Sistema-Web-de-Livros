@@ -8,24 +8,24 @@ Route::get('/', function () {
     return view('pages.inicio');
 });
 
-// rota para o dashboard, acessível apenas para usuários autenticados e verificados. 
+// rota para o dashboard, acessível apenas para usuários autenticados e verificados.
 // Ele retorna a view 'dashboard' quando acessado.
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('pages.dashboard');
+    return view('pages.dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 
 // Rotas para o perfil de Cliente
 
 // quando passamos mais de um middleware, o Laravel irá aplicar todos eles na ordem em que foram definidos.
 // Neste caso, as rotas dentro deste grupo só serão acessíveis para usuários que estão autenticados (auth) e que têm o tipo 'cliente'
-// estou usando o middleware 'checkTipo' para verificar se o usuário autenticado tem o tipo 'cliente'. 
+// estou usando o middleware 'checkTipo' para verificar se o usuário autenticado tem o tipo 'cliente'.
 Route::middleware(['auth', 'checkTipo:cliente'])->group(function () {
     Route::prefix('cliente')->group(function () {
         //rota para o perfil do cliente, onde ele pode ver, editar suas informações, atualizar e deletar sua conta
         Route::get('/perfil-cliente', [PerfilController::class, 'edit'])->name('cliente.perfil.editar'); // Rota para exibir o formulário de edição do perfil do cliente
         Route::patch('/perfil-cliente', [PerfilController::class, 'update'])->name('cliente.perfil.atualizar'); // Rota para processar a atualização do perfil do cliente
-        Route::delete('/perfil-cliente', [PerfilController::class, 'destroy'])->name('cliente.perfil.deletar'); // Rota para processar a exclusão da conta do cliente   
+        Route::delete('/perfil-cliente', [PerfilController::class, 'destroy'])->name('cliente.perfil.deletar'); // Rota para processar a exclusão da conta do cliente
     });
 });
 

@@ -22,7 +22,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * 
+     *
      * Obter as regras de validação que se aplicam à solicitação.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -42,8 +42,9 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): void
     {
+        // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo feita com muita frequência, o que pode indicar uma tentativa de ataque de força bruta. Se a solicitação exceder o limite de taxa, lançamos uma exceção de validação.
         $this->ensureIsNotRateLimited();
-
+        // Tentamos autenticar o usuário usando as credenciais fornecidas (email e senha). Se a autenticação falhar, registramos a tentativa de login para o limite de taxa e lançamos uma exceção de validação indicando que as credenciais são inválidas.
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 

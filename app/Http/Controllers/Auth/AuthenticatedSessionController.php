@@ -22,10 +22,10 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     *  Nessa função, autenticamos o usuário usando os dados fornecidos 
+     *  Nessa função, autenticamos o usuário usando os dados fornecidos
      * na solicitação de login.
      */
-    
+
     public function store(LoginRequest $request): RedirectResponse
     {
         // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo
@@ -35,13 +35,13 @@ class AuthenticatedSessionController extends Controller
         // Redirecionamos o usuário para a página pretendida ou para a rota 'dashboard' após o login bem-sucedido.
         return redirect()->intended(route('dashboard', absolute: false));
     }
-
+    
     /**
      * Aqui, encerramos a sessão do usuário.
      */
 
     public function destroy(Request $request): RedirectResponse
-    {   
+    {
         // Usamos o guard 'web' para garantir que estamos encerrando a sessão do usuário autenticado.
         Auth::guard('web')->logout();
         // Invalidamos a sessão atual para garantir que os dados da sessão sejam limpos.

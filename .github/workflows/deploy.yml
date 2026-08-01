@@ -1,0 +1,41 @@
+name: Deploy na Produção
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Executar deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/apps/Sistema-Web-de-Livros
+            
+            # Coloca a aplicação em modo de manutenção
+            php artisan down --retry=60
+            
+            # Puxa o código atualizado do GitHub
+            git pull origin main
+            
+            # Instala dependências do Composer sem pacotes dev
+            composer install --no-dev --optimize-autoloader --no-interaction
+            
+            # Executa as migrations de forma forçada
+            php artisan migrate --force
+            
+            # Otimiza os caches do Laravel
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            
+            # Tira a aplicação do modo de manutenção
+            php artisan up

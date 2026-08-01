@@ -1,4 +1,4 @@
-name: Implantar na Produção
+name: Implantar na Produção (Docker)
 
 on:
   push:
@@ -22,17 +22,15 @@ jobs:
           port: 22
           script: |
             cd /home/ubuntu/apps/Sistema-Web-de-Livros
-
-            # 1. Atualiza o código primeiro
+            
+            # 1. Baixar as novidades do Git
             git pull origin main
-
-            # 2. Instala dependências ignorando a checagem rigorosa de versão do PHP
-            composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
-
-            # 3. Executa as tarefas do Laravel
-            php artisan down --retry=60 || true
-            php artisan migrate --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan up
+            
+            # 2. Reconstruir e subir o container Docker
+            docker compose up -d --build
+            
+            # 3. Executar as migrações e otimizações dentro do container em execução
+            docker compose exec -T app php artisan migrate --force
+            docker compose exec -T app php artisan config:cache
+            docker compose exec -T app php artisan route:cache
+            docker compose exec -T app php artisan view:cache

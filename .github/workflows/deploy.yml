@@ -22,9 +22,15 @@ jobs:
           port: 22
           script: |
             cd /home/ubuntu/apps/Sistema-Web-de-Livros
-            php artisan down --retry=60
+
+            # 1. Atualiza o código primeiro
             git pull origin main
-            composer install --no-dev --optimize-autoloader --no-interaction
+
+            # 2. Instala dependências ignorando a checagem rigorosa de versão do PHP
+            composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
+
+            # 3. Executa as tarefas do Laravel
+            php artisan down --retry=60 || true
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache

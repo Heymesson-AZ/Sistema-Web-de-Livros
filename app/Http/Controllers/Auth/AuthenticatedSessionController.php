@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo
+        // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo feita com muitas tentativas de login em um curto período de tempo (throttling).    
         $request->authenticate();
         // Se a autenticação for bem-sucedida, limpamos as tentativas de login para o usuário.
         $request->session()->regenerate();
@@ -49,6 +49,6 @@ class AuthenticatedSessionController extends Controller
         // Regeneramos o token CSRF para proteger contra ataques de falsificação de solicitação entre sites (CSRF).
         $request->session()->regenerateToken();
         // Redirecionamos o usuário para a página inicial após o logout.
-        return redirect('/');
+        return redirect('/inicio');
     }
 }

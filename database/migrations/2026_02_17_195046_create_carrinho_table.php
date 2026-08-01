@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('carrinhos', function (Blueprint $table) {
             $table->id();
-            // Referência ao cliente (quem é o dono deste carrinho)
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('livro_id')->constrained('livros')->onDelete('cascade');
+
+            // Cada usuário tem 1 carrinho (cabeçalho)
+            $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
+
             $table->timestamps();
-            // Em vez disso, aumentamos a 'quantidade'
-            $table->unique(['user_id', 'livro_id']);
         });
     }
 

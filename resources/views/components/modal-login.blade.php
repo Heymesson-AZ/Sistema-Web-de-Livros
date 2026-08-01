@@ -23,7 +23,7 @@
 
                         <!-- Status da Sessão (Ex: Senha redefinida) -->
                         @if (session('status'))
-                            <div class="alert alert-success py-2 small">{{ session('status') }}</div>
+                        <div class="alert alert-success py-2 small">{{ session('status') }}</div>
                         @endif
 
                         <form method="POST" action="{{ route('login') }}">
@@ -36,19 +36,24 @@
                                     class="form-control @error('email') is-invalid @enderror"
                                     value="{{ old('email') }}" placeholder="Digite seu e-mail" required autofocus>
                                 @error('email')
-                                    <div class="invalid-feedback small">{{ $message }}</div>
+                                <div class="invalid-feedback small">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <!-- Senha -->
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-secondary">Senha</label>
-                                <input type="password" name="password"
-                                    class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="Digite sua senha" required>
-                                @error('password')
+                                <div class="input-group">
+                                    <input type="password" name="password" id="password"
+                                        class="form-control @error('password') is-invalid @enderror"
+                                        placeholder="Digite sua senha" required>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                    @error('password')
                                     <div class="invalid-feedback small">{{ $message }}</div>
-                                @enderror
+                                    @enderror
+                                </div>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="form-check">

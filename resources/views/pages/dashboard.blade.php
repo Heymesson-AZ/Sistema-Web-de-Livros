@@ -2,21 +2,24 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
 
-            <h2 class="font-bold text-xl text-green-600">✅ Cadastro e Login realizados com sucesso!</h2>
-            <p class="mt-4">Bem-vindo, <strong>{{ Auth::user()->name }}</strong> (Tipo: {{ Auth::user()->tipo }})</p>
+            <h2 class="font-bold text-xl text-green-600">Login realizado com sucesso!</h2>
+            <p class="mt-4">Seja Bem-vindo ao nosso sistema!</p>
 
-            <hr class="my-4">
+            <!-- Dados do Usuário logado -->
+            <p class="text-gray-600">Você está logado como: {{ Auth::user()->name }}</p>
+            <p class="text-gray-600">Email: {{ Auth::user()->email }}</p>
+            <p class="text-gray-600">Tipo: {{ Auth::user()->tipo }}</p>
+            <p class="text-gray-600">Status: {{ Auth::user()->status }}</p>
 
-            <h3 class="font-semibold text-lg">🔍 Verificação de Dados do Perfil:</h3>
+            @if(Auth::user()->tipo === 'cliente')
+            <p class="text-gray-600">Celular de Contato: {{ Auth::user()->cliente?->celular_contato ?? 'Não informado' }}</p>
 
-            @if(Auth::user()->cliente)
-            <ul class="mt-2">
-                <li><strong>CPF:</strong> {{ Auth::user()->cliente->cpf }}</li>
-                <li><strong>Telefone:</strong> {{ Auth::user()->cliente->telefone }}</li>
-                <li><strong>Data de Nasc.:</strong> {{ Auth::user()->cliente->data_nascimento }}</li>
-            </ul>
-            @else
-            <p class="text-red-500">❌ Erro: O registro na tabela 'clientes' não foi criado.</p>
+            @elseif(Auth::user()->tipo === 'vendedor')
+            <p class="text-gray-600">WhatsApp Comercial: {{ Auth::user()->vendedor?->whatsapp_comercial ?? 'Não informado' }}</p>
+
+            @elseif(Auth::user()->tipo === 'admin')
+            <p class="text-gray-600">Telefone de Urgência: {{ Auth::user()->admin?->telefone_urgencia ?? 'Não informado' }}</p>
+            <p class="text-gray-600">Cargo: {{ Auth::user()->admin?->cargo }}</p>
             @endif
         </div>
     </div>

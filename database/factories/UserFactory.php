@@ -28,10 +28,9 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-
             'tipo' => fake()->randomElement(['cliente', 'vendedor', 'admin']),
             'status' => fake()->randomElement(['ativo', 'inativo', 'banido']),
-
+            // remember_token é um token aleatório usado para lembrar o usuário em sessões futuras.
             'remember_token' => Str::random(10),
         ];
     }

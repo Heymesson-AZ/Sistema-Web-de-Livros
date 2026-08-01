@@ -10,7 +10,7 @@ return new class extends Migration
      * Criando as tabelas de usuários, tokens de redefinição de senha e sessões.
      */
     public function up(): void
-    {   
+    {
         // Tabela para armazenar os usuários
         Schema::create('users', function (Blueprint $table) {
             // Campos básicos de um usuário
@@ -18,6 +18,8 @@ return new class extends Migration
             $table->id();
             // O campo 'name' armazena o nome do usuário
             $table->string('name');
+            // NOVO CAMPO: Caminho da foto de perfil (opcional)
+            $table->string('foto_perfil')->nullable();
             // O campo 'email' armazena o email do usuário e deve ser único
             $table->string('email')->unique();
             // O campo 'email_verified_at' armazena a data e hora da verificação do email, pode ser nulo
@@ -35,7 +37,7 @@ return new class extends Migration
             // O campo 'deleted_at' é usado para soft deletes, permitindo que os usuários sejam "excluídos" sem serem removidos do banco de dados
             $table->softDeletes();
         });
-        
+
         // Tabela para armazenar tokens de redefinição de senha
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             // O campo 'email' é a chave primária e armazena o email do usuário para quem o token foi gerado

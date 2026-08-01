@@ -10,7 +10,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Cliente;
 use App\Models\Vendedor;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 // definição da classe User que estende Authenticatable
 // o Authenticatable fornece funcionalidades de autenticação para o modelo User(usuário)
@@ -32,6 +34,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'tipo',
+        'foto_perfil'
     ];
 
     /**
@@ -60,6 +63,20 @@ class User extends Authenticatable implements MustVerifyEmail
 
     // Definição dos Perfis ( Verificar se o usuário é cliente, vendedor ou admin)
 
+
+    /**
+     * Retorna a URL da foto de perfil ou um avatar padrão.
+     */
+    public function getFotoAttribute(): string
+    {
+        if ($this->foto_perfil) {
+            return asset('storage/' . $this->foto_perfil);
+        }
+
+        // Retorna um avatar gerado automaticamente com as iniciais do nome do usuário
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
+
     public function isCliente()
     {
         return $this->tipo === 'cliente';
@@ -68,6 +85,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isVendedor()
     {
         return $this->tipo === 'vendedor';
+    }
+
+
+    public function admin(): HasOne
+    {
+        return $this->hasOne(Admin::class);
     }
 
     public function isAdmin()

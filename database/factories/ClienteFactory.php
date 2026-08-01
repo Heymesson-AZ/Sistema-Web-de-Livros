@@ -25,7 +25,7 @@ class ClienteFactory extends Factory
                 ->first()?->id ?? User::factory()->cliente(),
 
             'cpf' => fake()->unique()->cpf(), // O Faker Laravel tem suporte a formatos PT-BR
-            'telefone' => fake()->phoneNumber(),
+            'celular_contato' => fake()->phoneNumber(),
             'data_nascimento' => fake()->date('Y-m-d', '-18 years'), // Clientes maiores de 18
         ];
     }

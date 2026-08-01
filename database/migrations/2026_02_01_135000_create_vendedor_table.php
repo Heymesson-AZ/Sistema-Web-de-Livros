@@ -18,7 +18,7 @@ return new class extends Migration
                 // cnpj do vendedor
                 $table->string('cnpj')->unique();
                 // telefone do vendedor
-                $table->string('telefone');
+                $table->string('telefone_comercial')->nullable();
                 // razao social do vendedor
                 $table->string('razao_social');
                 // nome fantasia do vendedor

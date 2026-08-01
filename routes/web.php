@@ -38,4 +38,14 @@ Route::middleware(['auth', 'checkTipo:vendedor'])->group(function () {
     });
 });
 
+
+// Rotas para o perfil de Admin
+Route::middleware(['auth', 'checkTipo:admin'])->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::get('/perfil-admin', [PerfilController::class, 'edit'])->name('admin.perfil.editar'); // Rota para exibir o formulário de edição do perfil do admin
+        Route::patch('/perfil-admin', [PerfilController::class, 'update'])->name('admin.perfil.atualizar'); // Rota para processar a atualização do perfil do admin
+        Route::delete('/perfil-admin', [PerfilController::class, 'destroy'])->name('admin.perfil.deletar'); // Rota para processar a exclusão da conta do admin
+    });
+});
+
 require __DIR__ . '/auth.php';

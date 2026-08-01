@@ -18,7 +18,7 @@ return new class extends Migration
                 // cpf do cliente
                 $table->string('cpf')->unique();
                 // telefone do cliente
-                $table->string('telefone');
+                $table->string('celular_contato')->nullable();
                 // data de nascimento do cliente
                 $table->date('data_nascimento');
                 // o timestamp de criação e atualização do cliente

@@ -19,6 +19,7 @@ use App\Models\Endereco;
 use App\Models\Carrinho;
 use App\Models\Livro;
 use App\Models\CartaoSalvo;
+use App\Models\Admin;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
@@ -38,13 +39,28 @@ class DatabaseSeeder extends Seeder
         // Criamos os perfis (que por sua vez criam os Users vinculados via Factory)
         Cliente::factory(100)->create();
         Vendedor::factory(60)->create();
+        Admin::factory(5)->create();
 
-        // Criar um admin fixo para acesso ao painel
-        User::factory()->admin()->create([
-            'name' => 'Admin Teste',
-            'email' => 'admin@teste.com',
-            'password' => bcrypt('12345678'), // Senha: password
-        ]);
+        // Usuário de Teste Pessoal / Admin Master
+        $meuAdmin = User::updateOrCreate(
+            ['email' => 'heymesson@teste.com'],
+            [
+                'name' => 'Heymesson',
+                'tipo' => 'admin',
+                'foto_perfil' => null,
+                'password' => bcrypt('suasenha123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Admin::updateOrCreate(
+            ['user_id' => $meuAdmin->id],
+            [
+                'telefone_urgencia' => '(11) 99999-9999',
+                'cargo' => Admin::CARGO_SUPER_ADMIN,
+                'departamento' => Admin::DEPARTAMENTO_TECNOLOGIA,
+            ]
+        );
 
         // 3. ENDEREÇOS (Importante: Criar ANTES dos pedidos para o snapshot funcionar)
         Endereco::factory(150)->create();
@@ -106,26 +122,24 @@ class DatabaseSeeder extends Seeder
 
         Avaliacao::factory(15)->create();
 
-        // 7. Preenchimento de Carrinhos (Lógica Blindada)
-        $clientes = Cliente::all(); // Pegamos os perfis de cliente
+        // 7. Preenchimento de Carrinhos (Lógica de Cabeçalho + Pivô)
+        $clientes = Cliente::all();
         $livros = Livro::all();
 
         $clientes->each(function ($perfilCliente) use ($livros) {
             $quantidadeDeLivros = fake()->numberBetween(0, 5);
 
             if ($quantidadeDeLivros > 0) {
-                // Em vez de factory()->create(), usamos updateOrCreate para evitar o erro de UNIQUE
-                // Isso garante que cada user_id tenha apenas UM carrinho
+                // Cria ou obtém o carrinho do usuário (somente user_id)
                 $carrinho = Carrinho::updateOrCreate(
-                    ['user_id' => $perfilCliente->user_id], // Chave de busca
-                    ['updated_at' => now()]                // Valores para atualizar/criar
+                    ['user_id' => $perfilCliente->user_id],
+                    ['updated_at' => now()]
                 );
 
-                // Sorteamos os livros
+                // Sorteia os livros e associa na tabela pivô carrinho_livro
                 $livrosSorteados = $livros->random($quantidadeDeLivros);
 
                 $livrosSorteados->each(function ($livro) use ($carrinho) {
-                    // Usamos syncWithoutDetaching para evitar erro de duplicidade na tabela intermediária
                     $carrinho->livros()->syncWithoutDetaching([
                         $livro->id => ['quantidade' => fake()->numberBetween(1, 3)]
                     ]);

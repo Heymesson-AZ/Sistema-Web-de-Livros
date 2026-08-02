@@ -20,17 +20,21 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
+          command_timeout: 30m
           script: |
             cd /home/ubuntu/apps/Sistema-Web-de-Livros
-            
-            # 1. Baixar as novidades do Git
+
+            # Força IPv4 no servidor
+            git config force.ipversion 4
+
+            # Atualiza o código
             git pull origin main
-            
-            # 2. Reconstruir e subir o container Docker
+
+            # Reconstrói e sobe o container Docker
             docker compose up -d --build
-            
-            # 3. Executar as migrações e otimizações dentro do container em execução
-            docker compose exec -T app php artisan migrate --force
+
+            # Otimizações e migrações do Laravel
+            docker compose exec -T app php artisan migrate --force || true
             docker compose exec -T app php artisan config:cache
             docker compose exec -T app php artisan route:cache
             docker compose exec -T app php artisan view:cache

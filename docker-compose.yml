@@ -1,29 +1,42 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel_app
+    image: ghcr.io/heymesson-az/sistema-web-de-livros:latest
+
+    restart: unless-stopped
+
     ports:
       - "80:80"
-    volumes:
-      - .:/var/www/html
+
+    env_file:
+      - .env
+
+    environment:
+      APP_ENV: production
+
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: mysql:8.4
-    container_name: mysql_livros
+
     restart: unless-stopped
+
     environment:
-      MYSQL_DATABASE: sistema_web_de_livros
+      MYSQL_DATABASE: db_livros
       MYSQL_USER: sail
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
+
     volumes:
       - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
 volumes:
   mysql_data:

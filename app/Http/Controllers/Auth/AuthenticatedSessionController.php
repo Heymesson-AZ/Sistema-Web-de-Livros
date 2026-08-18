@@ -49,6 +49,6 @@ class AuthenticatedSessionController extends Controller
         // Regeneramos o token CSRF para proteger contra ataques de falsificação de solicitação entre sites (CSRF).
         $request->session()->regenerateToken();
         // Redirecionamos o usuário para a página inicial após o logout.
-        return redirect('/inicio');
+        return redirect('pages/inicio');
     }
 }

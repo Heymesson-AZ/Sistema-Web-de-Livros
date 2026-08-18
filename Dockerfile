@@ -1,36 +1,56 @@
+# syntax=docker/dockerfile:1.7
+
+FROM composer:2 AS vendor
+
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --optimize-autoloader
+
+COPY . .
+
+RUN composer dump-autoload --optimize
+
 FROM php:8.3-fpm
 
-# Instalação rápida de extensões PHP pré-compiladas
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Dependências mínimas do sistema
 RUN apt-get update && apt-get install -y \
+    nginx \
     git \
     curl \
-    zip \
     unzip \
-    nginx
+    zip \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instalação rápida das extensões
-RUN install-php-extensions pdo_mysql mbstring exif pcntl bcmath gd
-
-# Copiar Composer oficial
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN install-php-extensions \
+    pdo_mysql \
+    mbstring \
+    bcmath \
+    exif \
+    gd \
+    pcntl
 
 WORKDIR /var/www
 
-# Copiar os arquivos do projeto (incluindo o front-end já compilado pela Action)
-COPY . /var/www
+COPY --from=vendor /app /var/www
 
-# Instalar dependências do PHP sem pacotes de dev
-RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
-
-# Permissões do Laravel
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-
-# Configuração do Nginx
 COPY docker/nginx/default.conf /etc/nginx/sites-enabled/default
+
+RUN php artisan optimize:clear || true
+
+RUN chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+CMD curl -f http://localhost || exit 1
 
 EXPOSE 80
 
-CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+CMD ["sh","-c","php-fpm -D && nginx -g 'daemon off;'"]

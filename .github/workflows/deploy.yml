@@ -3,7 +3,7 @@ name: Implantar na Produção (Docker)
 on:
   push:
     branches:
-      - main
+      - main # O deploy só acontece quando você mandar código para a main
 
 jobs:
   deploy:
@@ -13,6 +13,18 @@ jobs:
       - name: Confira o código
         uses: actions/checkout@v4
 
+      # 1. Instalar Node.js para compilar o front-end automaticamente no GitHub
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências e compilar o Front-end (Vite)
+        run: |
+          npm install
+          npm run build
+
+      # 2. Executar o Deploy via SSH na VPS nova
       - name: Executar Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -28,11 +40,11 @@ jobs:
             git config force.ipversion 4
             git pull origin main
 
-            # 2. Reconstruir e subir os containers leves
+            # 2. Reconstruir e subir os containers leves (já pegando o front-end compilado)
             docker compose up -d --build
 
             # 3. Executar migrações e caches do Laravel
-            docker compose exec -T app php artisan migrate --force || true
-            docker compose exec -T app php artisan config:cache
-            docker compose exec -T app php artisan route:cache
-            docker compose exec -T app php artisan view:cache
+            docker compose exec -T -u 0 app php artisan migrate --force || true
+            docker compose exec -T -u 0 app php artisan config:cache
+            docker compose exec -T -u 0 app php artisan route:cache
+            docker compose exec -T -u 0 app php artisan view:cache

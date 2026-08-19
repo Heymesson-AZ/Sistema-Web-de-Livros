@@ -47,4 +47,4 @@ jobs:
             docker compose exec -T -u 0 app php artisan migrate --force || true
             docker compose exec -T -u 0 app php artisan config:cache
             docker compose exec -T -u 0 app php artisan route:cache
-            docker compose exec -T -u 0 app php artisan view:cache
+            docker compose exec -T -u 0 app php artisan view:clear

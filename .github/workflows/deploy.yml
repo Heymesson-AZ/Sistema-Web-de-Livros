@@ -33,6 +33,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           command_timeout: 20m
+
+          # Tudo isso em uma esteira contínua (pipeline).
           script: |
             cd /home/ubuntu/apps/Sistema-Web-de-Livros
 
@@ -48,3 +50,12 @@ jobs:
             docker compose exec -T -u 0 app php artisan config:cache
             docker compose exec -T -u 0 app php artisan route:cache
             docker compose exec -T -u 0 app php artisan view:clear
+
+
+# Finalidade: Automatizar a publicação do seu sistema diretamente na sua
+# VPS da Oracle Cloud, sem que você precise acessar o servidor manualmente.
+
+# O que ele faz: Assim que o código vai para a branch principal (main),
+#  ele se conecta à sua VPS de forma segura via SSH, baixa a versão mais
+# atualizada do código, reconstrói os containers do Docker e executa os comandos essenciais do Laravel
+# (como migrações de banco de dados e limpeza de cache) para o site atualizar no ar na mesma hora.

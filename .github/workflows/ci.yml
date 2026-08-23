@@ -51,3 +51,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+
+
+# Finalidade: Automatizar a criação e o empacotamento do seu sistema em uma imagem Docker segura e otimizada.
+
+# O que ele faz: Toda vez que você envia código para o GitHub, ele roda
+# em servidores da nuvem do GitHub para compilar o projeto, testar se tudo está correto e enviar a
+# imagem final pronta para o GitHub Container Registry (GHCR), garantindo que o código esteja
+# empacotado corretamente.

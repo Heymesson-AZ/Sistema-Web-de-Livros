@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Universo de Papel </title>
+    <title>Universo de Papel</title>
+
     {{-- Links Bootstrap para ícones --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<>
+<body>
 
     <!-- NAVBAR -->
     <nav class="topbar">
@@ -37,6 +39,7 @@
     <x-modal-login />
     <x-modal-registro />
     <x-modal-esqueceu-senha />
+
     <!-- CONTEÚDO -->
     <main class="main-content">
         {{ $slot }}
@@ -47,7 +50,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Atualize o script de erro para abrir o modal correto se houver falha no registro
+        // Abre o modal correto quando houver erro de validação
         @if ($errors->has('name') || $errors->has('cpf') || $errors->has('telefone'))
             var regModal = new bootstrap.Modal(document.getElementById('registerModal'));
             regModal.show();
@@ -56,6 +59,7 @@
             logModal.show();
         @endif
     </script>
-    </body>
+
+</body>
 
 </html>

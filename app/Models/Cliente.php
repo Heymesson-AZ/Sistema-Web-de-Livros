@@ -9,15 +9,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Cliente extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = 'clientes';
-    
+    protected $table = 'cliente';
+
     protected $fillable = [
         'user_id',
         'celular_contato',
         'data_nascimento',
         'cpf',
     ];
-    
+
     // o cliente pertence somente a um usuário
     public function user()
     {

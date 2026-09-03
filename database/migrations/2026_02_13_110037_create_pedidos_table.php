@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('pedidos', function (Blueprint $table) {
             // Campos nessesarios para a tabela 'pedidos'
             $table->id();
-            $table->timestamps();   
+            $table->timestamps();
             // numero do pedido
             $table->string('numero_pedido')->unique();
             // status do pedido
@@ -26,7 +26,7 @@ return new class extends Migration
             // referencia ao vendedor que processou o pedido
             $table->foreignId('vendedor_id')->constrained('vendedores')->onDelete('cascade');
             // referencia ao cliente que fez o pedido
-            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('cliente_id')->constrained('cliente')->onDelete('cascade');
             // referencia ao cupom utilizado no pedido, se houver
             $table->foreignId('cupom_id')->nullable()->constrained('cupons')->onDelete('set null');
         });

@@ -17,7 +17,7 @@ return new class extends Migration
             // chave estrangeira do vendedor
             $table->foreignId('vendedor_id')->constrained('vendedores')->onDelete('cascade');
             // chave estrageira do cliente
-            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('cliente_id')->constrained('cliente')->onDelete('cascade');
             // chave estrangeira do pedido
             $table->foreignId('pedido_id')->constrained('pedidos')->onDelete('cascade');
             // campo de avaliação, pode ser um número de 1 a 5

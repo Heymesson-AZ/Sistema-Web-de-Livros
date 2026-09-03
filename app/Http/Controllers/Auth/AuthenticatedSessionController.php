@@ -9,16 +9,16 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Mostrando a tela de login.
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.login');
+        return redirect('/');
     }
 
     /**
@@ -28,14 +28,14 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo feita com muitas tentativas de login em um curto período de tempo (throttling).    
+        // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo feita com muitas tentativas de login em um curto período de tempo (throttling).
         $request->authenticate();
         // Se a autenticação for bem-sucedida, limpamos as tentativas de login para o usuário.
         $request->session()->regenerate();
         // Redirecionamos o usuário para a página pretendida ou para a rota 'dashboard' após o login bem-sucedido.
         return redirect()->intended(route('dashboard', absolute: false));
     }
-    
+
     /**
      * Aqui, encerramos a sessão do usuário.
      */
@@ -49,6 +49,6 @@ class AuthenticatedSessionController extends Controller
         // Regeneramos o token CSRF para proteger contra ataques de falsificação de solicitação entre sites (CSRF).
         $request->session()->regenerateToken();
         // Redirecionamos o usuário para a página inicial após o logout.
-        return redirect('pages/inicio');
+        return redirect('/');
     }
 }

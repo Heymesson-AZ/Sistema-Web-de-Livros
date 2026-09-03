@@ -101,8 +101,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /////////////////////////////////////////
     public function cliente()
     {
-        // Um usuário possui um (hasOne) perfil de cliente
-        return $this->hasOne(Cliente::class);
+        return $this->hasOne(Cliente::class, 'user_id');
     }
 
     public function vendedor()

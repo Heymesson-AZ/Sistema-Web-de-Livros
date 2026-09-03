@@ -11,11 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\View\View;
 use Carbon\Carbon;
 
-/// Controlador responsável por lidar com o registro de novos usuários, 
-//  incluindo a exibição do formulário de registro e a 
+/// Controlador responsável por lidar com o registro de novos usuários,
+//  incluindo a exibição do formulário de registro e a
 //criação de um novo usuário após a validação dos dados do formulário.
 class RegisteredUserController extends Controller
 {
@@ -24,9 +23,9 @@ class RegisteredUserController extends Controller
     /**
      * formulário de registro.
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.register');
+        return redirect('/');
     }
 
     /**
@@ -36,7 +35,7 @@ class RegisteredUserController extends Controller
      */
 
     // O método store() é responsável por processar os dados do formulário de registro,
-    // validar os dados, criar um novo usuário, disparar o evento Registered e autenticar o usuário recém-criado. 
+    // validar os dados, criar um novo usuário, disparar o evento Registered e autenticar o usuário recém-criado.
     //Após o registro bem-sucedido, o usuário é redirecion
     public function store(Request $request): RedirectResponse
     {
@@ -47,10 +46,10 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'cpf' => ['required', 'string', 'unique:clientes,cpf'],
+            'cpf' => ['required', 'string', 'unique:cliente,cpf'],
             'telefone' => ['required', 'string'],
             'data_nascimento' => ['required', 'date', 'before_or_equal:' . $datalimite],
-        ], [ 
+        ], [
             'data_nascimento.before_or_equal' => 'Você precisa ter pelo menos 18 anos para se cadastrar.',
             'cpf.unique' => 'Esse CPF já está cadastrado.',
             'email.unique' => 'O email informado já está em uso.',
@@ -65,7 +64,7 @@ class RegisteredUserController extends Controller
         // Agora criamos o cliente ligado a esse usuário
         $user->cliente()->create([
             'cpf' => $request->cpf,
-            'telefone' => $request->telefone,
+            'celular_contato' => $request->telefone,
             'data_nascimento' => $request->data_nascimento,
         ]);
 

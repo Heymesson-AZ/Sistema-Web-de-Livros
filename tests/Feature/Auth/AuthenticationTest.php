@@ -2,10 +2,10 @@
 
 use App\Models\User;
 
-test('login screen can be rendered', function () {
+test('login screen redirects to home page', function () {
     $response = $this->get('/login');
 
-    $response->assertStatus(200);
+    $response->assertRedirect('/');
 });
 
 test('users can authenticate using the login screen', function () {
@@ -17,6 +17,7 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
+
     $response->assertRedirect(route('dashboard', absolute: false));
 });
 
@@ -37,5 +38,6 @@ test('users can logout', function () {
     $response = $this->actingAs($user)->post('/logout');
 
     $this->assertGuest();
+
     $response->assertRedirect('/');
 });

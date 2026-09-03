@@ -62,9 +62,9 @@ class PerfilController extends Controller
             ]));
         } elseif ($user->tipo === 'cliente') {
             // Buscamos o registro do cliente e atualizamos apenas o telefone
-            $user->cliente()->update($request->only([
-                'telefone'
-            ]));
+            $user->cliente()->update([
+                'celular_contato' => $request->telefone
+            ]);
         }
 
         return Redirect::route($user->tipo . '.perfil.editar')->with('status', 'perfil-atualizado');
@@ -91,7 +91,7 @@ class PerfilController extends Controller
         // 2. Realiza o Logout
         Auth::logout();
         // 3. Deleta o usuário
-        // Graças ao "onDelete('cascade')" nas suas migrações, 
+        // Graças ao "onDelete('cascade')" nas suas migrações,
         // o Cliente ou Vendedor ligado a ele também será apagado!
         $user->delete();
         // 4. Invalida a sessão e redireciona

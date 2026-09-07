@@ -65,10 +65,18 @@ class Livro extends Model
     }
 
 
-    // Um livro pode estar em vários carrinhos (itens do carrinho)
+    // Um livro pode estar em vários carrinhos (relação muitos-para-muitos via carrinho_livro)
+    public function carrinhos()
+    {
+        return $this->belongsToMany(Carrinho::class, 'carrinho_livro')
+                    ->withPivot('quantidade')
+                    ->withTimestamps();
+    }
+
+    // Alias para retrocompatibilidade
     public function itensCarrinho()
     {
-        return $this->hasMany(Carrinho::class); // Relacionamento de um livro para muitos itens do carrinho
+        return $this->carrinhos();
     }
 
     // um livro pode estar em muitos itens do pedido (uma relação muitos-para-muitos)

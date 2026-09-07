@@ -11,6 +11,10 @@
 |
 */
 
+putenv('APP_ENV=testing');
+$_ENV['APP_ENV'] = 'testing';
+$_SERVER['APP_ENV'] = 'testing';
+
 pest()->extend(Tests\TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');

@@ -43,13 +43,15 @@ class RegisteredUserController extends Controller
         $datalimite = Carbon::now()->subYears(18)->format('Y-m-d');
 
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'cpf' => ['required', 'string', 'unique:cliente,cpf'],
             'telefone' => ['required', 'string'],
             'data_nascimento' => ['required', 'date', 'before_or_equal:' . $datalimite],
         ], [
+            'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
+            'name.max' => 'O nome não pode ter mais de 100 caracteres.',
             'data_nascimento.before_or_equal' => 'Você precisa ter pelo menos 18 anos para se cadastrar.',
             'cpf.unique' => 'Esse CPF já está cadastrado.',
             'email.unique' => 'O email informado já está em uso.',
@@ -59,6 +61,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'tipo' => 'cliente',
         ]);
 
         // Agora criamos o cliente ligado a esse usuário

@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 class ProfileUpdateRequest extends FormRequest
 {
     /**
-     * Aplica as regras de validação para os campos do perfil do usuário, 
+     * Aplica as regras de validação para os campos do perfil do usuário,
      * garantindo que o nome seja obrigatório,
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -20,7 +20,7 @@ class ProfileUpdateRequest extends FormRequest
     {
         // 1. Regras que SEMPRE existem (para todos)
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => [
                 'required',
                 'string',
@@ -43,5 +43,16 @@ class ProfileUpdateRequest extends FormRequest
             // Note que NÃO incluímos o CPF aqui para ele não ser alterado!
         }
         return $rules;
+    }
+
+    /**
+     * Mensagens de validação customizadas.
+     */
+    public function messages(): array
+    {
+        return [
+            'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
+            'name.max' => 'O nome não pode exceder 100 caracteres.',
+        ];
     }
 }

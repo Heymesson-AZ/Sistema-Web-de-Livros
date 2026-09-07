@@ -1,23 +1,41 @@
-<div class="menu-wrapper">
+<div class="menu-wrapper" id="menuWrapper">
     <div id="menu">
         <div class="menu-inner">
 
+            <!-- Cabeçalho visível no Drawer Mobile -->
+            <div class="menu-mobile-header d-lg-none">
+                <a href="{{ url('/') }}" class="brand-link text-decoration-none" title="Universo de Papel">
+                    <img src="{{ asset('images/logo-white.png') }}" alt="Universo de Papel" class="brand-logo-img">
+                </a>
+                <button type="button" class="menu-close-btn" id="menuCloseBtn" aria-label="Fechar menu">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Lista Principal de Navegação -->
             <ul class="menu-list">
 
-                <li class="menu-item">
-                    <div class="menu-item-header">
-                        <i data-lucide="house"></i>
-                        <span>Início</span>
-                    </div>
+                <!-- Início -->
+                <li class="menu-item {{ request()->is('/') ? 'active' : '' }}">
+                    <a href="{{ url('/') }}" class="menu-item-link">
+                        <div class="menu-item-header">
+                            <i data-lucide="house"></i>
+                            <span>Início</span>
+                        </div>
+                    </a>
                 </li>
 
+                <!-- Catálogo -->
                 <li class="menu-item">
-                    <div class="menu-item-header">
-                        <i data-lucide="book-open"></i>
-                        <span>Catálogo</span>
-                    </div>
+                    <a href="#" class="menu-item-link">
+                        <div class="menu-item-header">
+                            <i data-lucide="book-open"></i>
+                            <span>Catálogo</span>
+                        </div>
+                    </a>
                 </li>
 
+                <!-- Categorias com Submenu -->
                 <li class="menu-item has-submenu">
                     <div class="menu-item-header">
                         <i data-lucide="tag"></i>
@@ -41,89 +59,129 @@
                     </ul>
                 </li>
 
+                <!-- Promoções com Badge -->
                 <li class="menu-item">
-                    <div class="menu-item-header">
-                        <i data-lucide="badge-percent"></i>
-                        <span>Promoções</span>
-                    </div>
+                    <a href="#" class="menu-item-link">
+                        <div class="menu-item-header">
+                            <i data-lucide="badge-percent"></i>
+                            <span>Promoções</span>
+                            <span class="menu-badge badge-sale">Ofertas</span>
+                        </div>
+                    </a>
                 </li>
 
+                <!-- Carrinho -->
                 <li class="menu-item">
-                    <div class="menu-item-header">
-                        <i data-lucide="shopping-cart"></i>
-                        <span>Carrinho</span>
-                    </div>
+                    <a href="#" class="menu-item-link">
+                        <div class="menu-item-header">
+                            <i data-lucide="shopping-cart"></i>
+                            <span>Carrinho</span>
+                            <span class="menu-badge badge-count">0</span>
+                        </div>
+                    </a>
                 </li>
 
-                <li class="menu-item has-submenu">
+                <!-- Conta do Usuário -->
+                <li
+                    class="menu-item has-submenu {{ request()->routeIs('dashboard', 'cliente.perfil.*', 'vendedor.perfil.*') ? 'active' : '' }}">
                     <div class="menu-item-header">
                         <i data-lucide="user"></i>
-                        <span>Conta</span>
+                        <span>{{ Auth::check() ? Auth::user()->name : 'Minha Conta' }}</span>
                         <i class="submenu-arrow" data-lucide="chevron-down"></i>
                     </div>
 
                     <ul class="submenu">
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                <div class="menu-item-header">
-                                    <i data-lucide="log-in"></i>
-                                    <span>Login</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
-                                <div class="menu-item-header">
-                                    <i data-lucide="user-plus"></i>
-                                    <span>Criar Conta</span>
-                                </div>
-                            </a>
-                        </li>
+                        @guest
+                            <li>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                    <div class="menu-item-header">
+                                        <i data-lucide="log-in"></i>
+                                        <span>Entrar</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                    <div class="menu-item-header">
+                                        <i data-lucide="user-plus"></i>
+                                        <span>Cadastrar</span>
+                                    </div>
+                                </a>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ route('dashboard') }}">
+                                    <div class="menu-item-header">
+                                        <i data-lucide="layout-dashboard"></i>
+                                        <span>Painel</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                @php
+                                    $perfilRoute = match (Auth::user()->tipo) {
+                                        'cliente' => route('cliente.perfil.editar'),
+                                        'vendedor' => route('vendedor.perfil.editar'),
+                                        'admin' => route('admin.perfil.editar'),
+                                        default => route('dashboard'),
+                                    };
+                                @endphp
+                                <a href="{{ $perfilRoute }}">
+                                    <div class="menu-item-header">
+                                        <i data-lucide="user-check"></i>
+                                        <span>Meu Perfil</span>
+                                    </div>
+                                </a>
+                            </li>
+                        @endguest
                     </ul>
                 </li>
 
+                <!-- Contato -->
                 <li class="menu-item">
-                    <div class="menu-item-header">
-                        <i data-lucide="mail"></i>
-                        <span>Contato</span>
-                    </div>
+                    <a href="#" class="menu-item-link">
+                        <div class="menu-item-header">
+                            <i data-lucide="mail"></i>
+                            <span>Contato</span>
+                        </div>
+                    </a>
                 </li>
 
             </ul>
 
-            <!-- RODAPÉ -->
+            <!-- RODAPÉ DO MENU -->
             <div class="menu-footer">
                 <div class="social-icons">
-                    {{-- Ícones de redes sociais --}}
-                    <a href="#" aria-label="Instagram">
+                    <a href="#" aria-label="Instagram" title="Instagram">
                         <i class="bi bi-instagram"></i>
                     </a>
-                    <a href="#" aria-label="Facebook">
+                    <a href="#" aria-label="Facebook" title="Facebook">
                         <i class="bi bi-facebook"></i>
                     </a>
-                    {{-- X, antigo twitter --}}
-                    <a href="#" aria-label="X">
-                        <i class="bi bi-x" style="font-size: 2rem;"></i>
+                    <a href="#" aria-label="X" title="X (Twitter)">
+                        <i class="bi bi-twitter-x"></i>
                     </a>
-                    {{-- theads --}}
-                    <a href="#" aria-label="Threads">
+                    <a href="#" aria-label="Threads" title="Threads">
                         <i class="bi bi-threads"></i>
                     </a>
                 </div>
 
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button class="logout-btn" type="submit">
-                        <i class="log-out" data-lucide="log-out"></i>
-                        <span>Sair</span>
+                @auth
+                    <form method="POST" action="{{ route('logout') }}" class="w-100">
+                        @csrf
+                        <button class="logout-btn" type="submit">
+                            <i data-lucide="log-out"></i>
+                            <span>Sair da Conta</span>
+                        </button>
+                    </form>
+                @else
+                    <button class="login-quick-btn" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i data-lucide="log-in"></i>
+                        <span>Acessar Conta</span>
                     </button>
-                </form>
-
+                @endauth
             </div>
-            {{-- fim do rodapé --}}
+
         </div>
-        {{-- fim da div menu inner --}}
     </div>
-    {{-- fim da div menu com id= menu --}}
 </div>
-{{-- fim do componente menu --}}

@@ -17,11 +17,8 @@ class VendedorFactory extends Factory
     public function definition(): array
     {
         return [
-            // Sorteia um User que seja do tipo 'vendedor' e que ainda não tenha um perfil de vendedor
-            'user_id' => User::where('tipo', 'vendedor') //
-                ->whereDoesntHave('vendedor')
-                ->inRandomOrder()
-                ->first()?->id ?? User::factory()->vendedor(),
+            // Garante que cada vendedor tenha seu próprio User do tipo vendedor
+            'user_id' => User::factory()->vendedor(),
 
             'cnpj' => fake()->unique()->cnpj(),
             'telefone_comercial' => fake()->phoneNumber(),

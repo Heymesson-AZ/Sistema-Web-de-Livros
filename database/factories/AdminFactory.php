@@ -19,8 +19,8 @@ class AdminFactory extends Factory
     public function definition(): array
     {
         return [
-            // Cria um User do tipo 'admin' automaticamente se um user_id não for passado
-            'user_id' => User::factory()->create(['tipo' => 'admin'])->id,
+            // Garante que cada admin tenha seu próprio User do tipo admin
+            'user_id' => User::factory()->admin(),
 
             // Sorteia um telefone formatado
             'telefone_urgencia' => fake()->cellphoneNumber(),

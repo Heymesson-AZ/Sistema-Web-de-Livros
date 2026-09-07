@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Removendo a tabela 'genero' caso a migration seja revertida
-        Schema::dropIfExists('genero');
+        // Removendo a tabela 'generos' caso a migration seja revertida
+        Schema::dropIfExists('generos');
     }
 };

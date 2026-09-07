@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use App\Models\User;
+
 
 
 class PerfilController extends Controller
@@ -18,7 +18,7 @@ class PerfilController extends Controller
     /**
      * View para editar o perfil do usuário.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request)
     {
         if ($request->user()->tipo === 'cliente') {
             return view('cliente.perfil-editar', [

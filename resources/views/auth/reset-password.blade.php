@@ -1,53 +1,60 @@
-<!-- resources/views/auth/reset-password.blade.php -->
-<!DOCTYPE html>
-<html lang="pt-br">
+<x-layouts.auth>
+    <x-slot:title>Nova Senha - Universo de Papel</x-slot:title>
 
-<head>
-    <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/css/login.css'])
-</head>
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm p-4 login-container">
+                <div class="text-center mb-4">
+                    <i data-lucide="key-round" class="text-primary mb-2" style="width: 36px; height: 36px;"></i>
+                    <h4 class="fw-bold">Redefinir Senha</h4>
+                    <p class="text-muted small">Crie uma nova senha segura para acessar sua conta.</p>
+                </div>
 
-<body class="bg-light d-flex align-items-center" style="height: 100vh;">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card border-0 shadow-sm p-4" style="border-radius: 20px;">
-                    <h3 class="fw-bold mb-4">Nova Senha</h3>
+                <form method="POST" action="{{ route('password.store') }}">
+                    @csrf
+                    <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
-                    <form method="POST" action="{{ route('password.store') }}">
-                        @csrf
-                        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">E-mail</label>
+                        <input type="email" name="email"
+                            class="form-control @error('email') is-invalid border-danger @enderror"
+                            value="{{ old('email', $request->email) }}" required readonly>
+                        @error('email')
+                            <div class="invalid-feedback d-block fw-semibold mt-1 text-danger small">
+                                <i class="bi bi-exclamation-circle me-1"></i> {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">E-mail</label>
-                            <input type="email" name="email"
-                                class="form-control @error('email') is-invalid @enderror"
-                                value="{{ old('email', $request->email) }}" required readonly>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Nova Senha</label>
-                            <input type="password" name="password"
-                                class="form-control @error('password') is-invalid @enderror" required>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Nova Senha</label>
+                        <input type="password" name="password" minlength="8"
+                            class="form-control @error('password') is-invalid border-danger @enderror"
+                            placeholder="Mínimo 8 caracteres" required autofocus>
+                        <div class="invalid-feedback fw-semibold mt-1 text-danger small">
                             @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <i class="bi bi-exclamation-circle me-1"></i> {{ $message }}
                             @enderror
                         </div>
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Confirmar Nova Senha</label>
-                            <input type="password" name="password_confirmation" class="form-control" required>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Confirmar Nova Senha</label>
+                        <input type="password" name="password_confirmation" minlength="8"
+                            class="form-control @error('password_confirmation') is-invalid border-danger @enderror"
+                            placeholder="Repita a nova senha" required>
+                        <div class="invalid-feedback fw-semibold mt-1 text-danger small">
+                            @error('password_confirmation')
+                                <i class="bi bi-exclamation-circle me-1"></i> {{ $message }}
+                            @enderror
                         </div>
+                    </div>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-login">Redefinir Senha</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-login">Redefinir Senha</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</body>
-
-</html>
+</x-layouts.auth>

@@ -20,16 +20,17 @@ class PedidoEntregaFactory extends Factory
         $status = fake()->randomElement(['pendente', 'em_transito', 'entregue', 'cancelada']);
 
         return [
-            'pedido_id' => Pedido::inRandomOrder()->first()?->id ?? Pedido::factory(),
+            'pedido_id' => Pedido::doesntHave('entrega')->inRandomOrder()->first()?->id ?? Pedido::factory(),
             'status' => $status,
             'codigo_rastreamento' => strtoupper(fake()->bothify('??#########BR')),
             'url_nota_fiscal' => fake()->url(),
 
             // Dados de Endereço "Congelados"
             'rua' => fake()->streetName(),
+            'numero' => fake()->buildingNumber(),
             'bairro' => fake()->word(),
             'cidade' => fake()->city(),
-            'estado' => strtoupper(fake()->lexify('??')), // ex: SP, RJ
+            'estado' => fake()->stateAbbr(),
             'cep' => fake()->postcode(),
             'pais' => 'Brasil',
             'complemento' => fake()->secondaryAddress(),

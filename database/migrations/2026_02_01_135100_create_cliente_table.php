@@ -13,8 +13,8 @@ return new class extends Migration
         {
             Schema::create('cliente', function (Blueprint $table) {
                 $table->id();
-                // chave estrageira do usuario
-                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                // chave estrangeira do usuario (1 para 1)
+                $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
                 // cpf do cliente
                 $table->string('cpf')->unique();
                 // telefone do cliente

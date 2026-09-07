@@ -68,9 +68,14 @@ class Pedido extends Model
         return $this->hasOne(PedidoEntrega::class);
     }
 
-    // um pedido pode ter uma avalação
+    // um pedido pode ter uma avaliação
     public function avaliacao()
     {
         return $this->hasOne(Avaliacao::class);
+    }
+
+    public function avaliacoes()
+    {
+        return $this->hasMany(Avaliacao::class);
     }
 }

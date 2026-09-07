@@ -23,6 +23,7 @@ class PedidoEntrega extends Model
         'valor_frete',
         'metodo_envio',
         'rua',
+        'numero',
         'bairro',
         'cidade',
         'estado',
@@ -43,5 +44,5 @@ class PedidoEntrega extends Model
         // A Entrega "pertence a" um pedido
         return $this->belongsTo(Pedido::class);
     }
- 
+
 }

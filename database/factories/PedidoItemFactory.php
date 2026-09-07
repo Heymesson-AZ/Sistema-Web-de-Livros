@@ -16,14 +16,11 @@ class PedidoItemFactory extends Factory
      */
     public function definition(): array
     {
-        // Primeiro sorteamos um livro
-        $livro = Livro::inRandomOrder()->first() ?? Livro::factory()->create();
-
         return [
             'pedido_id' => Pedido::inRandomOrder()->first()?->id ?? Pedido::factory(),
-            'livro_id' => $livro->id,
+            'livro_id' => Livro::inRandomOrder()->first()?->id ?? Livro::factory(),
             'quantidade_itens' => fake()->numberBetween(1, 5),
-            'valor_unitario' => $livro->preco, // Usamos o preço real do livro sorteado 💰
+            'valor_unitario' => fn (array $attributes) => Livro::find($attributes['livro_id'])?->preco ?? fake()->randomFloat(2, 20, 100),
         ];
     }
 }

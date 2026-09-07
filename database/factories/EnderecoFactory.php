@@ -17,7 +17,8 @@ class EnderecoFactory extends Factory
     public function definition(): array
 {
     return [
-        'rua' => fake()->streetName(), //
+        'rua' => fake()->streetName(),
+        'numero' => fake()->buildingNumber(),
         'bairro' => fake()->words(2, true), // Ex: "Jardim das Flores"
         'cidade' => fake()->city(),
         'estado' => fake()->stateAbbr(), // Gera 'SP', 'RJ', etc.

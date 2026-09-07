@@ -18,6 +18,7 @@ class Vendedor extends Model
         'razao_social',
         'nome_fantasia',
         'inscricao_estadual',
+        'status_aprovacao',
     ];
 
 

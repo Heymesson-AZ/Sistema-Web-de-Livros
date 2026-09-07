@@ -14,8 +14,6 @@ class Carrinho extends Model
 
     protected $fillable = [
         'user_id',
-        'livro_id',
-        'quantidade',
     ];
 
     // um carrinho pertence a um usuário
@@ -26,11 +24,9 @@ class Carrinho extends Model
 
     // um carrinho pode ter muitos livros (relação muitos-para-muitos)
     public function livros()
-    {   
-        // a tabela intermediária 'carrinho_livro' tem os campos 'carrinho_id', 'livro_id' e
-        // 'quantidade'
-        // o método withPivot('quantidade') permite acessar a quantidade de cada livro no carrinho
+    {
         return $this->belongsToMany(Livro::class, 'carrinho_livro')
-            ->withPivot('quantidade');
+            ->withPivot('quantidade')
+            ->withTimestamps();
     }
 }

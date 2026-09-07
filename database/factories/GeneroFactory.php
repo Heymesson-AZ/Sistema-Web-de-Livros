@@ -16,19 +16,29 @@ class GeneroFactory extends Factory
      */
     public function definition(): array
     {
+        static $generos = [
+            'Ficção Científica',
+            'Romance',
+            'Terror',
+            'Biografia',
+            'História',
+            'Autoajuda',
+            'Fantasia',
+            'Suspense',
+            'Aventura',
+            'Infantil',
+            'Poesia',
+            'Drama',
+            'Quadrinhos',
+            'Tecnologia',
+            'Filosofia',
+            'Psicologia',
+        ];
+
+        $nome = !empty($generos) ? array_shift($generos) : fake()->unique()->words(2, true);
+
         return [
-            'nome' => fake()->unique()->randomElement([
-                'Ficção Científica',
-                'Romance',
-                'Terror',
-                'Biografia',
-                'História',
-                'Autoajuda',
-                'Fantasia',
-                'Suspense',
-                'Aventura',
-                'Infantil',
-            ]),
+            'nome' => ucfirst($nome),
         ];
     }
 }

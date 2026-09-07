@@ -10,7 +10,7 @@ return new class extends Migration
      * A função (Up) que será executada quando a migration for aplicada.
      */
     public function up(): void
-    {   
+    {
         // Criando a tabela 'autor' com os campos especificados
         // blueprint é usado para definir a estrutura da tabela
 
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('nacionalidade')->nullable(); // 'nullable' permite que o campo fique vazio
             $table->date('data_nascimento'); // Campo específico para datas
             $table->string('email')->unique(); // Campo de email único
-            $table->string('biografia')->nullable(); // Campo de biografia com limite de 1000 caracteres
+            $table->text('biografia')->nullable(); // Campo de biografia para textos longos
             $table->string('foto_perfil')->nullable(); // Campo para URL ou caminho da foto de perfil
             $table->timestamps(); // Campos 'created_at' e 'updated_at'
         });
@@ -32,7 +32,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Removendo a tabela 'autor' caso a migration seja revertida
-        Schema::dropIfExists('autor');
+        // Removendo a tabela 'autores' caso a migration seja revertida
+        Schema::dropIfExists('autores');
     }
 };

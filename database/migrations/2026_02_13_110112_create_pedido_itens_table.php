@@ -20,7 +20,7 @@ return new class extends Migration
             // id do livro
             $table->foreignId('livro_id')->constrained('livros')->onDelete('restrict');
             // id do pedido
-            $table->foreignId('pedido_id')->constrained('pedidos')->onDelete('restrict');
+            $table->foreignId('pedido_id')->constrained('pedidos')->onDelete('cascade');
             //timestamps para controle de criação e atualização dos registros
             $table->timestamps();
         });

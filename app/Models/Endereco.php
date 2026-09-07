@@ -8,10 +8,11 @@ class Endereco extends Model
 {
     use HasFactory;
 
-    protected $tables = 'enderecos';
+    protected $table = 'enderecos';
 
     protected $fillable = [
         'rua',
+        'numero',
         'bairro',
         'cidade',
         'estado',

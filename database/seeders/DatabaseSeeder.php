@@ -62,6 +62,51 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Usuário de Teste Cliente
+        $meuCliente = User::updateOrCreate(
+            ['email' => 'cliente@teste.com'],
+            [
+                'name' => 'Cliente Teste',
+                'tipo' => 'cliente',
+                'foto_perfil' => null,
+                'password' => bcrypt('suasenha123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Cliente::updateOrCreate(
+            ['user_id' => $meuCliente->id],
+            [
+                'cpf' => '111.222.333-44',
+                'celular_contato' => '(11) 98888-8888',
+                'data_nascimento' => '1995-05-15',
+            ]
+        );
+
+        // Usuário de Teste Vendedor
+        $meuVendedor = User::updateOrCreate(
+            ['email' => 'vendedor@teste.com'],
+            [
+                'name' => 'Vendedor Teste',
+                'tipo' => 'vendedor',
+                'foto_perfil' => null,
+                'password' => bcrypt('suasenha123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Vendedor::updateOrCreate(
+            ['user_id' => $meuVendedor->id],
+            [
+                'cnpj' => '12.345.678/0001-90',
+                'razao_social' => 'Livraria Universo LTDA',
+                'nome_fantasia' => 'Livraria Universo',
+                'inscricao_estadual' => '123456789',
+                'telefone_comercial' => '(11) 97777-7777',
+                'status_aprovacao' => 'aprovado',
+            ]
+        );
+
         // 3. ENDEREÇOS (Importante: Criar ANTES dos pedidos para o snapshot funcionar)
         Endereco::factory(150)->create();
 
@@ -70,10 +115,24 @@ class DatabaseSeeder extends Seeder
 
         // 5. LÓGICA DE PEDIDOS (Snapshot de Endereço e Cálculo de Total)
         Pedido::factory(40)->create()->each(function ($pedido) {
-            // Criamos os itens (1 a 4 por pedido)
-            $itens = PedidoItem::factory(fake()->numberBetween(1, 4))->create([
-                'pedido_id' => $pedido->id,
-            ]);
+            // Buscamos livros do mesmo vendedor do pedido (ou criamos se não houver)
+            $livrosVendedor = Livro::where('vendedor_id', $pedido->vendedor_id)->get();
+            if ($livrosVendedor->isEmpty()) {
+                $livrosVendedor = Livro::factory(2)->create(['vendedor_id' => $pedido->vendedor_id]);
+            }
+
+            // Criamos os itens (1 a 3 itens distintos pertencentes a este vendedor)
+            $quantidadeItens = min(fake()->numberBetween(1, 3), $livrosVendedor->count());
+            $livrosSorteados = $livrosVendedor->random($quantidadeItens);
+
+            $itens = collect();
+            foreach ($livrosSorteados as $livro) {
+                $itens->push(PedidoItem::factory()->create([
+                    'pedido_id' => $pedido->id,
+                    'livro_id' => $livro->id,
+                    'valor_unitario' => $livro->preco,
+                ]));
+            }
 
             // Calculamos o total real dos itens
             $valorTotal = $itens->sum(fn($item) => $item->quantidade_itens * $item->valor_unitario);
@@ -96,6 +155,7 @@ class DatabaseSeeder extends Seeder
                 // Se houver endereço, "congelamos" os dados na tabela de entrega
                 $dadosEntrega = array_merge($dadosEntrega, [
                     'rua'         => $enderecoReal->rua,
+                    'numero'      => $enderecoReal->numero,
                     'bairro'      => $enderecoReal->bairro,
                     'cidade'      => $enderecoReal->cidade,
                     'estado'      => $enderecoReal->estado,
@@ -112,15 +172,34 @@ class DatabaseSeeder extends Seeder
         $usuariosIds = User::pluck('id');
         $livrosIds = Livro::pluck('id');
 
-        // Combinações únicas para evitar duplicidade em favoritos
-        $usuariosIds->crossJoin($livrosIds)->shuffle()->take(30)->each(function ($par) {
-            Favorito::create([
-                'user_id'  => $par[0],
-                'livro_id' => $par[1],
-            ]);
-        });
+        // Combinações únicas para evitar duplicidade em favoritos (sem crossJoin pesado em memória)
+        if ($usuariosIds->isNotEmpty() && $livrosIds->isNotEmpty()) {
+            $paresFavoritos = [];
+            $tentativas = 0;
+            while (count($paresFavoritos) < 30 && $tentativas < 300) {
+                $tentativas++;
+                $uId = $usuariosIds->random();
+                $lId = $livrosIds->random();
+                $chave = "{$uId}-{$lId}";
+                if (!isset($paresFavoritos[$chave])) {
+                    $paresFavoritos[$chave] = true;
+                    Favorito::create([
+                        'user_id'  => $uId,
+                        'livro_id' => $lId,
+                    ]);
+                }
+            }
+        }
 
-        Avaliacao::factory(15)->create();
+        // Avaliações de pedidos reais (garantindo que cliente e vendedor batem com o pedido e sem duplicação)
+        $pedidosParaAvaliar = Pedido::inRandomOrder()->take(15)->get();
+        foreach ($pedidosParaAvaliar as $pedido) {
+            Avaliacao::factory()->create([
+                'pedido_id'   => $pedido->id,
+                'cliente_id'  => $pedido->cliente_id,
+                'vendedor_id' => $pedido->vendedor_id,
+            ]);
+        }
 
         // 7. Preenchimento de Carrinhos (Lógica de Cabeçalho + Pivô)
         $clientes = Cliente::all();

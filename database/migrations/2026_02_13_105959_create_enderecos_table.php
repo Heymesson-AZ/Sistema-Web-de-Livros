@@ -16,9 +16,10 @@ return new class extends Migration
             $table->timestamps();
             //campos nessessarios para tabela
             $table->string('rua');
+            $table->string('numero', 20);
             $table->string('bairro');
             $table->string('cidade');
-            $table->char('estado', 2); 
+            $table->char('estado', 2);
             $table->string('cep');
             $table->string('pais');
             $table->string('complemento')->nullable();

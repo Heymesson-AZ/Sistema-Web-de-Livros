@@ -21,7 +21,10 @@ return new class extends Migration
             $table->foreignId('livro_id')->constrained('livros')->onDelete('cascade');
 
             // Quantidade de exemplares no carrinho
-            $table->integer('quantidade')->default(1);
+            $table->unsignedInteger('quantidade')->default(1);
+
+            // Garante que cada livro só apareça uma vez no mesmo carrinho
+            $table->unique(['carrinho_id', 'livro_id']);
 
             $table->timestamps();
         });

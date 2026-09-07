@@ -10,6 +10,7 @@ RUN composer install \
     --no-dev \
     --prefer-dist \
     --no-interaction \
+    --no-scripts \
     --optimize-autoloader
 
 COPY . .
@@ -27,6 +28,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     unzip \
     zip \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 RUN install-php-extensions \
@@ -43,13 +46,19 @@ COPY --from=vendor /app /var/www
 
 COPY docker/nginx/default.conf /etc/nginx/sites-enabled/default
 
+RUN mkdir -p storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
 RUN php artisan optimize:clear || true
 
 RUN chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-CMD curl -f http://localhost || exit 1
+    CMD curl -f http://localhost || exit 1
 
 EXPOSE 80
 

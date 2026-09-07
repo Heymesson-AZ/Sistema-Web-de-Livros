@@ -116,10 +116,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Carrinho::class);
     }
 
-    // um usuario pode ter varias avaliacoes
+    // Avaliações feitas pelo usuário através do perfil de cliente
     public function avaliacoes()
     {
-        return $this->hasMany(Avaliacao::class);
+        return $this->hasManyThrough(Avaliacao::class, Cliente::class, 'user_id', 'cliente_id');
     }
 
     // um usuario pode ter varios favoritos

@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('pedido_entregas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pedido_id')->constrained('pedidos')->onDelete('cascade');
+            $table->foreignId('pedido_id')->unique()->constrained('pedidos')->onDelete('cascade');
 
             // --- DADOS DO ENDEREÇO (Snapshot para Segurança) ---
             $table->string('rua');
+            $table->string('numero', 20);
             $table->string('bairro');
             $table->string('cidade');
             $table->char('estado', 2);
@@ -44,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pedidos_entregas');
+        Schema::dropIfExists('pedido_entregas');
     }
 };

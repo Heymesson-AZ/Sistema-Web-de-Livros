@@ -26,6 +26,8 @@ return new class extends Migration
             $table->text('comentario')->nullable();
             //recomenda ou não o vendedor, pode ser nulo
             $table->boolean('recomenda')->nullable();
+            // Garante uma única avaliação por cliente em cada pedido
+            $table->unique(['cliente_id', 'pedido_id']);
             // timestamps para registrar quando a avaliação foi criada e atualizada
             $table->timestamps();
         });
@@ -36,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('avalicaoes');
+        Schema::dropIfExists('avaliacoes');
     }
 };

@@ -18,14 +18,12 @@ class AvaliacaoFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            // Sorteia quem está avaliando, quem está sendo avaliado e qual foi o pedido
-            // Tenta pegar um vendedor, cliente e pedido aleatório. Se não encontrar, cria um novo.
-            //usando a chamada do use no topo, não precisa usar o caminho completo
-            'vendedor_id' => Vendedor::inRandomOrder()->first()?->id ?? Vendedor::factory(),
-            'cliente_id' => Cliente::inRandomOrder()->first()?->id ?? Cliente::factory(),
-            'pedido_id' => Pedido::inRandomOrder()->first()?->id ?? Pedido::factory(),
+        $pedido = Pedido::doesntHave('avaliacoes')->inRandomOrder()->first();
 
+        return [
+            'pedido_id' => $pedido?->id ?? Pedido::factory(),
+            'vendedor_id' => fn (array $attributes) => Pedido::find($attributes['pedido_id'])?->vendedor_id ?? Vendedor::inRandomOrder()->first()?->id ?? Vendedor::factory(),
+            'cliente_id' => fn (array $attributes) => Pedido::find($attributes['pedido_id'])?->cliente_id ?? Cliente::inRandomOrder()->first()?->id ?? Cliente::factory(),
             'avaliacao' => fake()->numberBetween(1, 5),
             'comentario' => fake()->optional()->sentence(),
             'recomenda' => fake()->boolean(80), // 80% de chance de ser true

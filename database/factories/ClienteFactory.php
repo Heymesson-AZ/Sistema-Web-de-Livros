@@ -17,12 +17,20 @@ class ClienteFactory extends Factory
 
     public function definition(): array
     {
+        $cpf = null;
+        try {
+            $cpf = fake('pt_BR')->unique()->cpf();
+        } catch (\Throwable $e) {
+            $n = fake()->numerify('###########');
+            $cpf = substr($n, 0, 3) . '.' . substr($n, 3, 3) . '.' . substr($n, 6, 3) . '-' . substr($n, 9, 2);
+        }
+
         return [
             // Garante que cada cliente tenha seu próprio User do tipo cliente
             'user_id' => User::factory()->cliente(),
 
-            'cpf' => fake()->unique()->cpf(), // O Faker Laravel tem suporte a formatos PT-BR
-            'celular_contato' => fake()->phoneNumber(),
+            'cpf' => $cpf,
+            'celular_contato' => fake('pt_BR')->phoneNumber(),
             'data_nascimento' => fake()->date('Y-m-d', '-18 years'), // Clientes maiores de 18
         ];
     }

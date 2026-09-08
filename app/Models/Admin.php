@@ -32,12 +32,14 @@ class Admin extends Model
     public const DEPARTAMENTO_EDITORIAL = 'Editorial';
     public const DEPARTAMENTO_COMERCIAL = 'Comercial';
     public const DEPARTAMENTO_OPERACOES = 'Operações';
+    public const DEPARTAMENTO_OPERACIONAL = 'Operações';
     public const DEPARTAMENTO_ATENDIMENTO = 'Atendimento';
 
     // =========================================================================
     // CONSTANTES DOS CARGOS
     // =========================================================================
     public const CARGO_SUPER_ADMIN = 'Super Admin';
+    public const CARGO_ADMINISTRADOR = 'Administrador';
     public const CARGO_GERENTE_CATALOGO = 'Gerente de Catálogo';
     public const CARGO_GERENTE_COMERCIAL = 'Gerente Comercial';
     public const CARGO_ANALISTA_OPERACOES = 'Analista de Operações';

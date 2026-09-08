@@ -338,6 +338,142 @@ class VendedorController extends Controller
     }
 
     // =========================================================================
+    // SOLICITAÇÃO PÚBLICA DE CADASTRO E PAINEL DO VENDEDOR
+    // =========================================================================
+
+    /**
+     * Exibir formulário para visitante ou cliente solicitar se tornar vendedor.
+     */
+    public function solicitarCadastro(): View|RedirectResponse
+    {
+        if (Auth::check() && Auth::user()->isVendedor()) {
+            return redirect()->route('vendedor.painel');
+        }
+
+        return view('vendedor.solicitar', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    /**
+     * Processar a solicitação de cadastro do vendedor (gerando status_aprovacao = 'pendente').
+     */
+    public function enviarSolicitacao(Request $request): RedirectResponse
+    {
+        if (Auth::check()) {
+            $user = $request->user();
+
+            if ($user->isVendedor() && $user->vendedor) {
+                return redirect()->route('vendedor.painel');
+            }
+
+            $request->validate([
+                'cnpj' => ['required', 'string', 'max:20', 'unique:' . Vendedor::class . ',cnpj'],
+                'razao_social' => ['required', 'string', 'max:255'],
+                'nome_fantasia' => ['required', 'string', 'max:255'],
+                'inscricao_estadual' => ['nullable', 'string', 'max:50'],
+                'telefone_comercial' => ['required', 'string', 'max:20'],
+            ], [
+                'cnpj.required' => 'O CNPJ é obrigatório.',
+                'cnpj.unique' => 'Este CNPJ já está cadastrado por outro vendedor.',
+                'razao_social.required' => 'A razão social é obrigatória.',
+                'nome_fantasia.required' => 'O nome fantasia da loja é obrigatório.',
+                'telefone_comercial.required' => 'O telefone comercial é obrigatório.',
+            ]);
+
+            DB::transaction(function () use ($request, $user) {
+                $user->update(['tipo' => 'vendedor']);
+
+                Vendedor::create([
+                    'user_id' => $user->id,
+                    'cnpj' => $request->cnpj,
+                    'telefone_comercial' => $request->telefone_comercial,
+                    'razao_social' => $request->razao_social,
+                    'nome_fantasia' => $request->nome_fantasia,
+                    'inscricao_estadual' => $request->inscricao_estadual,
+                    'status_aprovacao' => Vendedor::STATUS_PENDENTE,
+                ]);
+            });
+        } else {
+            $request->validate([
+                'name' => ['required', 'string', 'min:3', 'max:100'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                'cnpj' => ['required', 'string', 'max:20', 'unique:' . Vendedor::class . ',cnpj'],
+                'razao_social' => ['required', 'string', 'max:255'],
+                'nome_fantasia' => ['required', 'string', 'max:255'],
+                'inscricao_estadual' => ['nullable', 'string', 'max:50'],
+                'telefone_comercial' => ['required', 'string', 'max:20'],
+            ], [
+                'name.required' => 'O nome do responsável é obrigatório.',
+                'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
+                'email.required' => 'O e-mail é obrigatório.',
+                'email.unique' => 'Este e-mail já está sendo utilizado.',
+                'password.required' => 'A senha é obrigatória.',
+                'password.confirmed' => 'A confirmação de senha não confere.',
+                'cnpj.required' => 'O CNPJ é obrigatório.',
+                'cnpj.unique' => 'Este CNPJ já está cadastrado por outro vendedor.',
+                'razao_social.required' => 'A razão social é obrigatória.',
+                'nome_fantasia.required' => 'O nome fantasia da loja é obrigatório.',
+                'telefone_comercial.required' => 'O telefone comercial é obrigatório.',
+            ]);
+
+            $user = DB::transaction(function () use ($request) {
+                $newUser = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'tipo' => 'vendedor',
+                    'status' => 'ativo',
+                    'email_verified_at' => now(),
+                ]);
+
+                Vendedor::create([
+                    'user_id' => $newUser->id,
+                    'cnpj' => $request->cnpj,
+                    'telefone_comercial' => $request->telefone_comercial,
+                    'razao_social' => $request->razao_social,
+                    'nome_fantasia' => $request->nome_fantasia,
+                    'inscricao_estadual' => $request->inscricao_estadual,
+                    'status_aprovacao' => Vendedor::STATUS_PENDENTE,
+                ]);
+
+                return $newUser;
+            });
+
+            Auth::login($user);
+        }
+
+        return redirect()->route('vendedor.painel')
+            ->with('status', 'solicitacao-enviada');
+    }
+
+    /**
+     * Exibir painel da loja com status da aprovação, métricas e avisos.
+     */
+    public function painel(Request $request): View|RedirectResponse
+    {
+        $user = $request->user();
+        $vendedor = $user->vendedor;
+
+        if (!$vendedor) {
+            return redirect()->route('vendedor.solicitar');
+        }
+
+        $livrosCount = $vendedor->livros()->count();
+        $pedidosCount = $vendedor->pedidos()->count();
+        $avaliacoesCount = $vendedor->avaliacoes()->count();
+
+        return view('vendedor.painel', [
+            'user' => $user,
+            'vendedor' => $vendedor,
+            'livrosCount' => $livrosCount,
+            'pedidosCount' => $pedidosCount,
+            'avaliacoesCount' => $avaliacoesCount,
+        ]);
+    }
+
+    // =========================================================================
     // MÉTODOS DE RESOURCE PADRÃO DO LARAVEL
     // =========================================================================
 

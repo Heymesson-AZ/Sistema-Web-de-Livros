@@ -35,6 +35,13 @@
                 <input type="text" placeholder="Buscar livros...">
             </div>
 
+            <!-- Botão Venda Conosco (Desktop) -->
+            <a href="{{ route('vendedor.solicitar') }}"
+                class="btn btn-warning btn-sm d-none d-md-flex align-items-center gap-1 rounded-pill px-3 ms-2 fw-semibold text-dark text-decoration-none shadow-sm">
+                <i data-lucide="store" style="width: 15px; height: 15px;"></i>
+                <span>Venda Conosco</span>
+            </a>
+
             <!-- Botão Entrar Rápido (Desktop) -->
             <button type="button"
                 class="btn btn-outline-light btn-sm d-none d-md-flex align-items-center gap-2 rounded-pill px-3 ms-2"

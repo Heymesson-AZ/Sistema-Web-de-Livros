@@ -38,6 +38,22 @@
                 <input type="text" placeholder="Buscar livros...">
             </div>
 
+            @if (Auth::user()->isCliente())
+                <!-- Botão Venda Conosco para Clientes -->
+                <a href="{{ route('vendedor.solicitar') }}"
+                    class="btn btn-outline-warning btn-sm d-none d-md-flex align-items-center gap-1 rounded-pill px-3 ms-2 fw-semibold text-decoration-none shadow-sm">
+                    <i data-lucide="store" style="width: 15px; height: 15px;"></i>
+                    <span>Venda Conosco</span>
+                </a>
+            @elseif (Auth::user()->isVendedor())
+                <!-- Atalho Minha Loja para Vendedores -->
+                <a href="{{ route('vendedor.painel') }}"
+                    class="btn btn-outline-light btn-sm d-none d-md-flex align-items-center gap-1 rounded-pill px-3 ms-2 fw-semibold text-decoration-none shadow-sm">
+                    <i data-lucide="store" style="width: 15px; height: 15px;"></i>
+                    <span>Minha Loja</span>
+                </a>
+            @endif
+
             <!-- Perfil / Usuário (Desktop) -->
             <a href="{{ route('dashboard') }}"
                 class="user-pill-link d-none d-md-flex align-items-center gap-2 text-decoration-none ms-2">

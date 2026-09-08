@@ -29,9 +29,14 @@ Route::middleware(['auth', 'checkTipo:cliente'])->group(function () {
     });
 });
 
-// Rotas para o perfil de Vendedor
+// Solicitação de Cadastro de Vendedor (Pública para visitantes e clientes)
+Route::get('/vendedor/cadastrar', [VendedorController::class, 'solicitarCadastro'])->name('vendedor.solicitar');
+Route::post('/vendedor/cadastrar', [VendedorController::class, 'enviarSolicitacao'])->name('vendedor.solicitar.salvar');
+
+// Rotas para o perfil e painel de Vendedor
 Route::middleware(['auth', 'checkTipo:vendedor'])->group(function () {
     Route::prefix('vendedor')->group(function () {
+        Route::get('/painel', [VendedorController::class, 'painel'])->name('vendedor.painel');
         Route::get('/perfil-vendedor', [VendedorController::class, 'editarPerfil'])->name('vendedor.perfil.editar');
         Route::patch('/perfil-vendedor', [VendedorController::class, 'atualizarPerfil'])->name('vendedor.perfil.atualizar');
         Route::delete('/perfil-vendedor', [VendedorController::class, 'deletarConta'])->name('vendedor.perfil.deletar');

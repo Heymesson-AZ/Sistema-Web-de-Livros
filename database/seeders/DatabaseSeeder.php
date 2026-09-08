@@ -20,6 +20,7 @@ use App\Models\Carrinho;
 use App\Models\Livro;
 use App\Models\CartaoSalvo;
 use App\Models\Admin;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
@@ -36,29 +37,51 @@ class DatabaseSeeder extends Seeder
         Cupom::factory(5)->create();
 
         // 2. USUÁRIOS E PERFIS
-        // Criamos os perfis (que por sua vez criam os Users vinculados via Factory)
-        Cliente::factory(100)->create();
-        Vendedor::factory(60)->create();
+        Cliente::factory(50)->create();
+        Vendedor::factory(30)->create();
         Admin::factory(5)->create();
 
-        // Usuário de Teste Pessoal / Admin Master
-        $meuAdmin = User::updateOrCreate(
-            ['email' => 'heymesson@teste.com'],
+        // Super Admin Principal Solicitado
+        $superAdmin = User::updateOrCreate(
+            ['email' => 'heymesson.az2017@gmail.com'],
             [
-                'name' => 'Heymesson',
+                'name' => 'Heymesson Azevêdo',
                 'tipo' => 'admin',
+                'status' => 'ativo',
                 'foto_perfil' => null,
-                'password' => bcrypt('suasenha123'),
+                'password' => Hash::make('50672253'),
                 'email_verified_at' => now(),
             ]
         );
 
         Admin::updateOrCreate(
-            ['user_id' => $meuAdmin->id],
+            ['user_id' => $superAdmin->id],
             [
                 'telefone_urgencia' => '(11) 99999-9999',
                 'cargo' => Admin::CARGO_SUPER_ADMIN,
                 'departamento' => Admin::DEPARTAMENTO_TECNOLOGIA,
+            ]
+        );
+
+        // Usuário de Teste Admin Secundário
+        $adminTeste = User::updateOrCreate(
+            ['email' => 'admin@teste.com'],
+            [
+                'name' => 'Administrador do Sistema',
+                'tipo' => 'admin',
+                'status' => 'ativo',
+                'foto_perfil' => null,
+                'password' => Hash::make('suasenha123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Admin::updateOrCreate(
+            ['user_id' => $adminTeste->id],
+            [
+                'telefone_urgencia' => '(11) 98888-7777',
+                'cargo' => Admin::CARGO_ADMINISTRADOR,
+                'departamento' => Admin::DEPARTAMENTO_OPERACIONAL,
             ]
         );
 
@@ -68,8 +91,9 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Cliente Teste',
                 'tipo' => 'cliente',
+                'status' => 'ativo',
                 'foto_perfil' => null,
-                'password' => bcrypt('suasenha123'),
+                'password' => Hash::make('suasenha123'),
                 'email_verified_at' => now(),
             ]
         );
@@ -83,20 +107,21 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Usuário de Teste Vendedor
-        $meuVendedor = User::updateOrCreate(
+        // Usuário de Teste Vendedor (APROVADO)
+        $vendedorAprovado = User::updateOrCreate(
             ['email' => 'vendedor@teste.com'],
             [
-                'name' => 'Vendedor Teste',
+                'name' => 'Livraria Universo (Aprovado)',
                 'tipo' => 'vendedor',
+                'status' => 'ativo',
                 'foto_perfil' => null,
-                'password' => bcrypt('suasenha123'),
+                'password' => Hash::make('suasenha123'),
                 'email_verified_at' => now(),
             ]
         );
 
         Vendedor::updateOrCreate(
-            ['user_id' => $meuVendedor->id],
+            ['user_id' => $vendedorAprovado->id],
             [
                 'cnpj' => '12.345.678/0001-90',
                 'razao_social' => 'Livraria Universo LTDA',
@@ -104,6 +129,56 @@ class DatabaseSeeder extends Seeder
                 'inscricao_estadual' => '123456789',
                 'telefone_comercial' => '(11) 97777-7777',
                 'status_aprovacao' => 'aprovado',
+            ]
+        );
+
+        // Usuário de Teste Vendedor (PENDENTE DE APROVAÇÃO)
+        $vendedorPendente = User::updateOrCreate(
+            ['email' => 'vendedor.pendente@teste.com'],
+            [
+                'name' => 'Livraria Saber Novo (Pendente)',
+                'tipo' => 'vendedor',
+                'status' => 'ativo',
+                'foto_perfil' => null,
+                'password' => Hash::make('suasenha123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Vendedor::updateOrCreate(
+            ['user_id' => $vendedorPendente->id],
+            [
+                'cnpj' => '98.765.432/0001-10',
+                'razao_social' => 'Livraria Saber Novo Comércio ME',
+                'nome_fantasia' => 'Saber Novo Livros',
+                'inscricao_estadual' => '987654321',
+                'telefone_comercial' => '(11) 96666-5555',
+                'status_aprovacao' => 'pendente',
+            ]
+        );
+
+        // Usuário de Teste Vendedor (REJEITADO)
+        $vendedorRejeitado = User::updateOrCreate(
+            ['email' => 'vendedor.rejeitado@teste.com'],
+            [
+                'name' => 'Livraria Alpha (Rejeitado)',
+                'tipo' => 'vendedor',
+                'status' => 'ativo',
+                'foto_perfil' => null,
+                'password' => Hash::make('suasenha123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        Vendedor::updateOrCreate(
+            ['user_id' => $vendedorRejeitado->id],
+            [
+                'cnpj' => '55.444.333/0001-22',
+                'razao_social' => 'Alpha Distribuidora de Livros EIRELI',
+                'nome_fantasia' => 'Livraria Alpha',
+                'inscricao_estadual' => '554443332',
+                'telefone_comercial' => '(11) 95555-4444',
+                'status_aprovacao' => 'rejeitado',
             ]
         );
 

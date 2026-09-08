@@ -178,6 +178,45 @@
                     @endif
                 @endauth
 
+                <!-- Área do Vendedor / Seja um Vendedor -->
+                @guest
+                    <li class="menu-item {{ request()->routeIs('vendedor.solicitar') ? 'active' : '' }}">
+                        <a href="{{ route('vendedor.solicitar') }}" class="menu-item-link">
+                            <div class="menu-item-header">
+                                <i data-lucide="store"></i>
+                                <span>Seja um Vendedor</span>
+                                <span class="menu-badge badge-sale">Vender</span>
+                            </div>
+                        </a>
+                    </li>
+                @else
+                    @if (Auth::user()->isCliente())
+                        <li class="menu-item {{ request()->routeIs('vendedor.solicitar') ? 'active' : '' }}">
+                            <a href="{{ route('vendedor.solicitar') }}" class="menu-item-link">
+                                <div class="menu-item-header">
+                                    <i data-lucide="store"></i>
+                                    <span>Quero Vender</span>
+                                    <span class="menu-badge badge-sale">Parceria</span>
+                                </div>
+                            </a>
+                        </li>
+                    @elseif (Auth::user()->isVendedor())
+                        <li class="menu-item {{ request()->routeIs('vendedor.painel') ? 'active' : '' }}">
+                            <a href="{{ route('vendedor.painel') }}" class="menu-item-link">
+                                <div class="menu-item-header">
+                                    <i data-lucide="store"></i>
+                                    <span>Minha Loja</span>
+                                    @if(Auth::user()->vendedor?->status_aprovacao === 'pendente')
+                                        <span class="badge bg-warning text-dark ms-auto" style="font-size: 11px;">Pendente</span>
+                                    @elseif(Auth::user()->vendedor?->status_aprovacao === 'aprovado')
+                                        <span class="badge bg-success ms-auto" style="font-size: 11px;">Ativo</span>
+                                    @endif
+                                </div>
+                            </a>
+                        </li>
+                    @endif
+                @endguest
+
                 <!-- Contato -->
                 <li class="menu-item">
                     <a href="#" class="menu-item-link">

@@ -40,6 +40,26 @@ class Vendedor extends Model
         return $this->hasMany(Avaliacao::class);
     }
 
+    public const STATUS_PENDENTE = 'pendente';
+    public const STATUS_APROVADO = 'aprovado';
+    public const STATUS_REJEITADO = 'rejeitado';
+
+    // Helpers de status
+    public function isAprovado(): bool
+    {
+        return $this->status_aprovacao === self::STATUS_APROVADO;
+    }
+
+    public function isPendente(): bool
+    {
+        return $this->status_aprovacao === self::STATUS_PENDENTE;
+    }
+
+    public function isRejeitado(): bool
+    {
+        return $this->status_aprovacao === self::STATUS_REJEITADO;
+    }
+
     // um vendedor pode ter muitos pedidos
     public function pedidos()
     {

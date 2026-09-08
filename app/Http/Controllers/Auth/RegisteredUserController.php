@@ -1,81 +1,10 @@
 <?php
 
-// Controlador responsável por lidar com o registro de novos usuários,
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
-use Carbon\Carbon;
+use App\Http\Controllers\Autenticacao\CadastroUsuarioController;
 
-/// Controlador responsável por lidar com o registro de novos usuários,
-//  incluindo a exibição do formulário de registro e a
-//criação de um novo usuário após a validação dos dados do formulário.
-class RegisteredUserController extends Controller
+class RegisteredUserController extends CadastroUsuarioController
 {
-
-
-    /**
-     * formulário de registro.
-     */
-    public function create(): RedirectResponse
-    {
-        return redirect('/');
-    }
-
-    /**
-     * Cria um novo usuário após a validação dos dados do formulário de registro.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-
-    // O método store() é responsável por processar os dados do formulário de registro,
-    // validar os dados, criar um novo usuário, disparar o evento Registered e autenticar o usuário recém-criado.
-    //Após o registro bem-sucedido, o usuário é redirecion
-    public function store(Request $request): RedirectResponse
-    {
-
-        $datalimite = Carbon::now()->subYears(18)->format('Y-m-d');
-
-        $request->validate([
-            'name' => ['required', 'string', 'min:3', 'max:100'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'cpf' => ['required', 'string', 'unique:cliente,cpf'],
-            'telefone' => ['required', 'string'],
-            'data_nascimento' => ['required', 'date', 'before_or_equal:' . $datalimite],
-        ], [
-            'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
-            'name.max' => 'O nome não pode ter mais de 100 caracteres.',
-            'data_nascimento.before_or_equal' => 'Você precisa ter pelo menos 18 anos para se cadastrar.',
-            'cpf.unique' => 'Esse CPF já está cadastrado.',
-            'email.unique' => 'O email informado já está em uso.',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'tipo' => 'cliente',
-        ]);
-
-        // Agora criamos o cliente ligado a esse usuário
-        $user->cliente()->create([
-            'cpf' => $request->cpf,
-            'celular_contato' => $request->telefone,
-            'data_nascimento' => $request->data_nascimento,
-        ]);
-
-        // Disparar o evento Registered
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
-    }
+    // Herda todos os métodos de CadastroUsuarioController para compatibilidade total
 }

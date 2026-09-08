@@ -1,31 +1,10 @@
 <?php
 
-// Controlador responsável por lidar com a atualização da senha dos usuários,
-// incluindo a validação da senha atual e a atualização para a nova senha fornecida
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use App\Http\Controllers\Autenticacao\SenhaController;
 
-class PasswordController extends Controller
+class PasswordController extends SenhaController
 {
-    /**
-     * Update the user's password.
-     */
-    public function update(Request $request): RedirectResponse
-    {
-        $validated = $request->validateWithBag('updatePassword', [
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
-        ]);
-
-        $request->user()->update([
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        return back()->with('status', 'senha atualizada');
-    }
+    // Herda todos os métodos de SenhaController para compatibilidade total
 }

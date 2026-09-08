@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.principal>
     <div class="container py-4">
 
         <!-- NAVEGAÇÃO -->
@@ -87,4 +87,4 @@
         </div>
 
     </div>
-</x-layouts.app>
+</x-layouts.principal>

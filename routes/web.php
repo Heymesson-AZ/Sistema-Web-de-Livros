@@ -4,48 +4,41 @@ use App\Http\Controllers\Admin\AdministradorController;
 use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
 
-// Rotas publica(Todo mundo pode acessar)
+// Rotas públicas (Acesso livre a todos os visitantes)
 Route::get('/', function () {
-    return view('pages.inicio');
+    return view('paginas.inicio');
 });
 
-// rota para o dashboard, acessível apenas para usuários autenticados e verificados.
-// Ele retorna a view 'dashboard' quando acessado.
+// Painel principal (Dashboard), acessível para usuários autenticados e verificados
 Route::get('/dashboard', function () {
-    return view('pages.dashboard');
+    return view('paginas.painel');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
 // Rotas para o perfil de Cliente
-
-// quando passamos mais de um middleware, o Laravel irá aplicar todos eles na ordem em que foram definidos.
-// Neste caso, as rotas dentro deste grupo só serão acessíveis para usuários que estão autenticados (auth) e que têm o tipo 'cliente'
-// estou usando o middleware 'checkTipo' para verificar se o usuário autenticado tem o tipo 'cliente'.
 Route::middleware(['auth', 'checkTipo:cliente'])->group(function () {
     Route::prefix('cliente')->group(function () {
-        //rota para o perfil do cliente, onde ele pode ver, editar suas informações, atualizar e deletar sua conta
-        Route::get('/perfil-cliente', [PerfilController::class, 'edit'])->name('cliente.perfil.editar'); // Rota para exibir o formulário de edição do perfil do cliente
-        Route::patch('/perfil-cliente', [PerfilController::class, 'update'])->name('cliente.perfil.atualizar'); // Rota para processar a atualização do perfil do cliente
-        Route::delete('/perfil-cliente', [PerfilController::class, 'destroy'])->name('cliente.perfil.deletar'); // Rota para processar a exclusão da conta do cliente
+        Route::get('/perfil-cliente', [PerfilController::class, 'editar'])->name('cliente.perfil.editar');
+        Route::patch('/perfil-cliente', [PerfilController::class, 'atualizar'])->name('cliente.perfil.atualizar');
+        Route::delete('/perfil-cliente', [PerfilController::class, 'deletar'])->name('cliente.perfil.deletar');
     });
 });
 
 // Rotas para o perfil de Vendedor
 Route::middleware(['auth', 'checkTipo:vendedor'])->group(function () {
     Route::prefix('vendedor')->group(function () {
-        Route::get('/perfil-vendedor', [PerfilController::class, 'edit'])->name('vendedor.perfil.editar'); // Rota para exibir o formulário de edição do perfil do vendedor
-        Route::patch('/perfil-vendedor', [PerfilController::class, 'update'])->name('vendedor.perfil.atualizar'); // Rota para processar a atualização do perfil do vendedor
-        Route::delete('/perfil-vendedor', [PerfilController::class, 'destroy'])->name('vendedor.perfil.deletar'); // Rota para processar a exclusão da conta do vendedor
+        Route::get('/perfil-vendedor', [PerfilController::class, 'editar'])->name('vendedor.perfil.editar');
+        Route::patch('/perfil-vendedor', [PerfilController::class, 'atualizar'])->name('vendedor.perfil.atualizar');
+        Route::delete('/perfil-vendedor', [PerfilController::class, 'deletar'])->name('vendedor.perfil.deletar');
     });
 });
 
-
-// Rotas para o perfil de Admin
+// Rotas para o perfil de Admin e Gestão de Administradores
 Route::middleware(['auth', 'checkTipo:admin'])->group(function () {
     Route::prefix('admin')->group(function () {
-        Route::get('/perfil-admin', [PerfilController::class, 'edit'])->name('admin.perfil.editar'); // Rota para exibir o formulário de edição do perfil do admin
-        Route::patch('/perfil-admin', [PerfilController::class, 'update'])->name('admin.perfil.atualizar'); // Rota para processar a atualização do perfil do admin
-        Route::delete('/perfil-admin', [PerfilController::class, 'destroy'])->name('admin.perfil.deletar'); // Rota para processar a exclusão da conta do admin
+        Route::get('/perfil-admin', [PerfilController::class, 'editar'])->name('admin.perfil.editar');
+        Route::patch('/perfil-admin', [PerfilController::class, 'atualizar'])->name('admin.perfil.atualizar');
+        Route::delete('/perfil-admin', [PerfilController::class, 'deletar'])->name('admin.perfil.deletar');
 
         // Rotas do CRUD de Administradores
         Route::resource('administradores', AdministradorController::class)

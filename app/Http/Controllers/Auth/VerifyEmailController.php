@@ -1,28 +1,10 @@
 <?php
-// Controlador responsável por lidar com a verificação de email dos usuários,
-// incluindo a marcação do email como verificado e o redirecionamento para a dashboard
+
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Http\Controllers\Autenticacao\VerificarEmailController;
 
-class VerifyEmailController extends Controller
+class VerifyEmailController extends VerificarEmailController
 {
-    /**
-     * Mark the authenticated user's email address as verified.
-     */
-    public function __invoke(EmailVerificationRequest $request): RedirectResponse
-    {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
-        }
-
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
-
-        return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
-    }
+    // Herda todos os métodos de VerificarEmailController para compatibilidade total
 }

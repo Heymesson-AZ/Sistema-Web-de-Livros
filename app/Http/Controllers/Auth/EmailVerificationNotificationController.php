@@ -1,26 +1,10 @@
 <?php
 
-// Controlador responsável por lidar com o envio de notificações de verificação de email para os usuários,
-// incluindo o envio de um novo email de verificação caso o usuário solicite.
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Autenticacao\NotificacaoVerificacaoEmailController;
 
-class EmailVerificationNotificationController extends Controller
+class EmailVerificationNotificationController extends NotificacaoVerificacaoEmailController
 {
-    /**
-     * Send a new email verification notification.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('dashboard', absolute: false));
-        }
-
-        $request->user()->sendEmailVerificationNotification();
-
-        return back()->with('status', 'verification-link-sent');
-    }
+    // Herda todos os métodos de NotificacaoVerificacaoEmailController para compatibilidade total
 }

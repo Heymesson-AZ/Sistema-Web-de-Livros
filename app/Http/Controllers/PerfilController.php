@@ -1,54 +1,53 @@
 <?php
 
-// Controlador responsável por lidar com as ações relacionadas ao perfil do usuário,
-// incluindo a exibição do formulário de edição de perfil, a atualização das informações do perfil e
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
-
-
 class PerfilController extends Controller
 {
     /**
-     * View para editar o perfil do usuário.
+     * Exibir formulário de edição de perfil do usuário (Cliente, Vendedor ou Administrador).
      */
-    public function edit(Request $request)
-    {
-        if ($request->user()->tipo === 'cliente') {
-            return view('cliente.perfil-editar', [
-                'user' => $request->user(),
-            ]);
-        } elseif ($request->user()->tipo === 'vendedor') {
-            return view('vendedor.perfil-editar', [
-                'user' => $request->user(),
-            ]);
-        } elseif ($request->user()->tipo === 'admin') {
-            return view('admin.perfil-editar', [
-                'user' => $request->user(),
-                'admin' => $request->user()->admin,
-            ]);
-        } else {
-            abort(403, 'Acesso negado.');
-        }
-    }
-
-    /**
-     * Alterar as informações do perfil do usuário.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function editar(Request $request): View
     {
         $user = $request->user();
 
-        // 1. Atualiza os dados básicos
+        if ($user->tipo === 'cliente') {
+            return view('cliente.perfil-editar', [
+                'user' => $user,
+            ]);
+        } elseif ($user->tipo === 'vendedor') {
+            return view('vendedor.perfil-editar', [
+                'user' => $user,
+            ]);
+        } elseif ($user->tipo === 'admin') {
+            return view('admin.perfil-editar', [
+                'user' => $user,
+                'admin' => $user->admin,
+            ]);
+        }
+
+        abort(403, 'Acesso negado.');
+    }
+
+    /**
+     * Atualizar as informações do perfil do usuário.
+     */
+    public function atualizar(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // 1. Atualiza os dados básicos do usuário
         $user->fill($request->validated());
 
-        // Se o email foi alterado, precisamos resetar a verificação de email
+        // Se o e-mail foi alterado, reseta a verificação e envia notificação
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
             $user->sendEmailVerificationNotification();
@@ -56,24 +55,22 @@ class PerfilController extends Controller
 
         $user->save();
 
-        // 2. Atualiza os dados específicos (Cliente, Vendedor ou Admin)
+        // 2. Atualiza os dados específicos do papel (Cliente, Vendedor ou Admin)
         if ($user->tipo === 'vendedor') {
-
-            $user->vendedor()->update($request->only([
-                'telefone',
-                'razao_social',
-                'nome_fantasia',
-                'inscricao_estadual'
-            ]));
+            $user->vendedor()->update([
+                'telefone_comercial' => $request->telefone ?? $request->telefone_comercial,
+                'razao_social' => $request->razao_social,
+                'nome_fantasia' => $request->nome_fantasia,
+                'inscricao_estadual' => $request->inscricao_estadual,
+            ]);
         } elseif ($user->tipo === 'cliente') {
-            // Buscamos o registro do cliente e atualizamos apenas o telefone
             $user->cliente()->update([
-                'celular_contato' => $request->telefone
+                'celular_contato' => $request->telefone,
             ]);
         } elseif ($user->tipo === 'admin') {
             if ($user->admin) {
                 $user->admin()->update($request->only([
-                    'telefone_urgencia'
+                    'telefone_urgencia',
                 ]));
             }
         }
@@ -82,38 +79,66 @@ class PerfilController extends Controller
     }
 
     /**
-     * deletar a conta do usuário.
+     * Deletar a conta do usuário com travas de segurança.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function deletar(Request $request): RedirectResponse
     {
-        // 1. Validação de segurança (exige a senha atual para deletar)
+        // 1. Validação de segurança (exige senha atual)
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
 
-        if ($user->tipo === 'admin' && \App\Models\User::where('tipo', 'admin')->count() <= 1) {
+        // Trava: Não permitir que o último administrador delete sua conta
+        if ($user->tipo === 'admin' && User::where('tipo', 'admin')->count() <= 1) {
             return back()->withErrors([
                 'DeleteUsuario' => 'Você é o único administrador do sistema e não pode excluir sua própria conta.'
             ]);
         }
 
+        // Trava: Pedidos ativos
         if ($user->temPedidosAtivos()) {
             return back()->withErrors([
                 'DeleteUsuario' => 'Você possui pedidos em andamento (pendentes, processando ou enviados) e não pode excluir sua conta agora.'
             ]);
         }
 
-        // 2. Realiza o Logout
+        // 2. Realiza o logout e remoção
         Auth::logout();
-        // 3. Deleta o usuário
-        // Graças ao "onDelete('cascade')" nas suas migrações,
-        // o Cliente ou Vendedor ligado a ele também será apagado!
         $user->delete();
-        // 4. Invalida a sessão e redireciona
+
+        // 3. Invalida a sessão
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return Redirect::to('/');
+    }
+
+    /**
+     * Alias em português: excluir.
+     */
+    public function excluir(Request $request): RedirectResponse
+    {
+        return $this->deletar($request);
+    }
+
+    // =========================================================================
+    // MÉTODOS DE COMPATIBILIDADE RETROATIVA (LEGACY)
+    // =========================================================================
+
+    public function edit(Request $request)
+    {
+        return $this->editar($request);
+    }
+
+    public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        return $this->atualizar($request);
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        return $this->deletar($request);
     }
 }

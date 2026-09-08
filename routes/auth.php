@@ -1,69 +1,62 @@
 <?php
-// Este arquivo define as rotas de autenticação para a aplicação, incluindo registro, login, recuperação de senha, 
-// verificação de email e logout. As rotas são organizadas em grupos de middleware 
-// para garantir que apenas usuários convidados (guest) possam acessar as rotas de registro e login, 
-// enquanto apenas usuários autenticados (auth) possam acessar as rotas de verificação de email, confirmação de senha e logout.
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Autenticacao\AutenticacaoController;
+use App\Http\Controllers\Autenticacao\AvisoVerificacaoEmailController;
+use App\Http\Controllers\Autenticacao\CadastroUsuarioController;
+use App\Http\Controllers\Autenticacao\ConfirmarSenhaController;
+use App\Http\Controllers\Autenticacao\LinkRedefinicaoSenhaController;
+use App\Http\Controllers\Autenticacao\NotificacaoVerificacaoEmailController;
+use App\Http\Controllers\Autenticacao\RedefinicaoSenhaController;
+use App\Http\Controllers\Autenticacao\SenhaController;
+use App\Http\Controllers\Autenticacao\VerificarEmailController;
 use Illuminate\Support\Facades\Route;
 
-// Rotas de autenticação para usuários convidados (guest)
+// Rotas de autenticação para visitantes (guest)
 Route::middleware('guest')->group(function () {
-
-    // Rota para exibir o formulário de registro
-    Route::get('register', [RegisteredUserController::class, 'create'])
+    // Registro de novos usuários
+    Route::get('register', [CadastroUsuarioController::class, 'exibirFormulario'])
         ->name('register');
-        // Rota para criar um novo usuário
-    Route::post('register', [RegisteredUserController::class, 'store']);
-        // Rota para exibir o formulário de login
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
+    Route::post('register', [CadastroUsuarioController::class, 'cadastrar']);
+
+    // Login e autenticação
+    Route::get('login', [AutenticacaoController::class, 'exibirLogin'])
         ->name('login');
-        // Rota para processar o login do usuário
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
-        // Rotas para recuperação de senha
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+    Route::post('login', [AutenticacaoController::class, 'autenticar']);
+
+    // Solicitação de link de redefinição de senha
+    Route::get('forgot-password', [LinkRedefinicaoSenhaController::class, 'exibirFormulario'])
         ->name('password.request');
-        // Rota para enviar o link de redefinição de senha para o email do usuário
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+    Route::post('forgot-password', [LinkRedefinicaoSenhaController::class, 'enviarLink'])
         ->name('password.email');
-        // Rota para exibir o formulário de redefinição de senha usando o token enviado por email
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+
+    // Redefinição de senha com token
+    Route::get('reset-password/{token}', [RedefinicaoSenhaController::class, 'exibirFormulario'])
         ->name('password.reset');
-        // Rota para processar a redefinição de senha do usuário
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
+    Route::post('reset-password', [RedefinicaoSenhaController::class, 'redefinirSenha'])
         ->name('password.store');
 });
 
 // Rotas de autenticação para usuários autenticados (auth)
 Route::middleware('auth')->group(function () {
-    
-    // Rotas para verificação de email, confirmação de senha e logout
-    Route::get('verify-email', EmailVerificationPromptController::class)
+    // Verificação de e-mail
+    Route::get('verify-email', AvisoVerificacaoEmailController::class)
         ->name('verification.notice');
-        // Rota para verificar o email do usuário usando o link enviado por email
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+    Route::get('verify-email/{id}/{hash}', VerificarEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
-        // Rota para reenviar o link de verificação de email para o usuário
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+    Route::post('email/verification-notification', [NotificacaoVerificacaoEmailController::class, 'reenviar'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
-        // Rota para exibir o formulário de confirmação de senha
-    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
+
+    // Confirmação de senha para ações sensíveis
+    Route::get('confirm-password', [ConfirmarSenhaController::class, 'exibirConfirmacao'])
         ->name('password.confirm');
-        // Rota para processar a confirmação de senha do usuário
-    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
-        // Rota para exibir o formulário de atualização de senha
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
-        // Rota para fazer logout do usuário
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+    Route::post('confirm-password', [ConfirmarSenhaController::class, 'confirmar']);
+
+    // Atualização de senha
+    Route::put('password', [SenhaController::class, 'atualizar'])->name('password.update');
+
+    // Encerramento de sessão (Logout)
+    Route::post('logout', [AutenticacaoController::class, 'encerrarSessao'])
         ->name('logout');
 });

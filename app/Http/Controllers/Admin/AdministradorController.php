@@ -17,9 +17,9 @@ use Illuminate\View\View;
 class AdministradorController extends Controller
 {
     /**
-     * Exibe a listagem dos administradores com busca, filtros e métricas.
+     * Listar administradores com busca, filtros e indicadores (KPIs).
      */
-    public function index(Request $request): View
+    public function listar(Request $request): View
     {
         $query = Admin::with('user');
 
@@ -50,7 +50,7 @@ class AdministradorController extends Controller
         $totalDepartamentos = count(Admin::getDepartamentos());
         $totalSuperAdmins = Admin::where('cargo', Admin::CARGO_SUPER_ADMIN)->count();
 
-        return view('admin.administradores.index', [
+        return view('admin.administradores.listar', [
             'administradores' => $administradores,
             'cargos' => Admin::getCargos(),
             'departamentos' => Admin::getDepartamentos(),
@@ -61,20 +61,20 @@ class AdministradorController extends Controller
     }
 
     /**
-     * Exibe o formulário de cadastro de novo administrador.
+     * Exibir formulário para cadastrar novo administrador.
      */
-    public function create(): View
+    public function cadastrar(): View
     {
-        return view('admin.administradores.create', [
+        return view('admin.administradores.cadastrar', [
             'cargos' => Admin::getCargos(),
             'departamentos' => Admin::getDepartamentos(),
         ]);
     }
 
     /**
-     * Salva um novo administrador no banco de dados.
+     * Salvar um novo administrador no banco de dados.
      */
-    public function store(Request $request): RedirectResponse
+    public function salvar(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:100'],
@@ -117,37 +117,37 @@ class AdministradorController extends Controller
     }
 
     /**
-     * Exibe os detalhes de um administrador específico.
+     * Exibir os detalhes de um administrador específico.
      */
-    public function show(Admin $administradore): View
+    public function detalhes(Admin $administrador): View
     {
-        $administradore->load('user');
+        $administrador->load('user');
 
-        return view('admin.administradores.show', [
-            'admin' => $administradore,
+        return view('admin.administradores.detalhes', [
+            'admin' => $administrador,
         ]);
     }
 
     /**
-     * Exibe o formulário de edição de um administrador.
+     * Exibir formulário de edição de um administrador.
      */
-    public function edit(Admin $administradore): View
+    public function editar(Admin $administrador): View
     {
-        $administradore->load('user');
+        $administrador->load('user');
 
-        return view('admin.administradores.edit', [
-            'admin' => $administradore,
+        return view('admin.administradores.editar', [
+            'admin' => $administrador,
             'cargos' => Admin::getCargos(),
             'departamentos' => Admin::getDepartamentos(),
         ]);
     }
 
     /**
-     * Atualiza as informações do administrador.
+     * Atualizar as informações do administrador.
      */
-    public function update(Request $request, Admin $administradore): RedirectResponse
+    public function atualizar(Request $request, Admin $administrador): RedirectResponse
     {
-        $user = $administradore->user;
+        $user = $administrador->user;
 
         $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:100'],
@@ -167,7 +167,7 @@ class AdministradorController extends Controller
             'departamento.in' => 'Selecione um departamento válido.',
         ]);
 
-        DB::transaction(function () use ($request, $user, $administradore) {
+        DB::transaction(function () use ($request, $user, $administrador) {
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
@@ -179,7 +179,7 @@ class AdministradorController extends Controller
 
             $user->update($userData);
 
-            $administradore->update([
+            $administrador->update([
                 'telefone_urgencia' => $request->telefone_urgencia,
                 'cargo' => $request->cargo,
                 'departamento' => $request->departamento,
@@ -191,18 +191,18 @@ class AdministradorController extends Controller
     }
 
     /**
-     * Remove um administrador do sistema com travas de segurança.
+     * Deletar/excluir um administrador do sistema com travas de segurança.
      */
-    public function destroy(Admin $administradore): RedirectResponse
+    public function deletar(Admin $administrador): RedirectResponse
     {
         // 1. Não permitir auto-exclusão
-        if ($administradore->user_id === Auth::id()) {
+        if ($administrador->user_id === Auth::id()) {
             return redirect()->route('admin.administradores.index')
                 ->with('error', 'Operação negada: Você não pode excluir sua própria conta de administrador.');
         }
 
         // 2. Não permitir exclusão se for o único Super Admin
-        if ($administradore->cargo === Admin::CARGO_SUPER_ADMIN) {
+        if ($administrador->cargo === Admin::CARGO_SUPER_ADMIN) {
             $totalSuperAdmins = Admin::where('cargo', Admin::CARGO_SUPER_ADMIN)->count();
             if ($totalSuperAdmins <= 1) {
                 return redirect()->route('admin.administradores.index')
@@ -210,13 +210,60 @@ class AdministradorController extends Controller
             }
         }
 
-        DB::transaction(function () use ($administradore) {
-            $user = $administradore->user;
-            $administradore->delete();
+        DB::transaction(function () use ($administrador) {
+            $user = $administrador->user;
+            $administrador->delete();
             $user?->delete();
         });
 
         return redirect()->route('admin.administradores.index')
             ->with('status', 'Administrador excluído com sucesso.');
+    }
+
+    /**
+     * Alias em português: excluir.
+     */
+    public function excluir(Admin $administrador): RedirectResponse
+    {
+        return $this->deletar($administrador);
+    }
+
+    // =========================================================================
+    // MÉTODOS DO RESOURCE PADRÃO DO LARAVEL (DELEGAÇÃO TRANSPARENTE)
+    // =========================================================================
+
+    public function index(Request $request): View
+    {
+        return $this->listar($request);
+    }
+
+    public function create(): View
+    {
+        return $this->cadastrar();
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        return $this->salvar($request);
+    }
+
+    public function show(Admin $administrador): View
+    {
+        return $this->detalhes($administrador);
+    }
+
+    public function edit(Admin $administrador): View
+    {
+        return $this->editar($administrador);
+    }
+
+    public function update(Request $request, Admin $administrador): RedirectResponse
+    {
+        return $this->atualizar($request, $administrador);
+    }
+
+    public function destroy(Admin $administrador): RedirectResponse
+    {
+        return $this->deletar($administrador);
     }
 }

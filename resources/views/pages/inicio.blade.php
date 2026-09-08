@@ -1,3 +1,1 @@
-<x-layouts.visitante>
-
-</x-layouts.visitante>
+@include('paginas.inicio')

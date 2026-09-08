@@ -1,54 +1,10 @@
 <?php
 
-// Controlador responsável por lidar com a autenticação de usuários,
-// incluindo a exibição do formulário de login, o processamento dos dados de login e o encerramento da sessão do usuário.
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Autenticacao\AutenticacaoController;
 
-
-class AuthenticatedSessionController extends Controller
+class AuthenticatedSessionController extends AutenticacaoController
 {
-    /**
-     * Mostrando a tela de login.
-     */
-    public function create(): RedirectResponse
-    {
-        return redirect('/');
-    }
-
-    /**
-     *  Nessa função, autenticamos o usuário usando os dados fornecidos
-     * na solicitação de login.
-     */
-
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        // Antes de tentar autenticar o usuário, verificamos se a solicitação não está sendo feita com muitas tentativas de login em um curto período de tempo (throttling).
-        $request->authenticate();
-        // Se a autenticação for bem-sucedida, limpamos as tentativas de login para o usuário.
-        $request->session()->regenerate();
-        // Redirecionamos o usuário para a página pretendida ou para a rota 'dashboard' após o login bem-sucedido.
-        return redirect()->intended(route('dashboard', absolute: false));
-    }
-
-    /**
-     * Aqui, encerramos a sessão do usuário.
-     */
-
-    public function destroy(Request $request): RedirectResponse
-    {
-        // Usamos o guard 'web' para garantir que estamos encerrando a sessão do usuário autenticado.
-        Auth::guard('web')->logout();
-        // Invalidamos a sessão atual para garantir que os dados da sessão sejam limpos.
-        $request->session()->invalidate();
-        // Regeneramos o token CSRF para proteger contra ataques de falsificação de solicitação entre sites (CSRF).
-        $request->session()->regenerateToken();
-        // Redirecionamos o usuário para a página inicial após o logout.
-        return redirect('/');
-    }
+    // Herda todos os métodos de AutenticacaoController para compatibilidade total
 }

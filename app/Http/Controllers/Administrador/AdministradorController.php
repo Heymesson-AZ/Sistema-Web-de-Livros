@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -46,6 +47,13 @@ class AdministradorController extends Controller
         // Filtro por Cargo
         if ($cargo = $request->input('cargo')) {
             $query->where('cargo', $cargo);
+        }
+
+        // Filtro por Status
+        if ($status = $request->input('status')) {
+            $query->whereHas('user', function ($u) use ($status) {
+                $u->where('status', $status);
+            });
         }
 
         $administradores = $query->latest()->paginate(10)->withQueryString();
@@ -85,6 +93,8 @@ class AdministradorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'status' => ['required', 'string', Rule::in(['ativo', 'inativo'])],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
             'cargo' => ['required', 'string', Rule::in(Admin::getCargos())],
             'departamento' => ['required', 'string', Rule::in(Admin::getDepartamentos())],
@@ -96,16 +106,26 @@ class AdministradorController extends Controller
             'email.unique' => 'Este e-mail já está sendo utilizado.',
             'password.required' => 'A senha é obrigatória.',
             'password.confirmed' => 'A confirmação de senha não confere.',
+            'status.in' => 'Selecione um status válido (ativo ou inativo).',
+            'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
             'cargo.in' => 'Selecione um cargo válido.',
             'departamento.in' => 'Selecione um departamento válido.',
         ]);
 
         DB::transaction(function () use ($request) {
+            $fotoPath = null;
+            if ($request->hasFile('foto_perfil')) {
+                $fotoPath = $request->file('foto_perfil')->store('perfis', 'public');
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'tipo' => 'admin',
+                'status' => $request->status,
+                'foto_perfil' => $fotoPath,
                 'email_verified_at' => now(),
             ]);
 
@@ -158,6 +178,9 @@ class AdministradorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'status' => ['required', 'string', Rule::in(['ativo', 'inativo'])],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remover_foto' => ['nullable', 'boolean'],
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
             'cargo' => ['required', 'string', Rule::in(Admin::getCargos())],
             'departamento' => ['required', 'string', Rule::in(Admin::getDepartamentos())],
@@ -168,6 +191,9 @@ class AdministradorController extends Controller
             'email.email' => 'Informe um endereço de e-mail válido.',
             'email.unique' => 'Este e-mail já está sendo utilizado.',
             'password.confirmed' => 'A confirmação de senha não confere.',
+            'status.in' => 'Selecione um status válido (ativo ou inativo).',
+            'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
             'cargo.in' => 'Selecione um cargo válido.',
             'departamento.in' => 'Selecione um departamento válido.',
         ]);
@@ -176,10 +202,23 @@ class AdministradorController extends Controller
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
+                'status' => $request->status,
             ];
 
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
+            }
+
+            if ($request->hasFile('foto_perfil')) {
+                if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+                $userData['foto_perfil'] = $request->file('foto_perfil')->store('perfis', 'public');
+            } elseif ($request->boolean('remover_foto')) {
+                if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+                $userData['foto_perfil'] = null;
             }
 
             $user?->update($userData);
@@ -215,6 +254,9 @@ class AdministradorController extends Controller
         $user = $administrador->user;
 
         DB::transaction(function () use ($administrador, $user) {
+            if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
             $administrador->delete();
             $user?->delete();
         });
@@ -259,6 +301,16 @@ class AdministradorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remover_foto' => ['nullable', 'boolean'],
+        ], [
+            'name.required' => 'O nome é obrigatório.',
+            'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.email' => 'Informe um endereço de e-mail válido.',
+            'email.unique' => 'Este e-mail já está sendo utilizado.',
+            'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
         ]);
 
         $user->fill($request->only('name', 'email'));
@@ -266,6 +318,18 @@ class AdministradorController extends Controller
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
             $user->sendEmailVerificationNotification();
+        }
+
+        if ($request->hasFile('foto_perfil')) {
+            if ($user->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $user->foto_perfil = $request->file('foto_perfil')->store('perfis', 'public');
+        } elseif ($request->boolean('remover_foto')) {
+            if ($user->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $user->foto_perfil = null;
         }
 
         $user->save();

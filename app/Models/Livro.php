@@ -85,4 +85,123 @@ class Livro extends Model
         return $this->hasMany(PedidoItem::class); // Relacionamento de um livro para muitos itens do pedido (pedido_itens)
     }
 
+    /**
+     * URL completa da capa com fallback seguro.
+     */
+    public function getUrlCapaAttribute(): string
+    {
+        if ($this->capa && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->capa)) {
+            return asset('storage/' . $this->capa);
+        }
+
+        if ($this->capa && (str_starts_with($this->capa, 'http://') || str_starts_with($this->capa, 'https://'))) {
+            return $this->capa;
+        }
+
+        // Capa ilustrativa padrão de alta qualidade para livros
+        return 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=450&q=80';
+    }
+
+    /**
+     * Preço formatado em Reais (BRL).
+     */
+    public function getPrecoFormatadoAttribute(): string
+    {
+        return 'R$ ' . number_format((float) $this->preco, 2, ',', '.');
+    }
+
+    /**
+     * Verifica se o livro possui estoque disponível.
+     */
+    public function isDisponivel(): bool
+    {
+        return (int) $this->quantidade > 0;
+    }
+
+    /**
+     * Scope para buscar apenas livros com estoque.
+     */
+    public function scopeDisponiveis($query)
+    {
+        return $query->where('quantidade', '>', 0);
+    }
+
+    /**
+     * Scope para filtros combinados estilo Amazon.
+     */
+    public function scopeFiltrar($query, array $filtros)
+    {
+        // 1. Busca textual (título, sinopse, ISBN ou nome do autor)
+        $termo = trim($filtros['busca'] ?? $filtros['q'] ?? '');
+        if (!empty($termo)) {
+            $query->where(function ($q) use ($termo) {
+                $q->where('titulo', 'like', "%{$termo}%")
+                  ->orWhere('isbn', 'like', "%{$termo}%")
+                  ->orWhere('sinopse', 'like', "%{$termo}%")
+                  ->orWhereHas('autor', function ($sub) use ($termo) {
+                      $sub->where('nome', 'like', "%{$termo}%");
+                  });
+            });
+        }
+
+        // 2. Filtro por Gênero (por ID ou Nome)
+        $filtroGenero = $filtros['genero'] ?? $filtros['categoria'] ?? null;
+        if (!empty($filtroGenero)) {
+            if (is_array($filtroGenero)) {
+                $query->whereIn('genero_id', $filtroGenero);
+            } elseif (is_numeric($filtroGenero)) {
+                $query->where('genero_id', $filtroGenero);
+            } else {
+                $query->whereHas('genero', function ($sub) use ($filtroGenero) {
+                    $sub->where('nome', 'like', "%{$filtroGenero}%");
+                });
+            }
+        }
+
+        // 3. Filtro por Editora
+        if (!empty($filtros['editora'])) {
+            $query->where('editora_id', $filtros['editora']);
+        }
+
+        // 4. Filtro por Vendedor
+        if (!empty($filtros['vendedor'])) {
+            $query->where('vendedor_id', $filtros['vendedor']);
+        }
+
+        // 5. Filtro por Faixas de Preço pré-definidas
+        if (!empty($filtros['faixa_preco'])) {
+            match ($filtros['faixa_preco']) {
+                'ate-30'   => $query->where('preco', '<=', 30),
+                '30-60'    => $query->whereBetween('preco', [30, 60]),
+                '60-100'   => $query->whereBetween('preco', [60, 100]),
+                'acima-100'=> $query->where('preco', '>', 100),
+                default    => null,
+            };
+        }
+
+        // 6. Faixa de Preço personalizada
+        if (isset($filtros['preco_min']) && is_numeric($filtros['preco_min'])) {
+            $query->where('preco', '>=', (float) $filtros['preco_min']);
+        }
+        if (isset($filtros['preco_max']) && is_numeric($filtros['preco_max'])) {
+            $query->where('preco', '<=', (float) $filtros['preco_max']);
+        }
+
+        // 7. Filtro de Estoque
+        if (!empty($filtros['em_estoque'])) {
+            $query->where('quantidade', '>', 0);
+        }
+
+        // 8. Ordenação
+        $ordem = $filtros['ordem'] ?? 'novidades';
+        match ($ordem) {
+            'preco_menor' => $query->orderBy('preco', 'asc'),
+            'preco_maior' => $query->orderBy('preco', 'desc'),
+            'titulo_az'   => $query->orderBy('titulo', 'asc'),
+            default       => $query->latest(),
+        };
+
+        return $query;
+    }
+
 }

@@ -1,6 +1,7 @@
 import "./bootstrap"; // Importações padrão do Laravel
 
 import "./menu";
+import "./carrosel";
 import { initMasks } from "./masks";
 import { initRealtimeValidation } from "./validation";
 
@@ -28,3 +29,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+// Pré-visualização instantânea de upload de imagens (avatar/foto)
+window.previewImage = function (input, previewId) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const el = document.getElementById(previewId);
+            if (el) {
+                el.src = e.target.result;
+            }
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+};

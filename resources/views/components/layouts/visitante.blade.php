@@ -30,25 +30,30 @@
         </div>
 
         <div class="topbar-right">
-            <div class="search-box">
+            <form action="{{ url('/') }}" method="GET" class="search-box">
                 <i data-lucide="search"></i>
-                <input type="text" placeholder="Buscar livros...">
-            </div>
+                <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Buscar livros...">
+            </form>
 
-            <!-- Botão Venda Conosco (Desktop) -->
-            <a href="{{ route('vendedor.solicitar') }}"
-                class="btn btn-warning btn-sm d-none d-md-flex align-items-center gap-1 rounded-pill px-3 ms-2 fw-semibold text-dark text-decoration-none shadow-sm">
-                <i data-lucide="store" style="width: 15px; height: 15px;"></i>
-                <span>Venda Conosco</span>
-            </a>
+            @auth
+                <!-- Menu Dropdown Centralizado do Usuário -->
+                <x-navbar-user-dropdown />
+            @else
+                <!-- Botão Venda Conosco (Desktop) -->
+                <a href="{{ route('vendedor.solicitar') }}"
+                    class="btn btn-warning btn-sm d-none d-md-flex align-items-center gap-1 rounded-pill px-3 ms-2 fw-semibold text-dark text-decoration-none shadow-sm">
+                    <i data-lucide="store" style="width: 15px; height: 15px;"></i>
+                    <span>Venda Conosco</span>
+                </a>
 
-            <!-- Botão Entrar Rápido (Desktop) -->
-            <button type="button"
-                class="btn btn-outline-light btn-sm d-none d-md-flex align-items-center gap-2 rounded-pill px-3 ms-2"
-                data-bs-toggle="modal" data-bs-target="#loginModal">
-                <i data-lucide="user" style="width: 16px; height: 16px;"></i>
-                <span>Entrar</span>
-            </button>
+                <!-- Botão Entrar Rápido (Desktop) -->
+                <button type="button"
+                    class="btn btn-outline-light btn-sm d-none d-md-flex align-items-center gap-2 rounded-pill px-3 ms-2"
+                    data-bs-toggle="modal" data-bs-target="#loginModal">
+                    <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                    <span>Entrar</span>
+                </button>
+            @endauth
         </div>
     </nav>
 
@@ -67,12 +72,19 @@
         {{ $slot }}
     </main>
 
+    <!-- RODAPÉ -->
+    <x-footer />
+
     <!-- LUCIDE -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
             // Abre o modal correto quando houver erro de validação ou status de sessão
             @if (old('formulario') === 'registro' ||
                     $errors->hasAny(['name', 'cpf', 'data_nascimento', 'telefone', 'password_confirmation']))

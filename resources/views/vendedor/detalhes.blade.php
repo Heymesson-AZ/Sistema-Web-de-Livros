@@ -5,9 +5,12 @@
         <div class="mb-4">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none text-muted">Painel</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('admin.vendedores.index') }}" class="text-decoration-none text-muted">Vendedores</a></li>
-                    <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">{{ $vendedor->nome_fantasia }}</li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}"
+                            class="text-decoration-none text-muted">Painel</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.vendedores.index') }}"
+                            class="text-decoration-none text-muted">Vendedores</a></li>
+                    <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">
+                        {{ $vendedor->nome_fantasia }}</li>
                 </ol>
             </nav>
             <div class="d-flex justify-content-between align-items-center">
@@ -28,26 +31,45 @@
             <!-- CARTÃO DE RESUMO E AVATAR -->
             <div class="col-12 col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center fw-bold shadow-sm mx-auto mb-3"
-                         style="width: 80px; height: 80px; background: #e0f2fe; color: #0369a1; font-size: 2rem;">
-                        {{ strtoupper(substr($vendedor->nome_fantasia ?? 'V', 0, 1)) }}
-                    </div>
+                    <img src="{{ $vendedor->user?->foto }}" alt="{{ $vendedor->nome_fantasia }}"
+                        class="rounded-circle shadow-sm object-fit-cover mx-auto mb-3 border border-2 border-white"
+                        style="width: 80px; height: 80px;">
 
                     <h4 class="fw-bold text-dark mb-1">{{ $vendedor->nome_fantasia }}</h4>
                     <p class="text-muted small mb-3">{{ $vendedor->razao_social }}</p>
 
-                    <div class="mb-4">
+                    <div class="mb-4 d-flex flex-column gap-1 align-items-center">
                         @if ($vendedor->status_aprovacao === 'aprovado')
-                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 fw-semibold">
-                                <i class="bi bi-patch-check-fill me-1"></i> Cadastro Aprovado
+                            <span
+                                class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 fw-semibold">
+                                <i class="bi bi-patch-check-fill me-1"></i> Loja Aprovada
                             </span>
                         @elseif ($vendedor->status_aprovacao === 'pendente')
-                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-2 fw-semibold">
+                            <span
+                                class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-2 fw-semibold">
                                 <i class="bi bi-hourglass-split me-1"></i> Aguardando Aprovação
                             </span>
                         @else
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2 fw-semibold">
-                                <i class="bi bi-x-circle-fill me-1"></i> Cadastro Rejeitado
+                            <span
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-2 fw-semibold">
+                                <i class="bi bi-x-circle-fill me-1"></i> Loja Rejeitada
+                            </span>
+                        @endif
+
+                        @if ($vendedor->user?->status === 'ativo')
+                            <span
+                                class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 small">
+                                Conta Ativa
+                            </span>
+                        @elseif($vendedor->user?->status === 'inativo')
+                            <span
+                                class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1 small">
+                                Conta Inativa
+                            </span>
+                        @else
+                            <span
+                                class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 small">
+                                Conta Banida
                             </span>
                         @endif
                     </div>
@@ -108,12 +130,14 @@
 
                         <div class="col-12 col-sm-6">
                             <span class="text-muted small d-block">Telefone Comercial</span>
-                            <span class="fw-semibold text-dark fs-6">{{ $vendedor->telefone_comercial ?? 'Não informado' }}</span>
+                            <span
+                                class="fw-semibold text-dark fs-6">{{ $vendedor->telefone_comercial ?? 'Não informado' }}</span>
                         </div>
 
                         <div class="col-12 col-sm-6">
                             <span class="text-muted small d-block">Data de Registro</span>
-                            <span class="fw-semibold text-dark fs-6">{{ $vendedor->created_at?->format('d/m/Y \à\s H:i') ?? '-' }}</span>
+                            <span
+                                class="fw-semibold text-dark fs-6">{{ $vendedor->created_at?->format('d/m/Y \à\s H:i') ?? '-' }}</span>
                         </div>
                     </div>
 
@@ -127,7 +151,8 @@
                     <div class="row g-3">
                         <div class="col-12 col-sm-6">
                             <span class="text-muted small d-block">Nome do Responsável</span>
-                            <span class="fw-semibold text-dark fs-6">{{ $vendedor->user?->name ?? 'Usuário não vinculado' }}</span>
+                            <span
+                                class="fw-semibold text-dark fs-6">{{ $vendedor->user?->name ?? 'Usuário não vinculado' }}</span>
                         </div>
 
                         <div class="col-12 col-sm-6">
@@ -138,19 +163,31 @@
                         <div class="col-12 col-sm-6">
                             <span class="text-muted small d-block">Status do E-mail</span>
                             @if ($vendedor->user?->email_verified_at)
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small">
-                                    <i class="bi bi-check-circle-fill me-1"></i> Verificado em {{ $vendedor->user->email_verified_at->format('d/m/Y') }}
+                                <span
+                                    class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Verificado em
+                                    {{ $vendedor->user->email_verified_at->format('d/m/Y') }}
                                 </span>
                             @else
-                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1 small">
+                                <span
+                                    class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1 small">
                                     <i class="bi bi-exclamation-circle me-1"></i> Não verificado
                                 </span>
                             @endif
                         </div>
 
                         <div class="col-12 col-sm-6">
+                            <span class="text-muted small d-block">Status do Acesso</span>
+                            <span
+                                class="badge {{ $vendedor->user?->status === 'ativo' ? 'bg-success' : ($vendedor->user?->status === 'inativo' ? 'bg-secondary' : 'bg-danger') }} rounded-pill text-capitalize px-3 py-1">
+                                {{ $vendedor->user?->status ?? 'ativo' }}
+                            </span>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
                             <span class="text-muted small d-block">Última Atualização</span>
-                            <span class="fw-semibold text-dark fs-6">{{ $vendedor->updated_at?->format('d/m/Y \à\s H:i') ?? '-' }}</span>
+                            <span
+                                class="fw-semibold text-dark fs-6">{{ $vendedor->updated_at?->format('d/m/Y \à\s H:i') ?? '-' }}</span>
                         </div>
                     </div>
                 </div>

@@ -16,6 +16,9 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-production}
 
+    volumes:
+      - '.:/var/www'
+
     depends_on:
       mysql:
         condition: service_healthy

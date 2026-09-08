@@ -33,35 +33,13 @@
         </div>
 
         <div class="topbar-right">
-            <div class="search-box">
+            <form action="{{ url('/') }}" method="GET" class="search-box">
                 <i data-lucide="search"></i>
-                <input type="text" placeholder="Buscar livros...">
-            </div>
+                <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Buscar livros...">
+            </form>
 
-            @if (Auth::user()->isCliente())
-                <!-- Botão Venda Conosco para Clientes -->
-                <a href="{{ route('vendedor.solicitar') }}"
-                    class="btn btn-outline-warning btn-sm d-none d-md-flex align-items-center gap-1 rounded-pill px-3 ms-2 fw-semibold text-decoration-none shadow-sm">
-                    <i data-lucide="store" style="width: 15px; height: 15px;"></i>
-                    <span>Venda Conosco</span>
-                </a>
-            @elseif (Auth::user()->isVendedor())
-                <!-- Atalho Minha Loja para Vendedores -->
-                <a href="{{ route('vendedor.painel') }}"
-                    class="btn btn-outline-light btn-sm d-none d-md-flex align-items-center gap-1 rounded-pill px-3 ms-2 fw-semibold text-decoration-none shadow-sm">
-                    <i data-lucide="store" style="width: 15px; height: 15px;"></i>
-                    <span>Minha Loja</span>
-                </a>
-            @endif
-
-            <!-- Perfil / Usuário (Desktop) -->
-            <a href="{{ route('dashboard') }}"
-                class="user-pill-link d-none d-md-flex align-items-center gap-2 text-decoration-none ms-2">
-                <div class="user-avatar-circle">
-                    <i data-lucide="user" style="width: 16px; height: 16px;"></i>
-                </div>
-                <span class="user-name-label">{{ Auth::user()->name }}</span>
-            </a>
+            <!-- Menu Dropdown Centralizado do Usuário -->
+            <x-navbar-user-dropdown />
         </div>
     </nav>
 
@@ -81,6 +59,9 @@
 
         {{ $slot }}
     </main>
+
+    <!-- RODAPÉ -->
+    <x-footer />
 
     <!-- SCRIPTS -->
     <script src="https://unpkg.com/lucide@latest"></script>

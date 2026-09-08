@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -45,6 +46,13 @@ class VendedorController extends Controller
         // Filtro por Status de Aprovação
         if ($status = $request->input('status')) {
             $query->where('status_aprovacao', $status);
+        }
+
+        // Filtro por Status da Conta de Usuário
+        if ($statusConta = $request->input('status_conta')) {
+            $query->whereHas('user', function ($u) use ($statusConta) {
+                $u->where('status', $statusConta);
+            });
         }
 
         $vendedores = $query->latest()->paginate(10)->withQueryString();
@@ -82,6 +90,8 @@ class VendedorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'cnpj' => ['required', 'string', 'max:20', 'unique:' . Vendedor::class . ',cnpj'],
             'razao_social' => ['required', 'string', 'max:255'],
             'nome_fantasia' => ['required', 'string', 'max:255'],
@@ -94,20 +104,30 @@ class VendedorController extends Controller
             'email.unique' => 'Este e-mail já está sendo utilizado.',
             'password.required' => 'A senha é obrigatória.',
             'password.confirmed' => 'A confirmação de senha não confere.',
+            'status.in' => 'Selecione um status de conta válido.',
+            'foto_perfil.image' => 'O logotipo ou foto deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
             'cnpj.required' => 'O CNPJ é obrigatório.',
             'cnpj.unique' => 'Este CNPJ já está cadastrado.',
             'razao_social.required' => 'A razão social é obrigatória.',
             'nome_fantasia.required' => 'O nome fantasia é obrigatório.',
             'inscricao_estadual.required' => 'A inscrição estadual é obrigatória.',
-            'status_aprovacao.in' => 'Selecione um status válido.',
+            'status_aprovacao.in' => 'Selecione um status de aprovação válido.',
         ]);
 
         DB::transaction(function () use ($request) {
+            $fotoPath = null;
+            if ($request->hasFile('foto_perfil')) {
+                $fotoPath = $request->file('foto_perfil')->store('perfis', 'public');
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'tipo' => 'vendedor',
+                'status' => $request->status,
+                'foto_perfil' => $fotoPath,
                 'email_verified_at' => now(),
             ]);
 
@@ -161,6 +181,9 @@ class VendedorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remover_foto' => ['nullable', 'boolean'],
             'cnpj' => ['required', 'string', 'max:20', Rule::unique(Vendedor::class, 'cnpj')->ignore($vendedor->id)],
             'razao_social' => ['required', 'string', 'max:255'],
             'nome_fantasia' => ['required', 'string', 'max:255'],
@@ -172,6 +195,9 @@ class VendedorController extends Controller
             'email.required' => 'O e-mail é obrigatório.',
             'email.unique' => 'Este e-mail já está sendo utilizado.',
             'password.confirmed' => 'A confirmação de senha não confere.',
+            'status.in' => 'Selecione um status de conta válido.',
+            'foto_perfil.image' => 'O logotipo ou foto deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
             'cnpj.required' => 'O CNPJ é obrigatório.',
             'cnpj.unique' => 'Este CNPJ já está cadastrado por outro vendedor.',
             'razao_social.required' => 'A razão social é obrigatória.',
@@ -184,10 +210,23 @@ class VendedorController extends Controller
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
+                'status' => $request->status,
             ];
 
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
+            }
+
+            if ($request->hasFile('foto_perfil')) {
+                if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+                $userData['foto_perfil'] = $request->file('foto_perfil')->store('perfis', 'public');
+            } elseif ($request->boolean('remover_foto')) {
+                if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+                $userData['foto_perfil'] = null;
             }
 
             $user?->update($userData);
@@ -242,6 +281,9 @@ class VendedorController extends Controller
         }
 
         DB::transaction(function () use ($vendedor, $user) {
+            if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
             $vendedor->delete();
             $user?->delete();
         });
@@ -288,6 +330,18 @@ class VendedorController extends Controller
             'razao_social' => ['required', 'string', 'max:255'],
             'nome_fantasia' => ['required', 'string', 'max:255'],
             'inscricao_estadual' => ['nullable', 'string', 'max:50'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remover_foto' => ['nullable', 'boolean'],
+        ], [
+            'name.required' => 'O nome do responsável é obrigatório.',
+            'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.unique' => 'Este e-mail já está sendo utilizado.',
+            'telefone.required' => 'O telefone é obrigatório.',
+            'razao_social.required' => 'A razão social é obrigatória.',
+            'nome_fantasia.required' => 'O nome fantasia da loja é obrigatório.',
+            'foto_perfil.image' => 'O logotipo ou foto selecionado deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
         ]);
 
         $user->fill($request->only('name', 'email'));
@@ -295,6 +349,18 @@ class VendedorController extends Controller
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
             $user->sendEmailVerificationNotification();
+        }
+
+        if ($request->hasFile('foto_perfil')) {
+            if ($user->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $user->foto_perfil = $request->file('foto_perfil')->store('perfis', 'public');
+        } elseif ($request->boolean('remover_foto')) {
+            if ($user->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $user->foto_perfil = null;
         }
 
         $user->save();

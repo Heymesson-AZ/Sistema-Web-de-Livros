@@ -1,14 +1,17 @@
 <?php
 
 use App\Http\Controllers\Administrador\AdministradorController;
+use App\Http\Controllers\Administrador\LivroAdminController;
 use App\Http\Controllers\Cliente\ClienteController;
+use App\Http\Controllers\Livro\LivroPublicoController;
+use App\Http\Controllers\Vendedor\LivroVendedorController;
 use App\Http\Controllers\Vendedor\VendedorController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas públicas (Acesso livre a todos os visitantes)
-Route::get('/', function () {
-    return view('paginas.inicio');
-})->name('inicio');
+Route::get('/', [LivroPublicoController::class, 'index'])->name('inicio');
+Route::get('/livros/{livro}', [LivroPublicoController::class, 'show'])->name('livros.show');
+Route::get('/livro/{livro}', [LivroPublicoController::class, 'show'])->name('livros.detalhes');
 
 // Painel principal (Dashboard), acessível para usuários autenticados e verificados
 Route::get('/dashboard', function () {
@@ -40,15 +43,23 @@ Route::middleware(['auth', 'checkTipo:vendedor'])->group(function () {
         Route::get('/perfil-vendedor', [VendedorController::class, 'editarPerfil'])->name('vendedor.perfil.editar');
         Route::patch('/perfil-vendedor', [VendedorController::class, 'atualizarPerfil'])->name('vendedor.perfil.atualizar');
         Route::delete('/perfil-vendedor', [VendedorController::class, 'deletarConta'])->name('vendedor.perfil.deletar');
+
+        // CRUD de Livros do Vendedor
+        Route::resource('livros', LivroVendedorController::class)
+            ->names('vendedor.livros');
     });
 });
 
-// Rotas para o perfil de Admin e Gestão de Administradores, Vendedores e Clientes
+// Rotas para o perfil de Admin e Gestão de Administradores, Vendedores, Clientes e Livros
 Route::middleware(['auth', 'checkTipo:admin'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/perfil-admin', [AdministradorController::class, 'editarPerfil'])->name('admin.perfil.editar');
         Route::patch('/perfil-admin', [AdministradorController::class, 'atualizarPerfil'])->name('admin.perfil.atualizar');
         Route::delete('/perfil-admin', [AdministradorController::class, 'deletarConta'])->name('admin.perfil.deletar');
+
+        // CRUD Global de Livros
+        Route::resource('livros', LivroAdminController::class)
+            ->names('admin.livros');
 
         // Rotas do CRUD de Administradores
         Route::resource('administradores', AdministradorController::class)

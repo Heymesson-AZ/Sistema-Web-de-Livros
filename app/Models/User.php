@@ -28,12 +28,12 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var list<string>
      */
-    // Atributos que podem ser atribuídos em massa
     protected $fillable = [
         'name',
         'email',
         'password',
         'tipo',
+        'status',
         'foto_perfil'
     ];
 
@@ -96,6 +96,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin()
     {
         return $this->tipo === 'admin';
+    }
+
+    public function isAtivo(): bool
+    {
+        return $this->status === 'ativo';
+    }
+
+    public function isInativo(): bool
+    {
+        return $this->status === 'inativo';
+    }
+
+    public function isBanido(): bool
+    {
+        return $this->status === 'banido';
     }
 
     /////////////////////////////////////////

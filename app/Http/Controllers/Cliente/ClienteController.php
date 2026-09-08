@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -37,6 +38,13 @@ class ClienteController extends Controller
                       $u->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
                   });
+            });
+        }
+
+        // Filtro por Status
+        if ($status = $request->input('status')) {
+            $query->whereHas('user', function ($u) use ($status) {
+                $u->where('status', $status);
             });
         }
 
@@ -74,6 +82,8 @@ class ClienteController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'cpf' => ['required', 'string', 'max:20', 'unique:' . Cliente::class . ',cpf'],
             'celular_contato' => ['nullable', 'string', 'max:20'],
             'data_nascimento' => ['required', 'date', 'before:today'],
@@ -83,6 +93,9 @@ class ClienteController extends Controller
             'email.unique' => 'Este e-mail já está em uso.',
             'password.required' => 'A senha é obrigatória.',
             'password.confirmed' => 'A confirmação de senha não confere.',
+            'status.in' => 'Selecione um status válido para a conta.',
+            'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
             'cpf.required' => 'O CPF é obrigatório.',
             'cpf.unique' => 'Este CPF já está cadastrado no sistema.',
             'data_nascimento.required' => 'A data de nascimento é obrigatória.',
@@ -90,11 +103,18 @@ class ClienteController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+            $fotoPath = null;
+            if ($request->hasFile('foto_perfil')) {
+                $fotoPath = $request->file('foto_perfil')->store('perfis', 'public');
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'tipo' => 'cliente',
+                'status' => $request->status,
+                'foto_perfil' => $fotoPath,
                 'email_verified_at' => now(),
             ]);
 
@@ -145,6 +165,9 @@ class ClienteController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remover_foto' => ['nullable', 'boolean'],
             'cpf' => ['required', 'string', 'max:20', Rule::unique(Cliente::class, 'cpf')->ignore($cliente->id)],
             'celular_contato' => ['nullable', 'string', 'max:20'],
             'data_nascimento' => ['required', 'date', 'before:today'],
@@ -153,6 +176,9 @@ class ClienteController extends Controller
             'email.required' => 'O e-mail é obrigatório.',
             'email.unique' => 'Este e-mail já está em uso.',
             'password.confirmed' => 'A confirmação de senha não confere.',
+            'status.in' => 'Selecione um status válido para a conta.',
+            'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
             'cpf.required' => 'O CPF é obrigatório.',
             'cpf.unique' => 'Este CPF já está cadastrado por outro cliente.',
             'data_nascimento.required' => 'A data de nascimento é obrigatória.',
@@ -163,10 +189,23 @@ class ClienteController extends Controller
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
+                'status' => $request->status,
             ];
 
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
+            }
+
+            if ($request->hasFile('foto_perfil')) {
+                if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+                $userData['foto_perfil'] = $request->file('foto_perfil')->store('perfis', 'public');
+            } elseif ($request->boolean('remover_foto')) {
+                if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+                $userData['foto_perfil'] = null;
             }
 
             $user?->update($userData);
@@ -196,6 +235,9 @@ class ClienteController extends Controller
         }
 
         DB::transaction(function () use ($cliente, $user) {
+            if ($user?->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
             $cliente->delete();
             $user?->delete();
         });
@@ -239,6 +281,16 @@ class ClienteController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
             'telefone' => ['required', 'string', 'max:20'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'remover_foto' => ['nullable', 'boolean'],
+        ], [
+            'name.required' => 'O nome é obrigatório.',
+            'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.unique' => 'Este e-mail já está sendo utilizado.',
+            'telefone.required' => 'O telefone é obrigatório.',
+            'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
+            'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
         ]);
 
         $user->fill($request->only('name', 'email'));
@@ -246,6 +298,18 @@ class ClienteController extends Controller
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
             $user->sendEmailVerificationNotification();
+        }
+
+        if ($request->hasFile('foto_perfil')) {
+            if ($user->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $user->foto_perfil = $request->file('foto_perfil')->store('perfis', 'public');
+        } elseif ($request->boolean('remover_foto')) {
+            if ($user->foto_perfil && Storage::disk('public')->exists($user->foto_perfil)) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $user->foto_perfil = null;
         }
 
         $user->save();

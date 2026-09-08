@@ -10,20 +10,75 @@
 
                     <div class="card-body p-3 p-md-4">
 
-                        <h2 class="mb-4">
-                            <i class="bi bi-shop me-2"></i>
-                            Meu Perfil de Vendedor
-                        </h2>
+                        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                            <img src="{{ $user->foto }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm"
+                                style="width: 56px; height: 56px; object-fit: cover; border: 2px solid #10b981;">
+                            <div>
+                                <h4 class="fw-bold text-dark mb-0">
+                                    {{ $user->vendedor?->nome_fantasia ?: 'Meu Perfil de Vendedor' }}</h4>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span
+                                        class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
+                                        <i class="bi bi-shop me-1"></i> Vendedor Parceiro
+                                    </span>
+                                    @if ($user->vendedor?->status_aprovacao === 'aprovado')
+                                        <span class="badge bg-success text-white rounded-pill"
+                                            style="font-size: 11px;">Loja Ativa</span>
+                                    @elseif($user->vendedor?->status_aprovacao === 'pendente')
+                                        <span class="badge bg-warning text-dark rounded-pill"
+                                            style="font-size: 11px;">Aprovação Pendente</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
 
                         @if (session('status') === 'perfil-atualizado')
-                            <div class="alert alert-success">
-                                Perfil atualizado com sucesso!
+                            <div
+                                class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center gap-2 mb-4">
+                                <i class="bi bi-check-circle-fill fs-5"></i>
+                                <div>Perfil atualizado com sucesso!</div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('vendedor.perfil.atualizar') }}">
+                        <form method="POST" action="{{ route('vendedor.perfil.atualizar') }}"
+                            enctype="multipart/form-data">
                             @csrf
                             @method('PATCH')
+
+                            <!-- LOGOTIPO / FOTO DE PERFIL -->
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-secondary">Logotipo da Loja / Foto de
+                                    Perfil</label>
+                                <div class="avatar-upload-box">
+                                    <img src="{{ $user->foto }}" id="avatarPreviewVendedor" alt="Logo atual"
+                                        class="avatar-preview-img">
+                                    <div class="avatar-upload-meta">
+                                        <input type="file" name="foto_perfil" id="foto_perfil_vendedor"
+                                            class="form-control form-control-sm @error('foto_perfil') is-invalid @enderror"
+                                            accept="image/png, image/jpeg, image/jpg, image/webp"
+                                            onchange="window.previewImage(this, 'avatarPreviewVendedor')">
+                                        <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
+                                            Formatos aceitos: JPG, PNG, WEBP até 2MB.
+                                        </small>
+                                        @if ($user->foto_perfil)
+                                            <div class="form-check mt-2">
+                                                <input class="form-check-input" type="checkbox" name="remover_foto"
+                                                    value="1" id="removerFotoVendedor">
+                                                <label class="form-check-label small text-danger"
+                                                    for="removerFotoVendedor">
+                                                    <i class="bi bi-trash me-1"></i> Remover foto atual (usar avatar
+                                                    padrão)
+                                                </label>
+                                            </div>
+                                        @endif
+                                        @error('foto_perfil')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="mb-3">
                                 <label for="name" class="form-label">
@@ -110,7 +165,8 @@
                                         Inscrição Estadual
                                     </label>
 
-                                    <input type="text" class="form-control @error('inscricao_estadual') is-invalid @enderror"
+                                    <input type="text"
+                                        class="form-control @error('inscricao_estadual') is-invalid @enderror"
                                         id="inscricao_estadual" name="inscricao_estadual"
                                         value="{{ old('inscricao_estadual', $user->vendedor?->inscricao_estadual) }}">
 

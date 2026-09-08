@@ -27,7 +27,7 @@
 
                 <!-- Catálogo -->
                 <li class="menu-item">
-                    <a href="#" class="menu-item-link">
+                    <a href="{{ url('/#catalogo') }}" class="menu-item-link">
                         <div class="menu-item-header">
                             <i data-lucide="book-open"></i>
                             <span>Catálogo</span>
@@ -44,18 +44,16 @@
                     </div>
 
                     <ul class="submenu">
-                        <li><span>Ficção</span></li>
-                        <li><span>Aventura</span></li>
-                        <li><span>Terror</span></li>
-                        <li><span>Romance</span></li>
-                        <li><span>Fantasia</span></li>
-                        <li><span>Infantil</span></li>
-                        <li><span>Biografia</span></li>
-                        <li><span>Autoajuda</span></li>
-                        <li><span>História</span></li>
-                        <li><span>Ciência</span></li>
-                        <li><span>Religião</span></li>
-                        <li><span>Mangá</span></li>
+                        <li><a href="{{ url('/?categoria=Ficção#catalogo') }}"><span>Ficção</span></a></li>
+                        <li><a href="{{ url('/?categoria=Aventura#catalogo') }}"><span>Aventura</span></a></li>
+                        <li><a href="{{ url('/?categoria=Terror#catalogo') }}"><span>Terror</span></a></li>
+                        <li><a href="{{ url('/?categoria=Romance#catalogo') }}"><span>Romance</span></a></li>
+                        <li><a href="{{ url('/?categoria=Fantasia#catalogo') }}"><span>Fantasia</span></a></li>
+                        <li><a href="{{ url('/?categoria=Infantil#catalogo') }}"><span>Infantil</span></a></li>
+                        <li><a href="{{ url('/?categoria=Biografia#catalogo') }}"><span>Biografia</span></a></li>
+                        <li><a href="{{ url('/?categoria=Autoajuda#catalogo') }}"><span>Autoajuda</span></a></li>
+                        <li><a href="{{ url('/?categoria=História#catalogo') }}"><span>História</span></a></li>
+                        <li><a href="{{ url('/?categoria=Ciência#catalogo') }}"><span>Ciência</span></a></li>
                     </ul>
                 </li>
 
@@ -140,8 +138,7 @@
                 @auth
                     @if (Auth::user()->isAdmin())
                         <!-- Administração (Apenas Admin) -->
-                        <li
-                            class="menu-item has-submenu {{ request()->routeIs('admin.*') ? 'active' : '' }}">
+                        <li class="menu-item has-submenu {{ request()->routeIs('admin.*') ? 'active' : '' }}">
                             <div class="menu-item-header">
                                 <i data-lucide="shield-check"></i>
                                 <span>Administração</span>
@@ -149,6 +146,14 @@
                             </div>
 
                             <ul class="submenu">
+                                <li>
+                                    <a href="{{ route('admin.livros.index') }}">
+                                        <div class="menu-item-header">
+                                            <i data-lucide="book-marked"></i>
+                                            <span>Livros (Catálogo)</span>
+                                        </div>
+                                    </a>
+                                </li>
                                 <li>
                                     <a href="{{ route('admin.administradores.index') }}">
                                         <div class="menu-item-header">
@@ -201,18 +206,38 @@
                             </a>
                         </li>
                     @elseif (Auth::user()->isVendedor())
-                        <li class="menu-item {{ request()->routeIs('vendedor.painel') ? 'active' : '' }}">
-                            <a href="{{ route('vendedor.painel') }}" class="menu-item-link">
-                                <div class="menu-item-header">
-                                    <i data-lucide="store"></i>
-                                    <span>Minha Loja</span>
-                                    @if(Auth::user()->vendedor?->status_aprovacao === 'pendente')
-                                        <span class="badge bg-warning text-dark ms-auto" style="font-size: 11px;">Pendente</span>
-                                    @elseif(Auth::user()->vendedor?->status_aprovacao === 'aprovado')
-                                        <span class="badge bg-success ms-auto" style="font-size: 11px;">Ativo</span>
-                                    @endif
-                                </div>
-                            </a>
+                        <li class="menu-item has-submenu {{ request()->routeIs('vendedor.*') ? 'active' : '' }}">
+                            <div class="menu-item-header">
+                                <i data-lucide="store"></i>
+                                <span>Minha Loja</span>
+                                <i class="submenu-arrow" data-lucide="chevron-down"></i>
+                            </div>
+                            <ul class="submenu">
+                                <li>
+                                    <a href="{{ route('vendedor.painel') }}">
+                                        <div class="menu-item-header">
+                                            <i data-lucide="layout-dashboard"></i>
+                                            <span>Painel da Loja</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('vendedor.livros.index') }}">
+                                        <div class="menu-item-header">
+                                            <i data-lucide="book-marked"></i>
+                                            <span>Meus Livros</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('vendedor.livros.create') }}">
+                                        <div class="menu-item-header">
+                                            <i data-lucide="plus-circle"></i>
+                                            <span>Publicar Livro</span>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     @endif
                 @endguest

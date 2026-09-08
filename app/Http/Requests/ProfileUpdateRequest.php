@@ -41,6 +41,8 @@ class ProfileUpdateRequest extends FormRequest
         } elseif ($this->user()->isCliente()) {
             $rules['telefone'] = ['required', 'string', 'max:20'];
             // Note que NÃO incluímos o CPF aqui para ele não ser alterado!
+        } elseif ($this->user()->isAdmin()) {
+            $rules['telefone_urgencia'] = ['nullable', 'string', 'max:20'];
         }
         return $rules;
     }

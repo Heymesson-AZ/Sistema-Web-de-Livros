@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        //
         // 1. Mensagem interativa e acolhedora de Confirmação de Cadastro
         VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             $firstName = explode(' ', trim($notifiable->name ?? 'Leitor(a)'))[0];

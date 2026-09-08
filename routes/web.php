@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdministradorController;
 use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,11 @@ Route::middleware(['auth', 'checkTipo:admin'])->group(function () {
         Route::get('/perfil-admin', [PerfilController::class, 'edit'])->name('admin.perfil.editar'); // Rota para exibir o formulário de edição do perfil do admin
         Route::patch('/perfil-admin', [PerfilController::class, 'update'])->name('admin.perfil.atualizar'); // Rota para processar a atualização do perfil do admin
         Route::delete('/perfil-admin', [PerfilController::class, 'destroy'])->name('admin.perfil.deletar'); // Rota para processar a exclusão da conta do admin
+
+        // Rotas do CRUD de Administradores
+        Route::resource('administradores', AdministradorController::class)
+            ->parameters(['administradores' => 'administrador'])
+            ->names('admin.administradores');
     });
 });
 

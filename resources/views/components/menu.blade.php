@@ -83,7 +83,7 @@
 
                 <!-- Conta do Usuário -->
                 <li
-                    class="menu-item has-submenu {{ request()->routeIs('dashboard', 'cliente.perfil.*', 'vendedor.perfil.*') ? 'active' : '' }}">
+                    class="menu-item has-submenu {{ request()->routeIs('dashboard', 'cliente.perfil.*', 'vendedor.perfil.*', 'admin.perfil.*') ? 'active' : '' }}">
                     <div class="menu-item-header">
                         <i data-lucide="user"></i>
                         <span>{{ Auth::check() ? Auth::user()->name : 'Minha Conta' }}</span>
@@ -136,6 +136,38 @@
                         @endguest
                     </ul>
                 </li>
+
+                @auth
+                    @if (Auth::user()->isAdmin())
+                        <!-- Administração (Apenas Admin) -->
+                        <li class="menu-item has-submenu {{ request()->routeIs('admin.administradores.*') ? 'active' : '' }}">
+                            <div class="menu-item-header">
+                                <i data-lucide="shield-check"></i>
+                                <span>Administração</span>
+                                <i class="submenu-arrow" data-lucide="chevron-down"></i>
+                            </div>
+
+                            <ul class="submenu">
+                                <li>
+                                    <a href="{{ route('admin.administradores.index') }}">
+                                        <div class="menu-item-header">
+                                            <i data-lucide="users"></i>
+                                            <span>Administradores</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.administradores.create') }}">
+                                        <div class="menu-item-header">
+                                            <i data-lucide="user-plus"></i>
+                                            <span>Novo Admin</span>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
+                @endauth
 
                 <!-- Contato -->
                 <li class="menu-item">

@@ -28,6 +28,11 @@ class PerfilController extends Controller
             return view('vendedor.perfil-editar', [
                 'user' => $request->user(),
             ]);
+        } elseif ($request->user()->tipo === 'admin') {
+            return view('admin.perfil-editar', [
+                'user' => $request->user(),
+                'admin' => $request->user()->admin,
+            ]);
         } else {
             abort(403, 'Acesso negado.');
         }
@@ -51,7 +56,7 @@ class PerfilController extends Controller
 
         $user->save();
 
-        // 2. Atualiza os dados específicos (Cliente ou Vendedor)
+        // 2. Atualiza os dados específicos (Cliente, Vendedor ou Admin)
         if ($user->tipo === 'vendedor') {
 
             $user->vendedor()->update($request->only([
@@ -65,6 +70,12 @@ class PerfilController extends Controller
             $user->cliente()->update([
                 'celular_contato' => $request->telefone
             ]);
+        } elseif ($user->tipo === 'admin') {
+            if ($user->admin) {
+                $user->admin()->update($request->only([
+                    'telefone_urgencia'
+                ]));
+            }
         }
 
         return Redirect::route($user->tipo . '.perfil.editar')->with('status', 'perfil-atualizado');
@@ -81,6 +92,12 @@ class PerfilController extends Controller
         ]);
 
         $user = $request->user();
+
+        if ($user->tipo === 'admin' && \App\Models\User::where('tipo', 'admin')->count() <= 1) {
+            return back()->withErrors([
+                'DeleteUsuario' => 'Você é o único administrador do sistema e não pode excluir sua própria conta.'
+            ]);
+        }
 
         if ($user->temPedidosAtivos()) {
             return back()->withErrors([

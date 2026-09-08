@@ -30,10 +30,19 @@
                     @elseif(Auth::user()->tipo === 'admin')
                         <li class="mb-2"><strong>Telefone de Urgência:</strong>
                             {{ Auth::user()->admin?->telefone_urgencia ?? 'Não informado' }}</li>
-                        <li class="mb-2"><strong>Cargo:</strong> {{ Auth::user()->admin?->cargo ?? 'Administrador' }}
-                        </li>
+                        <li class="mb-2"><strong>Cargo:</strong> {{ Auth::user()->admin?->cargo ?? 'Administrador' }}</li>
+                        <li class="mb-2"><strong>Departamento:</strong> {{ Auth::user()->admin?->departamento ?? 'Geral' }}</li>
                     @endif
                 </ul>
+
+                @if (Auth::user()->tipo === 'admin')
+                    <div class="mt-4 pt-3 border-top">
+                        <a href="{{ route('admin.administradores.index') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 px-4 py-2">
+                            <i data-lucide="shield-check"></i>
+                            <span>Gerenciar Administradores</span>
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

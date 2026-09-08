@@ -10,7 +10,7 @@
                     <p class="text-muted small">Confirme sua senha para continuar.</p>
                 </div>
 
-                <form method="POST" action="{{ route('password.confirm') }}">
+                <form method="POST" action="{{ route('senha.confirmar') }}">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Sua Senha</label>

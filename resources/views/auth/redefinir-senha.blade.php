@@ -10,7 +10,7 @@
                     <p class="text-muted small">Crie uma nova senha segura para acessar sua conta.</p>
                 </div>
 
-                <form method="POST" action="{{ route('password.store') }}">
+                <form method="POST" action="{{ route('senha.atualizar') }}">
                     @csrf
                     <input type="hidden" name="token" value="{{ $request->route('token') }}">
 

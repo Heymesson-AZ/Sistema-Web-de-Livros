@@ -37,12 +37,12 @@
                 @endif
 
                 <div class="mt-4 d-flex justify-content-center gap-3">
-                    <form method="POST" action="{{ route('verification.send') }}">
+                    <form method="POST" action="{{ route('verificacao.enviar') }}">
                         @csrf
                         <button type="submit" class="btn btn-primary btn-login">Reenviar E-mail</button>
                     </form>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('sair') }}">
                         @csrf
                         <button type="submit" class="btn btn-link text-decoration-none text-muted small">Sair</button>
                     </form>

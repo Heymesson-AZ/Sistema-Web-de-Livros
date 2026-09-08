@@ -1,1 +1,0 @@
-@include('admin.administradores.detalhes')

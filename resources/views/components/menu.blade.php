@@ -200,7 +200,7 @@
                 </div>
 
                 @auth
-                    <form method="POST" action="{{ route('logout') }}" class="w-100">
+                    <form method="POST" action="{{ route('sair') }}" class="w-100">
                         @csrf
                         <button class="logout-btn" type="submit">
                             <i data-lucide="log-out"></i>

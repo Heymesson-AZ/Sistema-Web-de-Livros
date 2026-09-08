@@ -34,7 +34,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('register') }}">
+                        <form method="POST" action="{{ route('cadastrar') }}">
                             @csrf
                             <input type="hidden" name="formulario" value="registro">
 

@@ -58,7 +58,7 @@
                         seguro para você criar uma nova senha.
                     </p>
 
-                    <form method="POST" action="{{ route('password.email') }}">
+                    <form method="POST" action="{{ route('senha.email') }}">
                         @csrf
                         <input type="hidden" name="formulario" value="recuperar_senha">
 

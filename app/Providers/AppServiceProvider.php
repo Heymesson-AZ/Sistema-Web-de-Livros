@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
         // 2. Mensagem interativa e segura de Recuperação de Senha
         ResetPassword::toMailUsing(function (object $notifiable, string $token) {
             $firstName = explode(' ', trim($notifiable->name ?? 'Leitor(a)'))[0];
-            $url = url(route('password.reset', [
+            $url = url(route('senha.redefinir', [
                 'token' => $token,
                 'email' => $notifiable->getEmailForPasswordReset(),
             ], false));

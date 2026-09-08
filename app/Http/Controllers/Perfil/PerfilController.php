@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Perfil;
 
-use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Perfil\AtualizarPerfilRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class PerfilController extends Controller
     /**
      * Exibir formulário de edição de perfil do usuário (Cliente, Vendedor ou Administrador).
      */
-    public function editar(Request $request): View
+    public function editar(Request $request)
     {
         $user = $request->user();
 
@@ -40,7 +41,7 @@ class PerfilController extends Controller
     /**
      * Atualizar as informações do perfil do usuário.
      */
-    public function atualizar(ProfileUpdateRequest $request): RedirectResponse
+    public function atualizar(AtualizarPerfilRequest $request): RedirectResponse
     {
         $user = $request->user();
 
@@ -132,7 +133,7 @@ class PerfilController extends Controller
         return $this->editar($request);
     }
 
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(AtualizarPerfilRequest $request): RedirectResponse
     {
         return $this->atualizar($request);
     }

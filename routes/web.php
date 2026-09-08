@@ -1,18 +1,22 @@
 <?php
 
 use App\Http\Controllers\Admin\AdministradorController;
-use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\Perfil\PerfilController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas públicas (Acesso livre a todos os visitantes)
 Route::get('/', function () {
     return view('paginas.inicio');
-});
+})->name('inicio');
 
 // Painel principal (Dashboard), acessível para usuários autenticados e verificados
 Route::get('/dashboard', function () {
     return view('paginas.painel');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/painel', function () {
+    return view('paginas.painel');
+})->middleware(['auth', 'verified'])->name('painel');
 
 
 // Rotas para o perfil de Cliente

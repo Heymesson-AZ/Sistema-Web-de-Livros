@@ -36,7 +36,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('login') }}">
+                        <form method="POST" action="{{ route('entrar') }}">
                             @csrf
                             <input type="hidden" name="formulario" value="login">
 

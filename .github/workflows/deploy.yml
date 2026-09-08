@@ -58,9 +58,9 @@ jobs:
             # 3. Reconstruir e subir os containers leves (já pegando o front-end compilado)
             docker compose up -d --build
 
-            # 4. Executar migrações com seed no MySQL e caches do Laravel
+            # 4. Executar migrações e caches do Laravel
             docker compose exec -T -u 0 app php artisan storage:link || true
-            docker compose exec -T -u 0 app php artisan migrate:fresh --seed --force
+            docker compose exec -T -u 0 app php artisan migrate --force || true
             docker compose exec -T -u 0 app php artisan config:cache
             docker compose exec -T -u 0 app php artisan route:cache
             docker compose exec -T -u 0 app php artisan view:clear

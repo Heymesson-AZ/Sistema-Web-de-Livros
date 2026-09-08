@@ -140,7 +140,8 @@
                 @auth
                     @if (Auth::user()->isAdmin())
                         <!-- Administração (Apenas Admin) -->
-                        <li class="menu-item has-submenu {{ request()->routeIs('admin.administradores.*') ? 'active' : '' }}">
+                        <li
+                            class="menu-item has-submenu {{ request()->routeIs('admin.administradores.*') ? 'active' : '' }}">
                             <div class="menu-item-header">
                                 <i data-lucide="shield-check"></i>
                                 <span>Administração</span>

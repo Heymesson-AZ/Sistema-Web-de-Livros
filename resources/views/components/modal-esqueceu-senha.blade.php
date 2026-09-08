@@ -33,7 +33,8 @@
                             </li>
                             <li class="d-flex align-items-center gap-2">
                                 <i class="bi bi-inbox text-success"></i>
-                                <span>Não encontrou? Verifique a pasta de <strong>Spam / Lixo Eletrônico</strong>.</span>
+                                <span>Não encontrou? Verifique a pasta de <strong>Spam / Lixo
+                                        Eletrônico</strong>.</span>
                             </li>
                             <li class="d-flex align-items-center gap-2">
                                 <i class="bi bi-shield-check text-success"></i>

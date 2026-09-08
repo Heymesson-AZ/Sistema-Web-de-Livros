@@ -17,7 +17,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Instalar dependências e compilar o Front-end (Vite)
         run: |
@@ -61,7 +61,6 @@ jobs:
             docker compose exec -T -u 0 app php artisan config:cache
             docker compose exec -T -u 0 app php artisan route:cache
             docker compose exec -T -u 0 app php artisan view:clear
-
 
 # Finalidade: Automatizar a publicação do seu sistema diretamente na sua
 # VPS da Oracle Cloud, sem que você precise acessar o servidor manualmente.

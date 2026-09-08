@@ -17,6 +17,19 @@ COPY . .
 
 RUN composer dump-autoload --optimize
 
+FROM node:20-alpine AS frontend
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci || npm install
+
+COPY resources ./resources
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+COPY --from=vendor /app/vendor ./vendor
+
+RUN npm run build
+
 FROM php:8.3-fpm
 
 COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
@@ -43,6 +56,7 @@ RUN install-php-extensions \
 WORKDIR /var/www
 
 COPY --from=vendor /app /var/www
+COPY --from=frontend /app/public/build /var/www/public/build
 
 COPY docker/nginx/default.conf /etc/nginx/sites-enabled/default
 

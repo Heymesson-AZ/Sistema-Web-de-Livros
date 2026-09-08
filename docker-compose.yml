@@ -14,10 +14,7 @@ services:
       - .env
 
     environment:
-      APP_ENV: local
-
-    volumes:
-      - '.:/var/www'
+      APP_ENV: ${APP_ENV:-production}
 
     depends_on:
       mysql:

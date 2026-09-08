@@ -1,20 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Vendedor;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Vendedor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
 class VendedorController extends Controller
 {
+    // =========================================================================
+    // CRUD DE VENDEDORES (GESTÃO ADMINISTRATIVA)
+    // =========================================================================
+
     /**
      * Listar vendedores com métricas (KPIs), busca e filtros.
      */
@@ -49,7 +55,7 @@ class VendedorController extends Controller
         $totalPendentes = Vendedor::where('status_aprovacao', 'pendente')->count();
         $totalRejeitados = Vendedor::where('status_aprovacao', 'rejeitado')->count();
 
-        return view('admin.vendedores.listar', [
+        return view('vendedor.listar', [
             'vendedores' => $vendedores,
             'totalVendedores' => $totalVendedores,
             'totalAprovados' => $totalAprovados,
@@ -64,7 +70,7 @@ class VendedorController extends Controller
      */
     public function cadastrar(): View
     {
-        return view('admin.vendedores.cadastrar');
+        return view('vendedor.cadastrar');
     }
 
     /**
@@ -127,7 +133,7 @@ class VendedorController extends Controller
     {
         $vendedor->load(['user', 'livros', 'pedidos', 'avaliacoes']);
 
-        return view('admin.vendedores.detalhes', [
+        return view('vendedor.detalhes', [
             'vendedor' => $vendedor,
         ]);
     }
@@ -139,7 +145,7 @@ class VendedorController extends Controller
     {
         $vendedor->load('user');
 
-        return view('admin.vendedores.editar', [
+        return view('vendedor.editar', [
             'vendedor' => $vendedor,
         ]);
     }
@@ -229,7 +235,6 @@ class VendedorController extends Controller
     {
         $user = $vendedor->user;
 
-        // Trava: Verificar se possui pedidos ou livros ativos vinculados
         if ($vendedor->pedidos()->exists()) {
             return back()->withErrors([
                 'erro' => 'Não é possível excluir este vendedor pois ele possui pedidos registrados no sistema.'
@@ -251,6 +256,85 @@ class VendedorController extends Controller
     public function excluir(Vendedor $vendedor): RedirectResponse
     {
         return $this->deletar($vendedor);
+    }
+
+    // =========================================================================
+    // GESTÃO DO PRÓPRIO PERFIL DO VENDEDOR
+    // =========================================================================
+
+    /**
+     * Exibir formulário de edição do perfil do próprio vendedor logado.
+     */
+    public function editarPerfil(Request $request): View
+    {
+        $user = $request->user();
+
+        return view('vendedor.perfil-editar', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Atualizar o próprio perfil do vendedor conectado.
+     */
+    public function atualizarPerfil(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'telefone' => ['required', 'string', 'max:20'],
+            'razao_social' => ['required', 'string', 'max:255'],
+            'nome_fantasia' => ['required', 'string', 'max:255'],
+            'inscricao_estadual' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $user->fill($request->only('name', 'email'));
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+            $user->sendEmailVerificationNotification();
+        }
+
+        $user->save();
+
+        if ($user->vendedor) {
+            $user->vendedor()->update([
+                'telefone_comercial' => $request->telefone,
+                'razao_social' => $request->razao_social,
+                'nome_fantasia' => $request->nome_fantasia,
+                'inscricao_estadual' => $request->inscricao_estadual,
+            ]);
+        }
+
+        return Redirect::route('vendedor.perfil.editar')->with('status', 'perfil-atualizado');
+    }
+
+    /**
+     * Deletar a própria conta de vendedor.
+     */
+    public function deletarConta(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->temPedidosAtivos()) {
+            return back()->withErrors([
+                'DeleteUsuario' => 'Você possui pedidos em andamento e não pode excluir sua conta agora.'
+            ]);
+        }
+
+        Auth::logout();
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
     }
 
     // =========================================================================

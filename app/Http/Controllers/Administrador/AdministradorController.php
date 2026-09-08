@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Administrador;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
@@ -10,12 +10,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
 class AdministradorController extends Controller
 {
+    // =========================================================================
+    // CRUD DE ADMINISTRADORES
+    // =========================================================================
+
     /**
      * Listar administradores com busca, filtros e indicadores (KPIs).
      */
@@ -50,7 +55,7 @@ class AdministradorController extends Controller
         $totalDepartamentos = count(Admin::getDepartamentos());
         $totalSuperAdmins = Admin::where('cargo', Admin::CARGO_SUPER_ADMIN)->count();
 
-        return view('admin.administradores.listar', [
+        return view('administrador.listar', [
             'administradores' => $administradores,
             'cargos' => Admin::getCargos(),
             'departamentos' => Admin::getDepartamentos(),
@@ -65,7 +70,7 @@ class AdministradorController extends Controller
      */
     public function cadastrar(): View
     {
-        return view('admin.administradores.cadastrar', [
+        return view('administrador.cadastrar', [
             'cargos' => Admin::getCargos(),
             'departamentos' => Admin::getDepartamentos(),
         ]);
@@ -123,7 +128,7 @@ class AdministradorController extends Controller
     {
         $administrador->load('user');
 
-        return view('admin.administradores.detalhes', [
+        return view('administrador.detalhes', [
             'admin' => $administrador,
         ]);
     }
@@ -135,7 +140,7 @@ class AdministradorController extends Controller
     {
         $administrador->load('user');
 
-        return view('admin.administradores.editar', [
+        return view('administrador.editar', [
             'admin' => $administrador,
             'cargos' => Admin::getCargos(),
             'departamentos' => Admin::getDepartamentos(),
@@ -151,7 +156,7 @@ class AdministradorController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:100'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
             'cargo' => ['required', 'string', Rule::in(Admin::getCargos())],
@@ -160,14 +165,14 @@ class AdministradorController extends Controller
             'name.required' => 'O nome é obrigatório.',
             'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
             'email.required' => 'O e-mail é obrigatório.',
-            'email.email' => 'Informe um e-mail válido.',
-            'email.unique' => 'Este e-mail já pertence a outro usuário.',
+            'email.email' => 'Informe um endereço de e-mail válido.',
+            'email.unique' => 'Este e-mail já está sendo utilizado.',
             'password.confirmed' => 'A confirmação de senha não confere.',
             'cargo.in' => 'Selecione um cargo válido.',
             'departamento.in' => 'Selecione um departamento válido.',
         ]);
 
-        DB::transaction(function () use ($request, $user, $administrador) {
+        DB::transaction(function () use ($request, $administrador, $user) {
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
@@ -177,7 +182,7 @@ class AdministradorController extends Controller
                 $userData['password'] = Hash::make($request->password);
             }
 
-            $user->update($userData);
+            $user?->update($userData);
 
             $administrador->update([
                 'telefone_urgencia' => $request->telefone_urgencia,
@@ -191,27 +196,25 @@ class AdministradorController extends Controller
     }
 
     /**
-     * Deletar/excluir um administrador do sistema com travas de segurança.
+     * Deletar o administrador do sistema.
      */
     public function deletar(Admin $administrador): RedirectResponse
     {
-        // 1. Não permitir auto-exclusão
-        if ($administrador->user_id === Auth::id()) {
+        // Trava de Segurança 1: Não permitir que o usuário logado exclua a si mesmo por esta rota
+        if (Auth::id() === $administrador->user_id) {
             return redirect()->route('admin.administradores.index')
-                ->with('error', 'Operação negada: Você não pode excluir sua própria conta de administrador.');
+                ->with('error', 'Você não pode excluir seu próprio cadastro de administrador por esta listagem.');
         }
 
-        // 2. Não permitir exclusão se for o único Super Admin
-        if ($administrador->cargo === Admin::CARGO_SUPER_ADMIN) {
-            $totalSuperAdmins = Admin::where('cargo', Admin::CARGO_SUPER_ADMIN)->count();
-            if ($totalSuperAdmins <= 1) {
-                return redirect()->route('admin.administradores.index')
-                    ->with('error', 'Operação negada: O sistema deve ter pelo menos um Super Administrador ativo.');
-            }
+        // Trava de Segurança 2: Garantir que sempre reste pelo menos um administrador no sistema
+        if (Admin::count() <= 1) {
+            return redirect()->route('admin.administradores.index')
+                ->with('error', 'Operação cancelada: O sistema deve possuir pelo menos um administrador cadastrado.');
         }
 
-        DB::transaction(function () use ($administrador) {
-            $user = $administrador->user;
+        $user = $administrador->user;
+
+        DB::transaction(function () use ($administrador, $user) {
             $administrador->delete();
             $user?->delete();
         });
@@ -229,7 +232,79 @@ class AdministradorController extends Controller
     }
 
     // =========================================================================
-    // MÉTODOS DO RESOURCE PADRÃO DO LARAVEL (DELEGAÇÃO TRANSPARENTE)
+    // GESTÃO DO PRÓPRIO PERFIL DO ADMINISTRADOR
+    // =========================================================================
+
+    /**
+     * Exibir formulário de edição do perfil do administrador conectado.
+     */
+    public function editarPerfil(Request $request): View
+    {
+        $user = $request->user();
+
+        return view('administrador.perfil-editar', [
+            'user' => $user,
+            'admin' => $user->admin,
+        ]);
+    }
+
+    /**
+     * Atualizar os dados do perfil do administrador conectado.
+     */
+    public function atualizarPerfil(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'telefone_urgencia' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $user->fill($request->only('name', 'email'));
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+            $user->sendEmailVerificationNotification();
+        }
+
+        $user->save();
+
+        if ($user->admin) {
+            $user->admin()->update($request->only('telefone_urgencia'));
+        }
+
+        return Redirect::route('admin.perfil.editar')->with('status', 'perfil-atualizado');
+    }
+
+    /**
+     * Deletar a própria conta de administrador.
+     */
+    public function deletarConta(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        if (User::where('tipo', 'admin')->count() <= 1) {
+            return back()->withErrors([
+                'DeleteUsuario' => 'Você é o único administrador do sistema e não pode excluir sua própria conta.'
+            ]);
+        }
+
+        Auth::logout();
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+
+    // =========================================================================
+    // MÉTODOS DE RESOURCE PADRÃO DO LARAVEL
     // =========================================================================
 
     public function index(Request $request): View

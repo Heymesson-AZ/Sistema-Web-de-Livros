@@ -1,20 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
 class ClienteController extends Controller
 {
+    // =========================================================================
+    // CRUD DE CLIENTES (GESTÃO ADMINISTRATIVA)
+    // =========================================================================
+
     /**
      * Listar clientes com métricas, busca e paginação.
      */
@@ -43,7 +49,7 @@ class ClienteController extends Controller
             ->whereYear('created_at', now()->year)
             ->count();
 
-        return view('admin.clientes.listar', [
+        return view('cliente.listar', [
             'clientes' => $clientes,
             'totalClientes' => $totalClientes,
             'totalComPedidos' => $totalComPedidos,
@@ -56,7 +62,7 @@ class ClienteController extends Controller
      */
     public function cadastrar(): View
     {
-        return view('admin.clientes.cadastrar');
+        return view('cliente.cadastrar');
     }
 
     /**
@@ -111,7 +117,7 @@ class ClienteController extends Controller
     {
         $cliente->load(['user', 'pedidos', 'avaliacoes']);
 
-        return view('admin.clientes.detalhes', [
+        return view('cliente.detalhes', [
             'cliente' => $cliente,
         ]);
     }
@@ -123,7 +129,7 @@ class ClienteController extends Controller
     {
         $cliente->load('user');
 
-        return view('admin.clientes.editar', [
+        return view('cliente.editar', [
             'cliente' => $cliente,
         ]);
     }
@@ -183,7 +189,6 @@ class ClienteController extends Controller
     {
         $user = $cliente->user;
 
-        // Trava: Verificar se possui pedidos em andamento
         if ($user && $user->temPedidosAtivos()) {
             return back()->withErrors([
                 'erro' => 'Não é possível excluir este cliente pois ele possui pedidos em andamento no sistema.'
@@ -205,6 +210,79 @@ class ClienteController extends Controller
     public function excluir(Cliente $cliente): RedirectResponse
     {
         return $this->deletar($cliente);
+    }
+
+    // =========================================================================
+    // GESTÃO DO PRÓPRIO PERFIL DO CLIENTE
+    // =========================================================================
+
+    /**
+     * Exibir formulário de edição do perfil do próprio cliente logado.
+     */
+    public function editarPerfil(Request $request): View
+    {
+        $user = $request->user();
+
+        return view('cliente.perfil-editar', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
+     * Atualizar o próprio perfil do cliente conectado.
+     */
+    public function atualizarPerfil(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'name' => ['required', 'string', 'min:3', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'telefone' => ['required', 'string', 'max:20'],
+        ]);
+
+        $user->fill($request->only('name', 'email'));
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+            $user->sendEmailVerificationNotification();
+        }
+
+        $user->save();
+
+        if ($user->cliente) {
+            $user->cliente()->update([
+                'celular_contato' => $request->telefone,
+            ]);
+        }
+
+        return Redirect::route('cliente.perfil.editar')->with('status', 'perfil-atualizado');
+    }
+
+    /**
+     * Deletar a própria conta de cliente.
+     */
+    public function deletarConta(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->temPedidosAtivos()) {
+            return back()->withErrors([
+                'DeleteUsuario' => 'Você possui pedidos em andamento e não pode excluir sua conta agora.'
+            ]);
+        }
+
+        Auth::logout();
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
     }
 
     // =========================================================================

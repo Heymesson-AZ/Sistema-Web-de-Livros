@@ -80,6 +80,52 @@
                             </div>
                         </form>
 
+                        <hr class="my-4">
+
+                        <div>
+                            <h5 class="text-danger fw-bold">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                Excluir Conta de Administrador
+                            </h5>
+
+                            <p class="text-muted small">
+                                Esta ação excluirá permanentemente o seu acesso administrativo. O sistema requer que exista ao menos outro administrador ativo cadastrado.
+                            </p>
+
+                            <form method="POST" action="{{ route('admin.perfil.deletar') }}">
+                                @csrf
+                                @method('DELETE')
+
+                                <div class="mb-3">
+                                    <label for="password" class="form-label small fw-bold text-secondary">
+                                        Confirme sua senha para continuar
+                                    </label>
+
+                                    <input type="password"
+                                        class="form-control @error('password', 'userDeletion') is-invalid @enderror"
+                                        id="password" name="password" required>
+
+                                    @error('password', 'userDeletion')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                    @error('DeleteUsuario')
+                                        <div class="text-danger small mt-2">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="d-grid d-sm-flex justify-content-sm-end">
+                                    <button type="submit" class="btn btn-outline-danger px-4 py-2" onclick="return confirm('Tem certeza de que deseja excluir sua conta de administrador? Esta ação é irreversível.')">
+                                        <i class="bi bi-trash me-1"></i>
+                                        Excluir minha conta
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
 

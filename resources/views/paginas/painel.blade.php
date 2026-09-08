@@ -25,8 +25,8 @@
                         <li class="mb-2"><strong>Celular de Contato:</strong>
                             {{ Auth::user()->cliente?->celular_contato ?? 'Não informado' }}</li>
                     @elseif(Auth::user()->tipo === 'vendedor')
-                        <li class="mb-2"><strong>WhatsApp Comercial:</strong>
-                            {{ Auth::user()->vendedor?->whatsapp_comercial ?? 'Não informado' }}</li>
+                        <li class="mb-2"><strong>Telefone Comercial:</strong>
+                            {{ Auth::user()->vendedor?->telefone_comercial ?? 'Não informado' }}</li>
                     @elseif(Auth::user()->tipo === 'admin')
                         <li class="mb-2"><strong>Telefone de Urgência:</strong>
                             {{ Auth::user()->admin?->telefone_urgencia ?? 'Não informado' }}</li>

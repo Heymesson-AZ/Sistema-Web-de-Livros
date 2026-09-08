@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdministradorController;
+use App\Http\Controllers\Admin\ClienteController;
+use App\Http\Controllers\Admin\VendedorController;
 use App\Http\Controllers\Perfil\PerfilController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +50,18 @@ Route::middleware(['auth', 'checkTipo:admin'])->group(function () {
         Route::resource('administradores', AdministradorController::class)
             ->parameters(['administradores' => 'administrador'])
             ->names('admin.administradores');
+
+        // Rotas do CRUD de Vendedores
+        Route::patch('vendedores/{vendedor}/status', [VendedorController::class, 'alterarStatus'])
+            ->name('admin.vendedores.status');
+        Route::resource('vendedores', VendedorController::class)
+            ->parameters(['vendedores' => 'vendedor'])
+            ->names('admin.vendedores');
+
+        // Rotas do CRUD de Clientes
+        Route::resource('clientes', ClienteController::class)
+            ->parameters(['clientes' => 'cliente'])
+            ->names('admin.clientes');
     });
 });
 

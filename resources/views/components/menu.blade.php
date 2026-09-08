@@ -141,7 +141,7 @@
                     @if (Auth::user()->isAdmin())
                         <!-- Administração (Apenas Admin) -->
                         <li
-                            class="menu-item has-submenu {{ request()->routeIs('admin.administradores.*') ? 'active' : '' }}">
+                            class="menu-item has-submenu {{ request()->routeIs('admin.*') ? 'active' : '' }}">
                             <div class="menu-item-header">
                                 <i data-lucide="shield-check"></i>
                                 <span>Administração</span>
@@ -158,10 +158,18 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.administradores.create') }}">
+                                    <a href="{{ route('admin.vendedores.index') }}">
                                         <div class="menu-item-header">
-                                            <i data-lucide="user-plus"></i>
-                                            <span>Novo Admin</span>
+                                            <i data-lucide="store"></i>
+                                            <span>Vendedores</span>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.clientes.index') }}">
+                                        <div class="menu-item-header">
+                                            <i data-lucide="user-check"></i>
+                                            <span>Clientes</span>
                                         </div>
                                     </a>
                                 </li>

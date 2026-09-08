@@ -1,0 +1,303 @@
+<x-layouts.principal>
+    <div class="container py-4">
+
+        <!-- CABEÇALHO DA PÁGINA -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">
+                    <i class="bi bi-shop text-primary me-2"></i>
+                    Gestão de Vendedores
+                </h1>
+                <p class="text-muted small mb-0">
+                    Gerencie os parceiros e lojistas da livraria Universo de Papel.
+                </p>
+            </div>
+            <a href="{{ route('admin.vendedores.create') }}" class="btn btn-primary px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>Novo Vendedor</span>
+            </a>
+        </div>
+
+        <!-- MENSAGENS DE STATUS E ERRO -->
+        @if (session('status'))
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center gap-2 mb-4" role="alert">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div>{{ session('status') }}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 d-flex align-items-center gap-2 mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <div>
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <!-- CARDS DE MÉTRICAS (KPIS) -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 h-100" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold text-uppercase">Total Vendedores</span>
+                            <h3 class="fw-bold mb-0 text-dark mt-1">{{ $totalVendedores }}</h3>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #eff6ff; color: #2563eb;">
+                            <i class="bi bi-shop fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 h-100" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold text-uppercase">Aprovados</span>
+                            <h3 class="fw-bold mb-0 text-success mt-1">{{ $totalAprovados }}</h3>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #f0fdf4; color: #16a34a;">
+                            <i class="bi bi-patch-check-fill fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 h-100" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold text-uppercase">Pendentes</span>
+                            <h3 class="fw-bold mb-0 text-warning mt-1">{{ $totalPendentes }}</h3>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #fefce8; color: #ca8a04;">
+                            <i class="bi bi-hourglass-split fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 p-3 h-100" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold text-uppercase">Rejeitados</span>
+                            <h3 class="fw-bold mb-0 text-danger mt-1">{{ $totalRejeitados }}</h3>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: #fef2f2; color: #dc2626;">
+                            <i class="bi bi-x-circle-fill fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTROS E BUSCA -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+            <form method="GET" action="{{ route('admin.vendedores.index') }}" class="row g-2 align-items-center">
+                <div class="col-12 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="busca" class="form-control border-start-0 ps-0" placeholder="Buscar por nome, e-mail, CNPJ ou razão social..." value="{{ request('busca') }}">
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">Todos os Status</option>
+                        <option value="aprovado" {{ request('status') === 'aprovado' ? 'selected' : '' }}>Aprovados</option>
+                        <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendentes</option>
+                        <option value="rejeitado" {{ request('status') === 'rejeitado' ? 'selected' : '' }}>Rejeitados</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">
+                        <i class="bi bi-filter me-1"></i> Filtrar
+                    </button>
+                    @if(request('busca') || request('status'))
+                        <a href="{{ route('admin.vendedores.index') }}" class="btn btn-outline-secondary" title="Limpar Filtros">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
+        <!-- TABELA DE VENDEDORES -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary text-uppercase small" style="letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="ps-4 py-3">Loja / Empresa</th>
+                            <th class="py-3">Responsável</th>
+                            <th class="py-3">CNPJ / Contato</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3 text-center">Catálogo</th>
+                            <th class="pe-4 py-3 text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @forelse ($vendedores as $vendedor)
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                                             style="width: 44px; height: 44px; background: #e0f2fe; color: #0369a1; font-size: 1.1rem;">
+                                            {{ strtoupper(substr($vendedor->nome_fantasia ?? 'V', 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ $vendedor->nome_fantasia }}</div>
+                                            <div class="text-muted small">{{ $vendedor->razao_social }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="py-3">
+                                    <div class="fw-semibold text-dark">{{ $vendedor->user?->name ?? 'Usuário Removido' }}</div>
+                                    <div class="text-muted small">{{ $vendedor->user?->email ?? '-' }}</div>
+                                </td>
+
+                                <td class="py-3">
+                                    <div class="fw-medium text-secondary">{{ $vendedor->cnpj }}</div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-telephone me-1"></i>{{ $vendedor->telefone_comercial ?? 'Não informado' }}
+                                    </div>
+                                </td>
+
+                                <td class="py-3">
+                                    @if ($vendedor->status_aprovacao === 'aprovado')
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Aprovado
+                                        </span>
+                                    @elseif ($vendedor->status_aprovacao === 'pendente')
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1 fw-semibold">
+                                            <i class="bi bi-hourglass-split me-1"></i> Pendente
+                                        </span>
+                                    @else
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 fw-semibold">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Rejeitado
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <td class="py-3 text-center">
+                                    <span class="badge bg-light text-dark border px-2 py-1 me-1" title="Livros cadastrados">
+                                        <i class="bi bi-book me-1 text-primary"></i> {{ $vendedor->livros_count ?? 0 }}
+                                    </span>
+                                    <span class="badge bg-light text-dark border px-2 py-1" title="Pedidos vinculados">
+                                        <i class="bi bi-bag-check me-1 text-success"></i> {{ $vendedor->pedidos_count ?? 0 }}
+                                    </span>
+                                </td>
+
+                                <td class="pe-4 py-3 text-end">
+                                    <div class="btn-group gap-1">
+                                        <!-- Ações rápidas de aprovação/rejeição -->
+                                        @if ($vendedor->status_aprovacao !== 'aprovado')
+                                            <form method="POST" action="{{ route('admin.vendedores.status', $vendedor) }}" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="aprovado">
+                                                <button type="submit" class="btn btn-sm btn-outline-success rounded-3" title="Aprovar Vendedor">
+                                                    <i class="bi bi-check-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        @if ($vendedor->status_aprovacao !== 'rejeitado')
+                                            <form method="POST" action="{{ route('admin.vendedores.status', $vendedor) }}" class="d-inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <input type="hidden" name="status" value="rejeitado">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-3" title="Rejeitar Vendedor">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <a href="{{ route('admin.vendedores.show', $vendedor) }}" class="btn btn-sm btn-outline-secondary rounded-3" title="Visualizar Detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <a href="{{ route('admin.vendedores.edit', $vendedor) }}" class="btn btn-sm btn-outline-primary rounded-3" title="Editar Vendedor">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $vendedor->id }}" title="Excluir Vendedor">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO -->
+                                    <div class="modal fade" id="deleteModal{{ $vendedor->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered text-start">
+                                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                                <div class="modal-header border-0 pb-0">
+                                                    <h5 class="modal-title fw-bold text-danger d-flex align-items-center gap-2">
+                                                        <i class="bi bi-exclamation-triangle-fill"></i>
+                                                        Confirmar Exclusão
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-3">
+                                                    <p class="text-secondary mb-2">
+                                                        Tem certeza que deseja excluir o vendedor <strong>{{ $vendedor->nome_fantasia }}</strong> (CNPJ: {{ $vendedor->cnpj }})?
+                                                    </p>
+                                                    <p class="text-danger small mb-0 fw-semibold">
+                                                        Atenção: A conta de acesso associada a este vendedor também será excluída permanentemente.
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer border-0 pt-0">
+                                                    <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Cancelar</button>
+                                                    <form method="POST" action="{{ route('admin.vendedores.destroy', $vendedor) }}" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger rounded-3 px-3">
+                                                            Sim, Excluir Vendedor
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                        <h6 class="fw-bold mb-1">Nenhum vendedor encontrado</h6>
+                                        <p class="small mb-3">Tente ajustar seus termos de busca ou cadastrar um novo vendedor.</p>
+                                        @if(request('busca') || request('status'))
+                                            <a href="{{ route('admin.vendedores.index') }}" class="btn btn-sm btn-outline-primary rounded-3">
+                                                Limpar Filtros
+                                            </a>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAGINAÇÃO -->
+            @if ($vendedores->hasPages())
+                <div class="p-3 border-top bg-light">
+                    {{ $vendedores->links() }}
+                </div>
+            @endif
+        </div>
+
+    </div>
+</x-layouts.principal>

@@ -1,7 +1,7 @@
 // Busca Dinâmica com Debounce via Fetch em Vanilla JS
 export function initBuscaDinamica() {
     const searchInputs = document.querySelectorAll(
-        '.search-box input[name="busca"], input[data-dynamic-search]'
+        '.search-box input[name="busca"], input[data-dynamic-search]',
     );
 
     searchInputs.forEach((input) => {
@@ -66,7 +66,7 @@ export function initBuscaDinamica() {
             livros.forEach((livro, idx) => {
                 html += `
                     <a href="${livro.url}" class="suggestion-item d-flex align-items-center gap-3 px-3 py-2 text-decoration-none text-dark border-bottom border-light" data-index="${idx}" style="transition: background 0.15s ease;">
-                        <img src="${livro.capa_url}" alt="${escapeHtml(livro.titulo)}" 
+                        <img src="${livro.capa_url}" alt="${escapeHtml(livro.titulo)}"
                              style="width: 38px; height: 50px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0;"
                              onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=150&q=80'">
                         <div class="overflow-hidden flex-grow-1" style="min-width: 0;">
@@ -96,7 +96,9 @@ export function initBuscaDinamica() {
             const items = dropdown.querySelectorAll(".suggestion-item");
             items.forEach((item) => {
                 item.addEventListener("mouseenter", () => {
-                    items.forEach((it) => (it.style.backgroundColor = "transparent"));
+                    items.forEach(
+                        (it) => (it.style.backgroundColor = "transparent"),
+                    );
                     item.style.backgroundColor = "#f1f5f9";
                 });
                 item.addEventListener("mouseleave", () => {
@@ -141,7 +143,11 @@ export function initBuscaDinamica() {
         // Navegação por teclado
         input.addEventListener("keydown", function (e) {
             const items = dropdown.querySelectorAll(".suggestion-item");
-            if (!items || items.length === 0 || dropdown.style.display === "none") {
+            if (
+                !items ||
+                items.length === 0 ||
+                dropdown.style.display === "none"
+            ) {
                 if (e.key === "Escape") closeDropdown();
                 return;
             }

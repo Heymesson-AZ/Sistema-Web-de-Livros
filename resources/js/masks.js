@@ -17,7 +17,10 @@ export function initMasks() {
             return digits.replace(/(\d{2})(\d{3})(\d+)/, "$1.$2.$3");
         if (digits.length <= 12)
             return digits.replace(/(\d{2})(\d{3})(\d{3})(\d+)/, "$1.$2.$3/$4");
-        return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})/, "$1.$2.$3/$4-$5");
+        return digits.replace(
+            /(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})/,
+            "$1.$2.$3/$4-$5",
+        );
     }
 
     function formatPhone(value) {
@@ -41,10 +44,19 @@ export function initMasks() {
         // Suporte a ISBN-10 e ISBN-13 (ex: 978-65-88888-00-1 ou 978-85-359-0277-8)
         let cleaned = value.replace(/[^0-9Xx]/g, "").slice(0, 13);
         if (cleaned.length <= 3) return cleaned;
-        if (cleaned.length <= 5) return cleaned.replace(/(\d{3})(\d+)/, "$1-$2");
-        if (cleaned.length <= 8) return cleaned.replace(/(\d{3})(\d{2})(\d+)/, "$1-$2-$3");
-        if (cleaned.length <= 12) return cleaned.replace(/(\d{3})(\d{2})(\d{3,5})(\d+)/, "$1-$2-$3-$4");
-        return cleaned.replace(/(\d{3})(\d{2})(\d{3,5})(\d{1,4})([0-9Xx])/, "$1-$2-$3-$4-$5");
+        if (cleaned.length <= 5)
+            return cleaned.replace(/(\d{3})(\d+)/, "$1-$2");
+        if (cleaned.length <= 8)
+            return cleaned.replace(/(\d{3})(\d{2})(\d+)/, "$1-$2-$3");
+        if (cleaned.length <= 12)
+            return cleaned.replace(
+                /(\d{3})(\d{2})(\d{3,5})(\d+)/,
+                "$1-$2-$3-$4",
+            );
+        return cleaned.replace(
+            /(\d{3})(\d{2})(\d{3,5})(\d{1,4})([0-9Xx])/,
+            "$1-$2-$3-$4-$5",
+        );
     }
 
     function formatDate(value) {
@@ -85,10 +97,7 @@ export function initMasks() {
     }
 
     // 1. CPF
-    bindMask(
-        'input[data-mask="cpf"], input#cpf, input[name="cpf"]',
-        formatCPF,
-    );
+    bindMask('input[data-mask="cpf"], input#cpf, input[name="cpf"]', formatCPF);
 
     // 2. CNPJ
     bindMask(
@@ -103,10 +112,7 @@ export function initMasks() {
     );
 
     // 4. CEP
-    bindMask(
-        'input[data-mask="cep"], input#cep, input[name="cep"]',
-        formatCEP,
-    );
+    bindMask('input[data-mask="cep"], input#cep, input[name="cep"]', formatCEP);
 
     // 5. ISBN
     bindMask(
@@ -115,20 +121,13 @@ export function initMasks() {
     );
 
     // 6. Data (DD/MM/AAAA)
-    bindMask(
-        'input[data-mask="data"], input[data-mask="date"]',
-        formatDate,
-    );
+    bindMask('input[data-mask="data"], input[data-mask="date"]', formatDate);
 
     // 7. Moeda / Preço (R$ 0,00)
-    bindMask(
-        'input[data-mask="money"], input.mask-money',
-        formatMoney,
-    );
+    bindMask('input[data-mask="money"], input.mask-money', formatMoney);
 }
 
 // Expõe globalmente no window para re-inicialização em modais dinâmicos
 if (typeof window !== "undefined") {
     window.initMasks = initMasks;
 }
-

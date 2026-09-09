@@ -2,13 +2,15 @@
     <div class="container py-4 py-md-5">
 
         @if (session('status') === 'perfil-atualizado' || session('status') === 'profile-updated')
-            <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
+            <div
+                class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
                 <i class="bi bi-check-circle-fill fs-5 text-success"></i>
                 <div class="fw-semibold">Dados do perfil atualizados com sucesso!</div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
             </div>
         @elseif (session('status'))
-            <div class="alert alert-info alert-dismissible fade show rounded-4 border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
+            <div
+                class="alert alert-info alert-dismissible fade show rounded-4 border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
                 <i class="bi bi-info-circle-fill fs-5 text-info"></i>
                 <div>{{ session('status') }}</div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
@@ -32,33 +34,43 @@
 
         <!-- CABEÇALHO DO PERFIL & PAINEL -->
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-            <div class="p-4 p-md-5 text-white position-relative" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
-                <div class="d-flex flex-column flex-md-row align-items-center gap-4 position-relative" style="z-index: 2;">
+            <div class="p-4 p-md-5 text-white position-relative"
+                style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+                <div class="d-flex flex-column flex-md-row align-items-center gap-4 position-relative"
+                    style="z-index: 2;">
                     <!-- AVATAR -->
                     <div class="position-relative">
-                        <img src="{{ $user->foto }}" alt="{{ $user->name }}" class="rounded-circle shadow-lg border border-3 border-white object-fit-cover"
+                        <img src="{{ $user->foto }}" alt="{{ $user->name }}"
+                            class="rounded-circle shadow-lg border border-3 border-white object-fit-cover"
                             style="width: 96px; height: 96px;" id="painelHeaderAvatar">
                     </div>
 
                     <!-- DADOS BÁSICOS -->
                     <div class="text-center text-md-start flex-grow-1">
-                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                        <div
+                            class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
                             <h2 class="h3 fw-bold mb-0 text-white">{{ $user->name }}</h2>
                             @if ($user->isAdmin())
-                                <span class="badge bg-danger rounded-pill px-3 py-1 font-monospace" style="font-size: 11px;">
-                                    <i class="bi bi-shield-lock-fill me-1"></i> {{ $user->admin?->cargo ?? 'Administrador' }}
+                                <span class="badge bg-danger rounded-pill px-3 py-1 font-monospace"
+                                    style="font-size: 11px;">
+                                    <i class="bi bi-shield-lock-fill me-1"></i>
+                                    {{ $user->admin?->cargo ?? 'Administrador' }}
                                 </span>
                             @elseif ($user->isVendedor())
-                                <span class="badge bg-success rounded-pill px-3 py-1 font-monospace" style="font-size: 11px;">
-                                    <i class="bi bi-shop me-1"></i> {{ $user->vendedor?->nome_fantasia ?: 'Vendedor Parceiro' }}
+                                <span class="badge bg-success rounded-pill px-3 py-1 font-monospace"
+                                    style="font-size: 11px;">
+                                    <i class="bi bi-shop me-1"></i>
+                                    {{ $user->vendedor?->nome_fantasia ?: 'Vendedor Parceiro' }}
                                 </span>
                             @else
-                                <span class="badge bg-primary rounded-pill px-3 py-1 font-monospace" style="font-size: 11px;">
+                                <span class="badge bg-primary rounded-pill px-3 py-1 font-monospace"
+                                    style="font-size: 11px;">
                                     <i class="bi bi-person-fill me-1"></i> Cliente Leitor
                                 </span>
                             @endif
 
-                            <span class="badge bg-secondary bg-opacity-50 rounded-pill px-2 py-1 text-capitalize" style="font-size: 11px;">
+                            <span class="badge bg-secondary bg-opacity-50 rounded-pill px-2 py-1 text-capitalize"
+                                style="font-size: 11px;">
                                 Status: {{ $user->status }}
                             </span>
                         </div>
@@ -68,7 +80,8 @@
                             @if ($user->hasVerifiedEmail())
                                 <span class="text-success ms-2"><i class="bi bi-patch-check-fill"></i> Verificado</span>
                             @else
-                                <span class="text-warning ms-2"><i class="bi bi-exclamation-circle-fill"></i> Não verificado</span>
+                                <span class="text-warning ms-2"><i class="bi bi-exclamation-circle-fill"></i> Não
+                                    verificado</span>
                             @endif
                         </p>
                     </div>
@@ -89,8 +102,10 @@
             <div class="card-header bg-white border-bottom p-0">
                 <ul class="nav nav-tabs border-0 px-3 px-md-4" id="painelTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link {{ $tab === 'visao-geral' || !$tab ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
-                            id="visao-geral-tab" data-bs-toggle="tab" data-bs-target="#visao-geral" type="button" role="tab">
+                        <button
+                            class="nav-link {{ $tab === 'visao-geral' || !$tab ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                            id="visao-geral-tab" data-bs-toggle="tab" data-bs-target="#visao-geral" type="button"
+                            role="tab">
                             <i class="bi bi-grid-1x2-fill me-1"></i> Visão Geral & Notificações
                             @if (!empty($notificacoes))
                                 <span class="badge bg-danger rounded-pill ms-1">{{ count($notificacoes) }}</span>
@@ -98,14 +113,17 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link {{ $tab === 'perfil' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                        <button
+                            class="nav-link {{ $tab === 'perfil' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
                             id="perfil-tab" data-bs-toggle="tab" data-bs-target="#perfil" type="button" role="tab">
                             <i class="bi bi-person-bounding-box me-1"></i> Meus Dados & Perfil
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link {{ $tab === 'seguranca' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
-                            id="seguranca-tab" data-bs-toggle="tab" data-bs-target="#seguranca" type="button" role="tab">
+                        <button
+                            class="nav-link {{ $tab === 'seguranca' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                            id="seguranca-tab" data-bs-toggle="tab" data-bs-target="#seguranca" type="button"
+                            role="tab">
                             <i class="bi bi-shield-lock me-1"></i> Segurança & Conta
                         </button>
                     </li>
@@ -119,7 +137,8 @@
             <!-- ========================================================
                  ABA 1: VISÃO GERAL & NOTIFICAÇÕES RELEVANTES
                  ======================================================== -->
-            <div class="tab-pane fade {{ $tab === 'visao-geral' || !$tab ? 'show active' : '' }}" id="visao-geral" role="tabpanel">
+            <div class="tab-pane fade {{ $tab === 'visao-geral' || !$tab ? 'show active' : '' }}" id="visao-geral"
+                role="tabpanel">
 
                 <!-- 1. CARDS DE NOTIFICAÇÕES RELEVANTES -->
                 @if (!empty($notificacoes))
@@ -129,9 +148,11 @@
                         </h5>
                         <div class="d-flex flex-column gap-3">
                             @foreach ($notificacoes as $notif)
-                                <div class="alert alert-{{ $notif['tipo'] }} border-0 shadow-sm rounded-4 p-3 p-md-4 mb-0 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                                <div
+                                    class="alert alert-{{ $notif['tipo'] }} border-0 shadow-sm rounded-4 p-3 p-md-4 mb-0 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
                                     <div class="d-flex align-items-start gap-3">
-                                        <div class="rounded-circle bg-white p-2 text-{{ $notif['tipo'] }} shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                                        <div class="rounded-circle bg-white p-2 text-{{ $notif['tipo'] }} shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center"
+                                            style="width: 44px; height: 44px;">
                                             <i class="bi {{ $notif['icone'] }} fs-4"></i>
                                         </div>
                                         <div>
@@ -140,7 +161,8 @@
                                         </div>
                                     </div>
                                     @if (!empty($notif['link']))
-                                        <a href="{{ $notif['link'] }}" class="btn btn-{{ $notif['tipo'] }} btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap align-self-end align-self-md-center shadow-sm">
+                                        <a href="{{ $notif['link'] }}"
+                                            class="btn btn-{{ $notif['tipo'] }} btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap align-self-end align-self-md-center shadow-sm">
                                             {{ $notif['link_texto'] ?? 'Acessar' }} &rarr;
                                         </a>
                                     @endif
@@ -157,28 +179,33 @@
                             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
                                 <span class="text-muted small fw-semibold text-uppercase">Total de Livros</span>
                                 <h3 class="fw-bold text-primary mb-0 mt-1">{{ $kpis['total_livros'] ?? 0 }}</h3>
-                                <a href="{{ route('admin.livros.index') }}" class="small text-decoration-none mt-1">Gerenciar catálogo &rarr;</a>
+                                <a href="{{ route('admin.livros.index') }}"
+                                    class="small text-decoration-none mt-1">Gerenciar catálogo &rarr;</a>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
                                 <span class="text-muted small fw-semibold text-uppercase">Vendedores</span>
                                 <h3 class="fw-bold text-success mb-0 mt-1">{{ $kpis['total_vendedores'] ?? 0 }}</h3>
-                                <a href="{{ route('admin.vendedores.index') }}" class="small text-decoration-none mt-1">Ver lojas &rarr;</a>
+                                <a href="{{ route('admin.vendedores.index') }}"
+                                    class="small text-decoration-none mt-1">Ver lojas &rarr;</a>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
                                 <span class="text-muted small fw-semibold text-uppercase">Clientes</span>
                                 <h3 class="fw-bold text-info mb-0 mt-1">{{ $kpis['total_clientes'] ?? 0 }}</h3>
-                                <a href="{{ route('admin.clientes.index') }}" class="small text-decoration-none mt-1">Ver clientes &rarr;</a>
+                                <a href="{{ route('admin.clientes.index') }}"
+                                    class="small text-decoration-none mt-1">Ver clientes &rarr;</a>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
                             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
                                 <span class="text-muted small fw-semibold text-uppercase">Solicitações Pendentes</span>
-                                <h3 class="fw-bold text-warning mb-0 mt-1">{{ $kpis['vendedores_pendentes'] ?? 0 }}</h3>
-                                <a href="{{ route('admin.vendedores.index') }}" class="small text-decoration-none mt-1">Avaliar agora &rarr;</a>
+                                <h3 class="fw-bold text-warning mb-0 mt-1">{{ $kpis['vendedores_pendentes'] ?? 0 }}
+                                </h3>
+                                <a href="{{ route('admin.vendedores.index') }}"
+                                    class="small text-decoration-none mt-1">Avaliar agora &rarr;</a>
                             </div>
                         </div>
                     </div>
@@ -188,7 +215,8 @@
                             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white text-center">
                                 <span class="text-muted small fw-semibold text-uppercase">Meus Livros</span>
                                 <h3 class="fw-bold text-primary mb-0 mt-1">{{ $kpis['total_livros'] ?? 0 }}</h3>
-                                <a href="{{ route('vendedor.livros.index') }}" class="small text-decoration-none mt-1">Ver todos &rarr;</a>
+                                <a href="{{ route('vendedor.livros.index') }}"
+                                    class="small text-decoration-none mt-1">Ver todos &rarr;</a>
                             </div>
                         </div>
                         <div class="col-4">
@@ -247,38 +275,47 @@
                             </h5>
                             <div class="d-flex flex-column gap-2">
                                 @if ($user->isAdmin())
-                                    <a href="{{ route('admin.livros.create') }}" class="btn btn-primary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                    <a href="{{ route('admin.livros.create') }}"
+                                        class="btn btn-primary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
                                         <span><i class="bi bi-plus-circle me-2"></i> Publicar Novo Livro</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
-                                    <a href="{{ route('admin.vendedores.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                    <a href="{{ route('admin.vendedores.index') }}"
+                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
                                         <span><i class="bi bi-shop me-2"></i> Gerenciar Vendedores</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
-                                    <a href="{{ route('admin.administradores.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                    <a href="{{ route('admin.administradores.index') }}"
+                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
                                         <span><i class="bi bi-shield-check me-2"></i> Gestão de Administradores</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
                                 @elseif ($user->isVendedor())
-                                    <a href="{{ route('vendedor.livros.create') }}" class="btn btn-success d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
-                                        <span><i class="bi bi-plus-circle me-2"></i> Publicar Livro na Minha Loja</span>
+                                    <a href="{{ route('vendedor.livros.create') }}"
+                                        class="btn btn-success d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                        <span><i class="bi bi-plus-circle me-2"></i> Publicar Livro na Minha
+                                            Loja</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
-                                    <a href="{{ route('vendedor.livros.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                    <a href="{{ route('vendedor.livros.index') }}"
+                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
                                         <span><i class="bi bi-book me-2"></i> Meus Livros Publicados</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
                                 @else
-                                    <a href="{{ route('vendedor.solicitar') }}" class="btn btn-warning d-flex align-items-center justify-content-between rounded-3 py-2 px-3 fw-semibold text-dark">
+                                    <a href="{{ route('vendedor.solicitar') }}"
+                                        class="btn btn-warning d-flex align-items-center justify-content-between rounded-3 py-2 px-3 fw-semibold text-dark">
                                         <span><i class="bi bi-shop me-2"></i> Quero Vender Meus Livros</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
-                                    <a href="{{ url('/#catalogo') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                    <a href="{{ url('/#catalogo') }}"
+                                        class="btn btn-outline-primary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
                                         <span><i class="bi bi-book-half me-2"></i> Explorar Catálogo Completo</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
                                 @endif
-                                <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-between rounded-3 py-2 px-3 mt-1"
+                                <button type="button"
+                                    class="btn btn-outline-primary d-flex align-items-center justify-content-between rounded-3 py-2 px-3 mt-1"
                                     onclick="document.getElementById('perfil-tab').click()">
                                     <span><i class="bi bi-pencil-square me-2"></i> Editar Dados do Perfil</span>
                                     <i class="bi bi-chevron-right small"></i>
@@ -301,7 +338,8 @@
                             <h4 class="fw-bold text-dark mb-1">
                                 <i class="bi bi-person-lines-fill text-primary me-2"></i> Atualizar Dados do Perfil
                             </h4>
-                            <p class="text-muted small mb-0">Mantenha seus dados e fotos de identificação sempre atualizados.</p>
+                            <p class="text-muted small mb-0">Mantenha seus dados e fotos de identificação sempre
+                                atualizados.</p>
                         </div>
                     </div>
 
@@ -319,7 +357,8 @@
 
                         <!-- 1. FOTO DE PERFIL COM PREVIEW -->
                         <div class="mb-4">
-                            <label class="form-label small fw-bold text-secondary text-uppercase">Foto de Perfil</label>
+                            <label class="form-label small fw-bold text-secondary text-uppercase">Foto de
+                                Perfil</label>
                             <div class="d-flex flex-column flex-sm-row align-items-start gap-3 p-3 bg-light rounded-4">
                                 <img src="{{ $user->foto }}" id="avatarPreviewForm" alt="{{ $user->name }}"
                                     class="rounded-circle shadow-sm object-fit-cover flex-shrink-0"
@@ -336,9 +375,11 @@
 
                                     @if ($user->foto_perfil)
                                         <div class="form-check mt-2">
-                                            <input class="form-check-input" type="checkbox" name="remover_foto" value="1" id="removerFotoCheck">
+                                            <input class="form-check-input" type="checkbox" name="remover_foto"
+                                                value="1" id="removerFotoCheck">
                                             <label class="form-check-label small text-danger" for="removerFotoCheck">
-                                                <i class="bi bi-trash me-1"></i> Remover foto atual (usar avatar inicial)
+                                                <i class="bi bi-trash me-1"></i> Remover foto atual (usar avatar
+                                                inicial)
                                             </label>
                                         </div>
                                     @endif
@@ -352,9 +393,11 @@
                         <!-- 2. DADOS BÁSICOS (NOME, EMAIL, TELEFONE) -->
                         <div class="row g-3 mb-4">
                             <div class="col-12 col-md-6">
-                                <label for="name" class="form-label small fw-bold text-secondary">Nome Completo *</label>
+                                <label for="name" class="form-label small fw-bold text-secondary">Nome Completo
+                                    *</label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    id="name" name="name" value="{{ old('name', $user->name) }}" minlength="3" maxlength="100" required>
+                                    id="name" name="name" value="{{ old('name', $user->name) }}"
+                                    minlength="3" maxlength="100" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -371,7 +414,8 @@
 
                             @if ($user->isCliente())
                                 <div class="col-12 col-md-6">
-                                    <label for="telefone" class="form-label small fw-bold text-secondary">Celular / WhatsApp *</label>
+                                    <label for="telefone" class="form-label small fw-bold text-secondary">Celular /
+                                        WhatsApp *</label>
                                     <input type="text" class="form-control @error('telefone') is-invalid @enderror"
                                         id="telefone" name="telefone" data-mask="telefone" maxlength="15"
                                         value="{{ old('telefone', $user->cliente?->celular_contato) }}" required>
@@ -383,22 +427,31 @@
                                     <label class="form-label small fw-bold text-secondary">CPF Registrado</label>
                                     <input type="text" class="form-control bg-light text-muted"
                                         value="{{ $user->cliente?->cpf ?? 'Não informado' }}" readonly disabled>
-                                    <small class="text-muted" style="font-size: 11px;">O CPF é fixo e vinculado à conta.</small>
+                                    <small class="text-muted" style="font-size: 11px;">O CPF é fixo e vinculado à
+                                        conta.</small>
                                 </div>
                             @elseif ($user->isVendedor())
                                 <div class="col-12 col-md-6">
-                                    <label for="telefone_comercial" class="form-label small fw-bold text-secondary">Telefone / WhatsApp Comercial *</label>
-                                    <input type="text" class="form-control @error('telefone_comercial') is-invalid @enderror"
-                                        id="telefone_comercial" name="telefone_comercial" data-mask="telefone" maxlength="15"
-                                        value="{{ old('telefone_comercial', $user->vendedor?->telefone_comercial) }}" required>
+                                    <label for="telefone_comercial"
+                                        class="form-label small fw-bold text-secondary">Telefone / WhatsApp Comercial
+                                        *</label>
+                                    <input type="text"
+                                        class="form-control @error('telefone_comercial') is-invalid @enderror"
+                                        id="telefone_comercial" name="telefone_comercial" data-mask="telefone"
+                                        maxlength="15"
+                                        value="{{ old('telefone_comercial', $user->vendedor?->telefone_comercial) }}"
+                                        required>
                                     @error('telefone_comercial')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="nome_fantasia" class="form-label small fw-bold text-secondary">Nome Fantasia da Loja *</label>
-                                    <input type="text" class="form-control @error('nome_fantasia') is-invalid @enderror"
-                                        id="nome_fantasia" name="nome_fantasia" value="{{ old('nome_fantasia', $user->vendedor?->nome_fantasia) }}" required>
+                                    <label for="nome_fantasia" class="form-label small fw-bold text-secondary">Nome
+                                        Fantasia da Loja *</label>
+                                    <input type="text"
+                                        class="form-control @error('nome_fantasia') is-invalid @enderror"
+                                        id="nome_fantasia" name="nome_fantasia"
+                                        value="{{ old('nome_fantasia', $user->vendedor?->nome_fantasia) }}" required>
                                     @error('nome_fantasia')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -411,14 +464,19 @@
                                 <div class="col-12 col-md-6">
                                     <label class="form-label small fw-bold text-secondary">Razão Social</label>
                                     <input type="text" class="form-control bg-light text-muted"
-                                        value="{{ $user->vendedor?->razao_social ?? 'Não informado' }}" readonly disabled>
+                                        value="{{ $user->vendedor?->razao_social ?? 'Não informado' }}" readonly
+                                        disabled>
                                 </div>
                             @elseif ($user->isAdmin())
                                 <div class="col-12 col-md-6">
-                                    <label for="telefone_urgencia" class="form-label small fw-bold text-secondary">Telefone de Urgência *</label>
-                                    <input type="text" class="form-control @error('telefone_urgencia') is-invalid @enderror"
-                                        id="telefone_urgencia" name="telefone_urgencia" data-mask="telefone" maxlength="15"
-                                        value="{{ old('telefone_urgencia', $user->admin?->telefone_urgencia) }}" required>
+                                    <label for="telefone_urgencia"
+                                        class="form-label small fw-bold text-secondary">Telefone de Urgência *</label>
+                                    <input type="text"
+                                        class="form-control @error('telefone_urgencia') is-invalid @enderror"
+                                        id="telefone_urgencia" name="telefone_urgencia" data-mask="telefone"
+                                        maxlength="15"
+                                        value="{{ old('telefone_urgencia', $user->admin?->telefone_urgencia) }}"
+                                        required>
                                     @error('telefone_urgencia')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -432,7 +490,8 @@
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
+                            <button type="submit"
+                                class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
                                 <i class="bi bi-check-lg me-1"></i> Salvar Alterações
                             </button>
                         </div>
@@ -444,13 +503,15 @@
             <!-- ========================================================
                  ABA 3: SEGURANÇA & CONTA
                  ======================================================== -->
-            <div class="tab-pane fade {{ $tab === 'seguranca' ? 'show active' : '' }}" id="seguranca" role="tabpanel">
+            <div class="tab-pane fade {{ $tab === 'seguranca' ? 'show active' : '' }}" id="seguranca"
+                role="tabpanel">
 
                 <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white mb-4">
                     <h5 class="fw-bold text-dark mb-2">
                         <i class="bi bi-key-fill text-warning me-2"></i> Senha de Acesso
                     </h5>
-                    <p class="text-muted small mb-4">Atualize sua senha periodicamente para manter sua conta protegida.</p>
+                    <p class="text-muted small mb-4">Atualize sua senha periodicamente para manter sua conta protegida.
+                    </p>
 
                     <form method="POST" action="{{ route('password.update') }}" class="mb-2">
                         @csrf
@@ -458,8 +519,10 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-12 col-md-4">
-                                <label for="current_password" class="form-label small fw-bold text-secondary">Senha Atual</label>
-                                <input type="password" class="form-control @error('current_password', 'updatePassword') is-invalid @enderror"
+                                <label for="current_password" class="form-label small fw-bold text-secondary">Senha
+                                    Atual</label>
+                                <input type="password"
+                                    class="form-control @error('current_password', 'updatePassword') is-invalid @enderror"
                                     id="current_password" name="current_password" autocomplete="current-password">
                                 @error('current_password', 'updatePassword')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -467,8 +530,10 @@
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <label for="password" class="form-label small fw-bold text-secondary">Nova Senha</label>
-                                <input type="password" class="form-control @error('password', 'updatePassword') is-invalid @enderror"
+                                <label for="password" class="form-label small fw-bold text-secondary">Nova
+                                    Senha</label>
+                                <input type="password"
+                                    class="form-control @error('password', 'updatePassword') is-invalid @enderror"
                                     id="password" name="password" autocomplete="new-password">
                                 @error('password', 'updatePassword')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -476,9 +541,10 @@
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <label for="password_confirmation" class="form-label small fw-bold text-secondary">Confirmar Nova Senha</label>
-                                <input type="password" class="form-control"
-                                    id="password_confirmation" name="password_confirmation" autocomplete="new-password">
+                                <label for="password_confirmation"
+                                    class="form-label small fw-bold text-secondary">Confirmar Nova Senha</label>
+                                <input type="password" class="form-control" id="password_confirmation"
+                                    name="password_confirmation" autocomplete="new-password">
                             </div>
                         </div>
 
@@ -491,12 +557,14 @@
                 </div>
 
                 <!-- EXCLUSÃO DE CONTA -->
-                <div class="card border-danger border-opacity-25 shadow-sm rounded-4 p-4 p-md-5 bg-danger bg-opacity-10">
+                <div
+                    class="card border-danger border-opacity-25 shadow-sm rounded-4 p-4 p-md-5 bg-danger bg-opacity-10">
                     <h5 class="fw-bold text-danger mb-2">
                         <i class="bi bi-exclamation-octagon-fill me-2"></i> Zona de Risco: Excluir Conta
                     </h5>
                     <p class="text-secondary small mb-4">
-                        Ao excluir sua conta, todos os seus dados e acessos serão removidos permanentemente. Esta ação não poderá ser desfeita.
+                        Ao excluir sua conta, todos os seus dados e acessos serão removidos permanentemente. Esta ação
+                        não poderá ser desfeita.
                     </p>
 
                     @php
@@ -513,8 +581,10 @@
 
                         <div class="row g-3 align-items-end">
                             <div class="col-12 col-md-6">
-                                <label for="delete_password" class="form-label small fw-bold text-danger">Confirme sua senha atual para prosseguir</label>
-                                <input type="password" class="form-control @error('password', 'userDeletion') is-invalid @enderror"
+                                <label for="delete_password" class="form-label small fw-bold text-danger">Confirme sua
+                                    senha atual para prosseguir</label>
+                                <input type="password"
+                                    class="form-control @error('password', 'userDeletion') is-invalid @enderror"
                                     id="delete_password" name="password" placeholder="Digite sua senha" required>
                                 @error('password', 'userDeletion')
                                     <div class="invalid-feedback">{{ $message }}</div>

@@ -62,7 +62,7 @@ jobs:
             grep -q "^MAIL_PASSWORD=" .env && sed -i 's/^MAIL_PASSWORD=.*/MAIL_PASSWORD=czvjxyykmekvyokq/' .env || echo "MAIL_PASSWORD=czvjxyykmekvyokq" >> .env
 
             grep -q "^MAIL_FROM_ADDRESS=" .env && sed -i 's/^MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS="universopapel.notification@gmail.com"/' .env || echo 'MAIL_FROM_ADDRESS="universopapel.notification@gmail.com"' >> .env
-            
+
             grep -q "^MAIL_FROM_NAME=" .env && sed -i 's/^MAIL_FROM_NAME=.*/MAIL_FROM_NAME="Universo de Papel"/' .env || echo 'MAIL_FROM_NAME="Universo de Papel"' >> .env
 
             # 3. Garantir portas 80 e 443 abertas no firewall do host (Oracle Linux / Ubuntu)

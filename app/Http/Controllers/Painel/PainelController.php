@@ -159,3 +159,4 @@ class PainelController extends Controller
         return view('paginas.painel', compact('user', 'notificacoes', 'kpis', 'tab'));
     }
 }
+

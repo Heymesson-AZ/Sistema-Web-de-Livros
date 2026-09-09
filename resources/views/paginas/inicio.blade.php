@@ -60,14 +60,20 @@
 
                                 <!-- FILTRO: DEPARTAMENTOS / GÊNEROS (SELEÇÃO MANUAL) -->
                                 <div class="mb-4">
-                                    <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Departamentos</h6>
-                                    <div class="d-flex flex-column gap-2 small p-2 bg-light rounded-3" style="max-height: 220px; overflow-y: auto;">
+                                    <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Departamentos
+                                    </h6>
+                                    <div class="d-flex flex-column gap-2 small p-2 bg-light rounded-3"
+                                        style="max-height: 220px; overflow-y: auto;">
                                         <div class="form-check m-0">
-                                            <input class="form-check-input" type="radio" name="genero" id="gen_todos" value=""
+                                            <input class="form-check-input" type="radio" name="genero" id="gen_todos"
+                                                value=""
                                                 {{ !request('genero') && !request('categoria') ? 'checked' : '' }}>
-                                            <label class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center" for="gen_todos">
+                                            <label
+                                                class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center"
+                                                for="gen_todos">
                                                 <span>Todos os Gêneros</span>
-                                                <span class="badge bg-white text-secondary border">{{ $totalLivros }}</span>
+                                                <span
+                                                    class="badge bg-white text-secondary border">{{ $totalLivros }}</span>
                                             </label>
                                         </div>
                                         @foreach ($generos as $gen)
@@ -78,11 +84,16 @@
                                                     request('genero') == $gen->nome;
                                             @endphp
                                             <div class="form-check m-0">
-                                                <input class="form-check-input" type="radio" name="genero" id="gen_{{ $gen->id }}" value="{{ $gen->id }}"
+                                                <input class="form-check-input" type="radio" name="genero"
+                                                    id="gen_{{ $gen->id }}" value="{{ $gen->id }}"
                                                     {{ $isSelected ? 'checked' : '' }}>
-                                                <label class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center" for="gen_{{ $gen->id }}">
-                                                    <span class="text-truncate" style="max-width: 140px;">{{ $gen->nome }}</span>
-                                                    <span class="badge bg-white text-secondary border">{{ $gen->livros_count }}</span>
+                                                <label
+                                                    class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center"
+                                                    for="gen_{{ $gen->id }}">
+                                                    <span class="text-truncate"
+                                                        style="max-width: 140px;">{{ $gen->nome }}</span>
+                                                    <span
+                                                        class="badge bg-white text-secondary border">{{ $gen->livros_count }}</span>
                                                 </label>
                                             </div>
                                         @endforeach
@@ -189,11 +200,13 @@
 
                                 <!-- BOTÕES DE APLICAÇÃO MANUAL DOS FILTROS -->
                                 <div class="d-grid gap-2 pt-2 border-top">
-                                    <button type="submit" class="btn btn-primary rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                    <button type="submit"
+                                        class="btn btn-primary rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
                                         <i class="bi bi-funnel-fill"></i>
                                         <span>Aplicar Filtros</span>
                                     </button>
-                                    <a href="{{ url('/#catalogo') }}" class="btn btn-outline-secondary rounded-pill btn-sm py-1 d-flex align-items-center justify-content-center gap-1">
+                                    <a href="{{ url('/#catalogo') }}"
+                                        class="btn btn-outline-secondary rounded-pill btn-sm py-1 d-flex align-items-center justify-content-center gap-1">
                                         <i class="bi bi-x-circle"></i>
                                         <span>Limpar Filtros</span>
                                     </a>

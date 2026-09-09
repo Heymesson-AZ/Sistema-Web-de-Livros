@@ -103,7 +103,8 @@
                 <ul class="nav nav-tabs border-0 px-3 px-md-4" id="painelTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link {{ $tab === 'visao-geral' || !$tab ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-2 border-bottom border-2"
+                            class="nav-link {{ $tab === 'visao-geral' || !$tab ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
+
                             id="visao-geral-tab" data-bs-toggle="tab" data-bs-target="#visao-geral" type="button"
                             role="tab">
                             <i class="bi bi-grid-1x2-fill me-1"></i> Visão Geral & Notificações
@@ -114,14 +115,14 @@
                     </li>
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link {{ $tab === 'perfil' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                            class="nav-link {{ $tab === 'perfil' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
                             id="perfil-tab" data-bs-toggle="tab" data-bs-target="#perfil" type="button" role="tab">
                             <i class="bi bi-person-bounding-box me-1"></i> Meus Dados & Perfil
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link {{ $tab === 'enderecos' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                            class="nav-link {{ $tab === 'enderecos' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
                             id="enderecos-tab" data-bs-toggle="tab" data-bs-target="#enderecos" type="button"
                             role="tab">
                             <i class="bi bi-geo-alt-fill me-1"></i> Meus Endereços
@@ -132,7 +133,7 @@
                     </li>
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link {{ $tab === 'seguranca' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                            class="nav-link {{ $tab === 'seguranca' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
                             id="seguranca-tab" data-bs-toggle="tab" data-bs-target="#seguranca" type="button"
                             role="tab">
                             <i class="bi bi-shield-lock me-1"></i> Segurança & Conta

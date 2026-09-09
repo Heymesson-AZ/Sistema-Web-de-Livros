@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/enderecos', [\App\Http\Controllers\Cliente\EnderecoController::class, 'salvar'])->name('enderecos.salvar');
     Route::put('/enderecos/{endereco}', [\App\Http\Controllers\Cliente\EnderecoController::class, 'atualizar'])->name('enderecos.atualizar');
     Route::patch('/enderecos/{endereco}/principal', [\App\Http\Controllers\Cliente\EnderecoController::class, 'definirPrincipal'])->name('enderecos.principal');
+    Route::match(['post', 'patch'], '/enderecos/{endereco}/definir-principal', [\App\Http\Controllers\Cliente\EnderecoController::class, 'definirPrincipal'])->name('enderecos.definir-principal');
     Route::delete('/enderecos/{endereco}', [\App\Http\Controllers\Cliente\EnderecoController::class, 'deletar'])->name('enderecos.deletar');
 });
 

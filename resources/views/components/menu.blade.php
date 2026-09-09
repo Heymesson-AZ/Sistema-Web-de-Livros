@@ -68,13 +68,16 @@
                     </a>
                 </li>
 
-                <!-- Carrinho -->
-                <li class="menu-item">
-                    <a href="#" class="menu-item-link">
+                <!-- Carrinho de Compras -->
+                @php
+                    $qtdItensCarrinho = \App\Http\Controllers\Carrinho\CarrinhoController::obterContagemItens();
+                @endphp
+                <li class="menu-item {{ request()->routeIs('carrinho.*') ? 'active' : '' }}">
+                    <a href="{{ route('carrinho.index') }}" class="menu-item-link">
                         <div class="menu-item-header">
                             <i data-lucide="shopping-cart"></i>
                             <span>Carrinho</span>
-                            <span class="menu-badge badge-count">0</span>
+                            <span class="menu-badge badge-count bg-primary text-white">{{ $qtdItensCarrinho }}</span>
                         </div>
                     </a>
                 </li>
@@ -84,15 +87,24 @@
                     @php
                         $notifsMenu = \App\Http\Controllers\Painel\PainelController::obterNotificacoes(Auth::user());
                         $qtdNotifsMenu = count($notifsMenu);
+                        $qtdFavoritosMenu = Auth::user()->favoritos()->count();
                     @endphp
-                    <li
-                        class="menu-item {{ request()->is('painel*') && request('tab') === 'visao-geral' ? 'active' : '' }}">
-                        <a href="{{ route('painel', ['tab' => 'visao-geral']) }}" class="menu-item-link">
+                    <li class="menu-item {{ request()->is('painel*') && request('tab') === 'pedidos' ? 'active' : '' }}">
+                        <a href="{{ route('painel', ['tab' => 'pedidos']) }}" class="menu-item-link">
                             <div class="menu-item-header">
-                                <i data-lucide="bell"></i>
-                                <span>Notificações</span>
-                                @if ($qtdNotifsMenu > 0)
-                                    <span class="menu-badge badge-count bg-danger text-white">{{ $qtdNotifsMenu }}</span>
+                                <i data-lucide="package"></i>
+                                <span>Meus Pedidos</span>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ request()->is('painel*') && request('tab') === 'favoritos' ? 'active' : '' }}">
+                        <a href="{{ route('painel', ['tab' => 'favoritos']) }}" class="menu-item-link">
+                            <div class="menu-item-header">
+                                <i data-lucide="heart"></i>
+                                <span>Meus Favoritos</span>
+                                @if ($qtdFavoritosMenu > 0)
+                                    <span
+                                        class="menu-badge badge-count bg-danger-subtle text-danger">{{ $qtdFavoritosMenu }}</span>
                                 @endif
                             </div>
                         </a>

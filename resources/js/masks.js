@@ -102,6 +102,30 @@ export function inicializarMascaras() {
     }
 
     /**
+     * Formata Cartão de Crédito no padrão: 0000 0000 0000 0000
+     */
+    function formatarCartao(valor) {
+        const digitos = valor.replace(/\D/g, "").slice(0, 19);
+        return digitos.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+    }
+
+    /**
+     * Formata Validade de Cartão no padrão: MM/AA
+     */
+    function formatarValidade(valor) {
+        const digitos = valor.replace(/\D/g, "").slice(0, 4);
+        if (digitos.length <= 2) return digitos;
+        return digitos.replace(/(\d{2})(\d{1,2})/, "$1/$2");
+    }
+
+    /**
+     * Formata CVV no padrão: 000 ou 0000
+     */
+    function formatarCVV(valor) {
+        return valor.replace(/\D/g, "").slice(0, 4);
+    }
+
+    /**
      * Vincula a máscara ao input monitorando eventos de digitação e desfoque
      */
     function vincularMascara(seletor, formatador) {
@@ -153,6 +177,15 @@ export function inicializarMascaras() {
         'input[data-mask="money"], input.mask-money',
         formatarMoeda,
     );
+    vincularMascara(
+        'input[data-mask="cartao"], input[data-mask="cartao_credito"], input#numero_cartao',
+        formatarCartao,
+    );
+    vincularMascara(
+        'input[data-mask="validade"], input#validade',
+        formatarValidade,
+    );
+    vincularMascara('input[data-mask="cvv"], input#cvv', formatarCVV);
 }
 
 // Alias em inglês para retrocompatibilidade

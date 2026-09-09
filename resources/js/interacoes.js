@@ -30,7 +30,9 @@ function configurarPreviaImagens() {
         if (!input || !input.matches("[data-preview-target]")) return;
 
         const seletorAlvo = input.getAttribute("data-preview-target");
-        const limiteMegabytes = parseFloat(input.getAttribute("data-max-size") || "2");
+        const limiteMegabytes = parseFloat(
+            input.getAttribute("data-max-size") || "2",
+        );
 
         if (input.files && input.files[0]) {
             const arquivo = input.files[0];
@@ -38,7 +40,7 @@ function configurarPreviaImagens() {
 
             if (tamanhoMegabytes > limiteMegabytes) {
                 alert(
-                    `O arquivo selecionado possui ${tamanhoMegabytes.toFixed(1)}MB e excede o limite máximo permitido de ${limiteMegabytes}MB. Por favor, selecione uma imagem menor.`
+                    `O arquivo selecionado possui ${tamanhoMegabytes.toFixed(1)}MB e excede o limite máximo permitido de ${limiteMegabytes}MB. Por favor, selecione uma imagem menor.`,
                 );
                 input.value = "";
                 return;
@@ -46,7 +48,9 @@ function configurarPreviaImagens() {
 
             const leitor = new FileReader();
             leitor.onload = function (e) {
-                const elementoAlvo = document.getElementById(seletorAlvo) || document.querySelector(seletorAlvo);
+                const elementoAlvo =
+                    document.getElementById(seletorAlvo) ||
+                    document.querySelector(seletorAlvo);
                 if (elementoAlvo) {
                     elementoAlvo.src = e.target.result;
                 }
@@ -120,14 +124,174 @@ function configurarDisparoDeAbas() {
  * Verifica se há solicitação declarativa no <body> para abertura de modal de autenticação
  */
 function verificarAberturaAutomaticaDeModais() {
-    const nomeModal = document.body ? document.body.getAttribute("data-auth-modal") : null;
+    const nomeModal = document.body
+        ? document.body.getAttribute("data-auth-modal")
+        : null;
     if (!nomeModal) return;
 
     const elementoModal = document.getElementById(nomeModal);
-    if (elementoModal && typeof window.bootstrap !== "undefined" && window.bootstrap.Modal) {
-        const modalInstance = window.bootstrap.Modal.getOrCreateInstance(elementoModal);
+    if (
+        elementoModal &&
+        typeof window.bootstrap !== "undefined" &&
+        window.bootstrap.Modal
+    ) {
+        const modalInstance =
+            window.bootstrap.Modal.getOrCreateInstance(elementoModal);
         modalInstance.show();
     }
+}
+
+/**
+ * Copiar dados para a área de transferência (PIX, código de barras, etc)
+ */
+function configurarClipboard() {
+    document.addEventListener("click", async function (evento) {
+        const botao = evento.target.closest(
+            "[data-clipboard-target], [data-clipboard-text]",
+        );
+        if (!botao) return;
+
+        let textoCopiar = botao.getAttribute("data-clipboard-text");
+        if (!textoCopiar) {
+            const seletor = botao.getAttribute("data-clipboard-target");
+            const elementoAlvo = document.querySelector(seletor);
+            if (elementoAlvo) {
+                textoCopiar =
+                    elementoAlvo.value || elementoAlvo.textContent || "";
+            }
+        }
+
+        if (!textoCopiar) return;
+
+        try {
+            await navigator.clipboard.writeText(textoCopiar.trim());
+            const conteudoOriginal = botao.innerHTML;
+            botao.innerHTML = '<i class="bi bi-check-lg me-1"></i> Copiado!';
+            botao.classList.add("btn-success");
+            setTimeout(() => {
+                botao.innerHTML = conteudoOriginal;
+                botao.classList.remove("btn-success");
+            }, 2000);
+        } catch (erro) {
+            console.error(
+                "Falha ao copiar para a área de transferência:",
+                erro,
+            );
+        }
+    });
+}
+
+/**
+ * Preenche o modal de edição de endereço dinamicamente
+ */
+function configurarEdicaoEndereco() {
+    document.addEventListener("click", function (evento) {
+        const botao = evento.target.closest("[data-editar-endereco]");
+        if (!botao) return;
+
+        const form = document.getElementById("formEditarEndereco");
+        if (!form) return;
+
+        const action = botao.getAttribute("data-endereco-action");
+        if (action) {
+            form.action = action;
+        }
+
+        const campos = {
+            tipo: botao.getAttribute("data-endereco-tipo"),
+            cep: botao.getAttribute("data-endereco-cep"),
+            rua: botao.getAttribute("data-endereco-rua"),
+            numero: botao.getAttribute("data-endereco-numero"),
+            bairro: botao.getAttribute("data-endereco-bairro"),
+            cidade: botao.getAttribute("data-endereco-cidade"),
+            estado: botao.getAttribute("data-endereco-estado"),
+            complemento: botao.getAttribute("data-endereco-complemento"),
+        };
+
+        for (const [chave, valor] of Object.entries(campos)) {
+            const input = form.querySelector(`[name="${chave}"]`);
+            if (input) {
+                input.value = valor || "";
+            }
+        }
+
+        const inputPrincipal = form.querySelector('[name="principal"]');
+        if (inputPrincipal) {
+            inputPrincipal.checked =
+                botao.getAttribute("data-endereco-principal") === "1";
+        }
+    });
+}
+
+/**
+ * Alterna status de favorito assincronamente via fetch
+ */
+function configurarFavoritosToggle() {
+    document.addEventListener("click", async function (evento) {
+        const botao = evento.target.closest("[data-favorito-toggle]");
+        if (!botao) return;
+
+        evento.preventDefault();
+        evento.stopPropagation();
+
+        const url =
+            botao.getAttribute("data-favorito-url") || botao.form?.action;
+        if (!url) return;
+
+        const tokenCsrf = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
+
+        try {
+            const resposta = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": tokenCsrf || "",
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
+
+            if (resposta.status === 401) {
+                window.location.href = "/entrar";
+                return;
+            }
+
+            if (!resposta.ok) throw new Error("Erro na requisição");
+
+            const dados = await resposta.json();
+            const icone = botao.querySelector("i");
+
+            if (dados.favoritado) {
+                if (icone) {
+                    icone.className = "bi bi-heart-fill text-danger fs-6";
+                }
+                botao.title = "Remover dos favoritos";
+            } else {
+                if (icone) {
+                    icone.className = "bi bi-heart text-secondary fs-6";
+                }
+                botao.title = "Adicionar aos favoritos";
+
+                // Se estiver na aba de favoritos do painel, remove o card com transição suave
+                const cardFavorito = botao.closest("[data-favorito-item]");
+                if (cardFavorito) {
+                    cardFavorito.remove();
+                }
+            }
+
+            // Atualiza contadores de favoritos na navbar se existirem
+            const badges = document.querySelectorAll(
+                "[data-contador-favoritos]",
+            );
+            badges.forEach((badge) => {
+                badge.textContent = dados.total_favoritos;
+            });
+        } catch (erro) {
+            console.error("Erro ao favoritar:", erro);
+        }
+    });
 }
 
 /**
@@ -138,6 +302,9 @@ export function inicializarInteracoesDeclarativas() {
     configurarConfirmacoes();
     configurarNavegacaoSelect();
     configurarDisparoDeAbas();
+    configurarClipboard();
+    configurarEdicaoEndereco();
+    configurarFavoritosToggle();
     inicializarIconesLucide();
     verificarAberturaAutomaticaDeModais();
 
@@ -151,4 +318,3 @@ export function inicializarInteracoesDeclarativas() {
         inicializarIconesLucide();
     });
 }
-

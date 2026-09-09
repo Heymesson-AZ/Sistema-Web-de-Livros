@@ -48,9 +48,45 @@ class PainelController extends Controller
         }
 
         $enderecos = $user->enderecos()->orderByDesc('principal')->latest()->get();
+        $cartoesSalvos = $user->cartoesSalvos()->orderByDesc('cartao_padrao')->latest()->get();
+        $favoritos = $user->favoritos()->with('livro.autor', 'livro.editora')->latest()->get();
+
+        // Pedidos contextuais
+        if ($user->isAdmin()) {
+            $pedidos = \App\Models\Pedido::with(['cliente.user', 'vendedor', 'itens.livro', 'entrega'])->latest()->take(30)->get();
+            $avaliacoes = \App\Models\Avaliacao::with(['cliente.user', 'vendedor', 'pedido'])->latest()->take(30)->get();
+        } elseif ($user->isVendedor() && $user->vendedor) {
+            $pedidos = \App\Models\Pedido::where('vendedor_id', $user->vendedor->id)
+                ->with(['cliente.user', 'itens.livro', 'entrega'])
+                ->latest()->get();
+            $avaliacoes = $user->vendedor->avaliacoes()->with(['cliente.user', 'pedido'])->latest()->get();
+        } else {
+            $clienteId = $user->cliente?->id;
+            $pedidos = $clienteId
+                ? \App\Models\Pedido::where('cliente_id', $clienteId)
+                    ->with(['vendedor', 'itens.livro', 'entrega', 'avaliacao'])
+                    ->latest()->get()
+                : collect();
+            $avaliacoes = $clienteId
+                ? \App\Models\Avaliacao::where('cliente_id', $clienteId)
+                    ->with(['vendedor', 'pedido'])
+                    ->latest()->get()
+                : collect();
+        }
+
         $tab = $request->query('tab', 'visao-geral');
 
-        return view('paginas.painel', compact('user', 'notificacoes', 'kpis', 'tab', 'enderecos'));
+        return view('paginas.painel', compact(
+            'user',
+            'notificacoes',
+            'kpis',
+            'tab',
+            'enderecos',
+            'cartoesSalvos',
+            'favoritos',
+            'pedidos',
+            'avaliacoes'
+        ));
     }
 
     /**
@@ -86,16 +122,29 @@ class PainelController extends Controller
                 ];
             }
 
-            // 2. Ruptura de estoque no catálogo da plataforma
-            $livrosSemEstoque = Livro::where('quantidade', '<=', 0)->count();
-            if ($livrosSemEstoque > 0) {
+            // 2. Livros sob análise preventiva
+            $livrosSobAnalise = Livro::where('status_moderacao', Livro::STATUS_MODERACAO_SOB_ANALISE)->count();
+            if ($livrosSobAnalise > 0) {
+                $notificacoes[] = [
+                    'tipo' => 'warning',
+                    'icone' => 'bi-shield-exclamation',
+                    'titulo' => 'Livros Sob Análise',
+                    'mensagem' => "Existem {$livrosSobAnalise} livro(s) sob análise por suspeita de dados inválidos ou irregularidade.",
+                    'link' => route('admin.livros.index', ['status_moderacao' => Livro::STATUS_MODERACAO_SOB_ANALISE]),
+                    'link_texto' => 'Moderar Obras',
+                ];
+            }
+
+            // 3. Livros com bloqueio temporário
+            $livrosBloqueados = Livro::where('status_moderacao', Livro::STATUS_MODERACAO_BLOQUEADO)->count();
+            if ($livrosBloqueados > 0) {
                 $notificacoes[] = [
                     'tipo' => 'danger',
-                    'icone' => 'bi-exclamation-octagon-fill',
-                    'titulo' => 'Ruptura de Estoque no Catálogo',
-                    'mensagem' => "Existem {$livrosSemEstoque} título(s) com estoque totalmente esgotado no catálogo geral.",
-                    'link' => route('admin.livros.index', ['status_estoque' => 'sem_estoque']),
-                    'link_texto' => 'Auditar Catálogo',
+                    'icone' => 'bi-slash-circle-fill',
+                    'titulo' => 'Livros Bloqueados Temporariamente',
+                    'mensagem' => "Existem {$livrosBloqueados} livro(s) com suspensão temporária aguardando regularização.",
+                    'link' => route('admin.livros.index', ['status_moderacao' => Livro::STATUS_MODERACAO_BLOQUEADO]),
+                    'link_texto' => 'Ver Bloqueados',
                 ];
             }
 

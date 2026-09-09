@@ -21,11 +21,21 @@ class Pagamento extends Model
     ];
 
 
-    // Cast para data_confirmacao_pagamento
-
     protected $casts = [
         'data_confirmacao_pagamento' => 'datetime',
+        'valor_pago' => 'decimal:2',
     ];
+
+    public function getMetodoFormatadoAttribute(): string
+    {
+        return match ($this->metodo_pagamento) {
+            'cartao_credito' => 'Cartão de Crédito',
+            'cartao_debito' => 'Cartão de Débito',
+            'pix' => 'PIX Instantâneo',
+            'boleto' => 'Boleto Bancário',
+            default => ucfirst((string) $this->metodo_pagamento),
+        };
+    }
 
     // um pagamento pertence a um pedido
     public function pedido()

@@ -48,6 +48,16 @@ class Endereco extends Model
     }
 
 
+    public function getIsPrincipalAttribute(): bool
+    {
+        return (bool) $this->principal;
+    }
+
+    public function getPadraoAttribute(): bool
+    {
+        return (bool) $this->principal;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

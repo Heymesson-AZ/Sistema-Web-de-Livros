@@ -23,7 +23,7 @@ class LivroPublicoController extends Controller
             ->get();
 
         if ($destaques->isEmpty()) {
-            $destaques = Livro::with(['autor', 'genero', 'vendedor'])->take(12)->get();
+            $destaques = Livro::ativos()->with(['autor', 'genero', 'vendedor'])->take(12)->get();
         }
 
         // 2. Consulta de livros do catálogo aplicando filtros (busca, gênero, faixa de preço, estoque, ordem)
@@ -47,7 +47,7 @@ class LivroPublicoController extends Controller
             ->get();
 
         // Estatísticas para os filtros
-        $totalLivros = Livro::count();
+        $totalLivros = Livro::ativos()->count();
         $totalDisponiveis = Livro::disponiveis()->count();
 
         return view('paginas.inicio', compact(
@@ -65,6 +65,11 @@ class LivroPublicoController extends Controller
      */
     public function show(Livro $livro)
     {
+        // Se o livro estiver sob análise, bloqueado ou banido, bloqueia acesso público
+        if (!$livro->isAtivo() && !(auth()->check() && auth()->user()->isAdmin())) {
+            abort(404, 'Este título não está disponível no catálogo da loja.');
+        }
+
         $livro->load(['autor', 'genero', 'editora', 'vendedor.user']);
 
         // Livros relacionados do mesmo gênero ou autor
@@ -97,6 +102,7 @@ class LivroPublicoController extends Controller
         }
 
         $resultados = Livro::query()
+            ->ativos()
             ->with(['autor', 'genero'])
             ->where(function ($q) use ($termo) {
                 $q->where('titulo', 'like', "%{$termo}%")

@@ -12,6 +12,14 @@ class Livro extends Model
     use HasFactory;
     use SoftDeletes;
 
+    // =========================================================================
+    // CONSTANTES DE MODERAÇÃO DE LIVROS
+    // =========================================================================
+    public const STATUS_MODERACAO_ATIVO = 'ativo';
+    public const STATUS_MODERACAO_SOB_ANALISE = 'sob_analise';
+    public const STATUS_MODERACAO_BLOQUEADO = 'bloqueado_temporariamente';
+    public const STATUS_MODERACAO_BANIDO = 'banido';
+
     protected $fillable = [
         'titulo',
         'data_publicacao',
@@ -20,6 +28,10 @@ class Livro extends Model
         'capa',
         'preco',
         'quantidade',
+        'status_moderacao',
+        'motivo_moderacao',
+        'moderado_em',
+        'moderado_por',
         'autor_id',
         'genero_id',
         'editora_id',
@@ -32,6 +44,7 @@ class Livro extends Model
      */
     protected $casts = [
         'data_publicacao' => 'date',
+        'moderado_em' => 'datetime',
     ];
 
     /**
@@ -107,6 +120,18 @@ class Livro extends Model
         return $this->belongsToMany(User::class, 'favoritos');  // Relacionamento de muitos para muitos entre livros e usuários (favoritos)
     }
 
+    /**
+     * Verifica se o livro foi favoritado pelo usuário informado.
+     */
+    public function isFavoritadoPor(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        return $this->favoritos()->where('users.id', $user->id)->exists();
+    }
+
 
     // Um livro pode estar em vários carrinhos (relação muitos-para-muitos via carrinho_livro)
     public function carrinhos()
@@ -154,19 +179,78 @@ class Livro extends Model
     }
 
     /**
-     * Verifica se o livro possui estoque disponível.
+     * Administrador responsável pela moderação da obra.
      */
-    public function isDisponivel(): bool
+    public function moderador()
     {
-        return (int) $this->quantidade > 0;
+        return $this->belongsTo(User::class, 'moderado_por');
     }
 
     /**
-     * Scope para buscar apenas livros com estoque.
+     * Helpers para verificação do status de moderação
+     */
+    public function isAtivo(): bool
+    {
+        return ($this->status_moderacao ?? self::STATUS_MODERACAO_ATIVO) === self::STATUS_MODERACAO_ATIVO;
+    }
+
+    public function isSobAnalise(): bool
+    {
+        return $this->status_moderacao === self::STATUS_MODERACAO_SOB_ANALISE;
+    }
+
+    public function isBloqueado(): bool
+    {
+        return $this->status_moderacao === self::STATUS_MODERACAO_BLOQUEADO;
+    }
+
+    public function isBanido(): bool
+    {
+        return $this->status_moderacao === self::STATUS_MODERACAO_BANIDO;
+    }
+
+    public function getStatusModeracaoRotuloAttribute(): string
+    {
+        return match ($this->status_moderacao) {
+            self::STATUS_MODERACAO_SOB_ANALISE => 'Sob Análise',
+            self::STATUS_MODERACAO_BLOQUEADO   => 'Bloqueado Temporariamente',
+            self::STATUS_MODERACAO_BANIDO      => 'Banido',
+            default                            => 'Ativo',
+        };
+    }
+
+    public function getStatusModeracaoBadgeClassAttribute(): string
+    {
+        return match ($this->status_moderacao) {
+            self::STATUS_MODERACAO_SOB_ANALISE => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+            self::STATUS_MODERACAO_BLOQUEADO   => 'bg-danger-subtle text-danger border border-danger-subtle',
+            self::STATUS_MODERACAO_BANIDO      => 'bg-dark text-white border border-dark',
+            default                            => 'bg-success-subtle text-success border border-success-subtle',
+        };
+    }
+
+    /**
+     * Verifica se o livro possui estoque disponível e está ativo no catálogo.
+     */
+    public function isDisponivel(): bool
+    {
+        return (int) $this->quantidade > 0 && $this->isAtivo();
+    }
+
+    /**
+     * Scope para buscar apenas livros aprovados/ativos para exibição pública.
+     */
+    public function scopeAtivos($query)
+    {
+        return $query->where('status_moderacao', self::STATUS_MODERACAO_ATIVO);
+    }
+
+    /**
+     * Scope para buscar livros com estoque e ativos no catálogo.
      */
     public function scopeDisponiveis($query)
     {
-        return $query->where('quantidade', '>', 0);
+        return $query->where('quantidade', '>', 0)->where('status_moderacao', self::STATUS_MODERACAO_ATIVO);
     }
 
     /**
@@ -235,7 +319,15 @@ class Livro extends Model
             $query->where('quantidade', '>', 0);
         }
 
-        // 8. Ordenação
+        // 8. Filtro por Status de Moderação
+        if (!empty($filtros['status_moderacao'])) {
+            $query->where('status_moderacao', $filtros['status_moderacao']);
+        } elseif (!isset($filtros['admin_gestao']) || !$filtros['admin_gestao']) {
+            // No catálogo público, garante exibição apenas de livros com status 'ativo'
+            $query->where('status_moderacao', self::STATUS_MODERACAO_ATIVO);
+        }
+
+        // 9. Ordenação
         $ordem = $filtros['ordem'] ?? 'novidades';
         match ($ordem) {
             'preco_menor' => $query->orderBy('preco', 'asc'),

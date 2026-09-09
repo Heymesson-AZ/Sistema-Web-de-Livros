@@ -366,10 +366,23 @@
                                                     onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=450&q=80'">
                                             </a>
 
+                                            <!-- BOTÃO FAVORITAR -->
+                                            @php
+                                                $isFavoritado = Auth::check() && $livro->isFavoritadoPor(Auth::user());
+                                            @endphp
+                                            <button type="button"
+                                                class="position-absolute top-0 end-0 m-2 btn btn-light btn-sm rounded-circle shadow-sm p-1 z-2 border-0 d-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;" data-favorito-toggle
+                                                data-favorito-url="{{ route('favoritos.toggle', $livro) }}"
+                                                title="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
+                                                <i
+                                                    class="bi {{ $isFavoritado ? 'bi-heart-fill text-danger' : 'bi-heart text-secondary' }} fs-6"></i>
+                                            </button>
+
                                             <!-- BADGE DE GÊNERO -->
                                             @if ($livro->genero)
                                                 <span
-                                                    class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 backdrop-blur rounded-pill small px-2 py-1">
+                                                    class="position-absolute top-0 start-0 m-2 badge bg-dark bg-opacity-75 backdrop-blur rounded-pill small px-2 py-1">
                                                     {{ $livro->genero->nome }}
                                                 </span>
                                             @endif
@@ -377,7 +390,7 @@
                                             <!-- BADGE DE ESTOQUE -->
                                             @if (!$livro->isDisponivel())
                                                 <span
-                                                    class="position-absolute top-0 end-0 m-3 badge bg-danger rounded-pill small px-2 py-1">
+                                                    class="position-absolute bottom-0 start-0 m-2 badge bg-danger rounded-pill small px-2 py-1">
                                                     Esgotado
                                                 </span>
                                             @endif
@@ -415,7 +428,7 @@
                                             <!-- VENDEDOR & EDITORA -->
                                             <div class="small text-muted mb-3">
                                                 @if ($livro->editora)
-                                                    <span>Editora: {{ $livro->editora->nome }}</span> •
+                                                    <span>{{ $livro->editora->nome }}</span> •
                                                 @endif
                                                 <span>Loja: <strong
                                                         class="text-dark">{{ $livro->vendedor->nome_fantasia ?? 'Livraria Oficial' }}</strong></span>
@@ -428,14 +441,33 @@
                                                         class="fs-4 fw-bold text-dark">{{ $livro->preco_formatado }}</span>
                                                     <span class="small text-muted">à vista</span>
                                                 </div>
-                                                <span class="small text-secondary d-block mb-3">
-                                                    ou em até 3x sem juros no cartão
+                                                <span class="small text-muted d-block mb-2">
+                                                    ou até 3x sem juros
                                                 </span>
 
                                                 <!-- BOTÕES DE AÇÃO -->
                                                 <div class="d-grid gap-2">
+                                                    @if ($livro->isDisponivel())
+                                                        <form action="{{ route('carrinho.adicionar') }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            <input type="hidden" name="livro_id"
+                                                                value="{{ $livro->id }}">
+                                                            <input type="hidden" name="quantidade" value="1">
+                                                            <button type="submit"
+                                                                class="btn btn-primary btn-sm rounded-pill fw-semibold w-100 shadow-sm">
+                                                                <i class="bi bi-cart-plus me-1"></i> Adicionar
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <button
+                                                            class="btn btn-secondary btn-sm rounded-pill fw-semibold w-100 disabled"
+                                                            disabled>
+                                                            Esgotado
+                                                        </button>
+                                                    @endif
                                                     <a href="{{ route('livros.detalhes', $livro) }}"
-                                                        class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">
+                                                        class="btn btn-outline-secondary btn-sm rounded-pill fw-semibold">
                                                         <i class="bi bi-eye me-1"></i> Detalhes
                                                     </a>
                                                 </div>

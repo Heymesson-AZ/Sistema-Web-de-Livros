@@ -10,7 +10,7 @@ class Avaliacao extends Model
     use HasFactory;
 
     protected $table = 'avaliacoes';
-    
+
     protected $fillable = [
         'vendedor_id',
         'cliente_id',
@@ -18,6 +18,11 @@ class Avaliacao extends Model
         'avaliacao',
         'comentario',
         'recomenda',
+    ];
+
+    protected $casts = [
+        'avaliacao' => 'integer',
+        'recomenda' => 'boolean',
     ];
 
     public function vendedor()
@@ -35,5 +40,5 @@ class Avaliacao extends Model
         return $this->belongsTo(Pedido::class);
     }
 
-    
+
 }

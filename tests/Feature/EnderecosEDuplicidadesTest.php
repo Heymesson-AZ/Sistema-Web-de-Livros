@@ -21,6 +21,7 @@ class EnderecosEDuplicidadesTest extends TestCase
 
     protected User $clienteUser;
     protected User $adminUser;
+    protected User $vendedorUser;
     protected Autor $autor;
     protected Genero $genero;
     protected Editora $editora;
@@ -49,12 +50,14 @@ class EnderecosEDuplicidadesTest extends TestCase
         ]);
 
         $vendedorUser = User::factory()->create([
+        $this->vendedorUser = User::factory()->create([
             'tipo' => 'vendedor',
             'name' => 'Livraria Central',
             'email' => 'vendedor@teste.com',
         ]);
         $this->vendedor = Vendedor::create([
             'user_id' => $vendedorUser->id,
+            'user_id' => $this->vendedorUser->id,
             'cnpj' => '12345678000199',
             'razao_social' => 'Livraria Central LTDA',
             'nome_fantasia' => 'Livraria Central',
@@ -193,6 +196,7 @@ class EnderecosEDuplicidadesTest extends TestCase
 
         // Tentativa de cadastrar outro livro com o mesmo ISBN
         $response = $this->actingAs($this->adminUser)->post(route('admin.livros.store'), [
+        $response = $this->actingAs($this->vendedorUser)->post(route('vendedor.livros.store'), [
             'titulo' => 'Dom Casmurro Edição 2',
             'isbn' => '978-85-359-0277-8', // Com formatação (o mutator/controller normaliza e detecta)
             'data_publicacao' => '1900-01-01',
@@ -223,6 +227,7 @@ class EnderecosEDuplicidadesTest extends TestCase
 
         // Tentativa de cadastrar o mesmo título para o mesmo autor com ISBN diferente
         $response = $this->actingAs($this->adminUser)->post(route('admin.livros.store'), [
+        $response = $this->actingAs($this->vendedorUser)->post(route('vendedor.livros.store'), [
             'titulo' => 'Memórias Póstumas de Brás Cubas',
             'isbn' => '9788535900002',
             'data_publicacao' => '1881-01-01',
@@ -240,6 +245,7 @@ class EnderecosEDuplicidadesTest extends TestCase
     public function test_sanitizacao_de_preco_formatado_em_reais(): void
     {
         $response = $this->actingAs($this->adminUser)->post(route('admin.livros.store'), [
+        $response = $this->actingAs($this->vendedorUser)->post(route('vendedor.livros.store'), [
             'titulo' => 'Esaú e Jacó',
             'isbn' => '9788535901111',
             'data_publicacao' => '1904-01-01',
@@ -252,6 +258,7 @@ class EnderecosEDuplicidadesTest extends TestCase
         ]);
 
         $response->assertRedirect(route('admin.livros.index'));
+        $response->assertRedirect(route('vendedor.livros.index'));
         $this->assertDatabaseHas('livros', [
             'titulo' => 'Esaú e Jacó',
             'preco' => 54.90,

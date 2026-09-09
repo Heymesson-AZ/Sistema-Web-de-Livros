@@ -28,8 +28,39 @@ class Pedido extends Model
      * como um objeto Carbon (data) automaticamente.
      */
     protected $casts = [
-        'data_pedido' => 'date',
+        'data_pedido' => 'datetime',
+        'total' => 'decimal:2',
     ];
+
+    public function getTotalFormatadoAttribute(): string
+    {
+        return 'R$ ' . number_format((float) $this->total, 2, ',', '.');
+    }
+
+    public function getStatusBadgeClassAttribute(): string
+    {
+        return match ($this->status) {
+            'pendente' => 'bg-warning text-dark',
+            'processando' => 'bg-info text-dark',
+            'enviado' => 'bg-primary text-white',
+            'entregue' => 'bg-success text-white',
+            'cancelado', 'devolvido' => 'bg-danger text-white',
+            default => 'bg-secondary text-white',
+        };
+    }
+
+    public function getStatusRotuloAttribute(): string
+    {
+        return match ($this->status) {
+            'pendente' => 'Pendente',
+            'processando' => 'Em Processamento',
+            'enviado' => 'Enviado',
+            'entregue' => 'Entregue',
+            'cancelado' => 'Cancelado',
+            'devolvido' => 'Devolvido',
+            default => ucfirst((string) $this->status),
+        };
+    }
 
 
     // um pedido pertence a um vendedor

@@ -213,8 +213,10 @@
                                         </a>
 
                                         <a href="{{ route('admin.clientes.edit', $cliente) }}"
-                                            class="btn btn-sm btn-outline-primary rounded-3" title="Editar Cliente">
-                                            <i class="bi bi-pencil"></i>
+                                            class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
+                                            title="Editar Cliente">
+                                            <i class="bi bi-pencil-square"></i>
+                                            <span>Editar</span>
                                         </a>
 
                                         <button type="button" class="btn btn-sm btn-outline-danger rounded-3"

@@ -26,51 +26,115 @@ class Admin extends Model
     ];
 
     // =========================================================================
-    // CONSTANTES DOS DEPARTAMENTOS
+    // CONSTANTES DOS DEPARTAMENTOS (Contextualizados e simplificados)
     // =========================================================================
-    public const DEPARTAMENTO_TECNOLOGIA = 'Tecnologia';
-    public const DEPARTAMENTO_EDITORIAL = 'Editorial';
-    public const DEPARTAMENTO_COMERCIAL = 'Comercial';
-    public const DEPARTAMENTO_OPERACOES = 'Operações';
-    public const DEPARTAMENTO_OPERACIONAL = 'Operações';
-    public const DEPARTAMENTO_ATENDIMENTO = 'Atendimento';
+    public const DEPARTAMENTO_DIRETORIA = 'Diretoria Executiva';
+    public const DEPARTAMENTO_MODERACAO = 'Moderação e Catálogo';
+    public const DEPARTAMENTO_COMERCIAL = 'Comercial e Parcerias';
+
+    // Aliases para retrocompatibilidade
+    public const DEPARTAMENTO_TECNOLOGIA = 'Diretoria Executiva';
+    public const DEPARTAMENTO_EDITORIAL = 'Moderação e Catálogo';
+    public const DEPARTAMENTO_OPERACOES = 'Moderação e Catálogo';
+    public const DEPARTAMENTO_OPERACIONAL = 'Moderação e Catálogo';
+    public const DEPARTAMENTO_ATENDIMENTO = 'Comercial e Parcerias';
 
     // =========================================================================
-    // CONSTANTES DOS CARGOS
+    // CONSTANTES DOS CARGOS (Contexto Universo de Papel)
     // =========================================================================
     public const CARGO_SUPER_ADMIN = 'Super Admin';
-    public const CARGO_ADMINISTRADOR = 'Administrador';
-    public const CARGO_GERENTE_CATALOGO = 'Gerente de Catálogo';
-    public const CARGO_GERENTE_COMERCIAL = 'Gerente Comercial';
-    public const CARGO_ANALISTA_OPERACOES = 'Analista de Operações';
-    public const CARGO_ATENDENTE_SUPORTE = 'Atendente de Suporte';
+    public const CARGO_MODERADOR = 'Moderador de Catálogo';
+    public const CARGO_GESTOR_COMERCIAL = 'Gestor Comercial';
+
+    // Aliases para retrocompatibilidade
+    public const CARGO_ADMINISTRADOR = 'Super Admin';
+    public const CARGO_GERENTE_CATALOGO = 'Moderador de Catálogo';
+    public const CARGO_GERENTE_COMERCIAL = 'Gestor Comercial';
+    public const CARGO_ANALISTA_OPERACOES = 'Moderador de Catálogo';
+    public const CARGO_ATENDENTE_SUPORTE = 'Gestor Comercial';
 
     /**
-     * Retorna a lista completa de departamentos (Útil para formulários e validações)
+     * Retorna a lista completa de departamentos simplificados
      */
     public static function getDepartamentos(): array
     {
         return [
-            self::DEPARTAMENTO_TECNOLOGIA,
-            self::DEPARTAMENTO_EDITORIAL,
+            self::DEPARTAMENTO_DIRETORIA,
+            self::DEPARTAMENTO_MODERACAO,
             self::DEPARTAMENTO_COMERCIAL,
-            self::DEPARTAMENTO_OPERACOES,
-            self::DEPARTAMENTO_ATENDIMENTO,
         ];
     }
 
     /**
-     * Retorna a lista completa de cargos (Útil para formulários e validações)
+     * Retorna a lista de cargos simplificados para a plataforma
      */
     public static function getCargos(): array
     {
         return [
             self::CARGO_SUPER_ADMIN,
-            self::CARGO_GERENTE_CATALOGO,
-            self::CARGO_GERENTE_COMERCIAL,
-            self::CARGO_ANALISTA_OPERACOES,
-            self::CARGO_ATENDENTE_SUPORTE,
+            self::CARGO_MODERADOR,
+            self::CARGO_GESTOR_COMERCIAL,
         ];
+    }
+
+    // =========================================================================
+    // REGRAS DE NEGÓCIO E PERMISSÕES POR CARGO
+    // =========================================================================
+
+    /**
+     * Verifica se o administrador é Super Admin (acesso total irrestrito)
+     */
+    public function isSuperAdmin(): bool
+    {
+        return in_array($this->cargo, [self::CARGO_SUPER_ADMIN, 'Super Admin', 'Administrador'], true);
+    }
+
+    /**
+     * Verifica se o administrador atua na moderação e catálogo
+     */
+    public function isModerador(): bool
+    {
+        return in_array($this->cargo, [self::CARGO_MODERADOR, 'Moderador de Catálogo', 'Gerente de Catálogo', 'Analista de Operações'], true);
+    }
+
+    /**
+     * Verifica se o administrador atua na gestão comercial e de parceiros
+     */
+    public function isGestorComercial(): bool
+    {
+        return in_array($this->cargo, [self::CARGO_GESTOR_COMERCIAL, 'Gestor Comercial', 'Gerente Comercial', 'Atendente de Suporte'], true);
+    }
+
+    /**
+     * Regra: Somente o Super Admin pode gerenciar outros administradores
+     */
+    public function podeGerenciarAdministradores(): bool
+    {
+        return $this->isSuperAdmin();
+    }
+
+    /**
+     * Regra: Super Admin e Moderador de Catálogo podem moderar obras
+     */
+    public function podeModerarLivros(): bool
+    {
+        return $this->isSuperAdmin() || $this->isModerador();
+    }
+
+    /**
+     * Regra: Super Admin e Gestor Comercial podem aprovar/gerenciar vendedores parceiros
+     */
+    public function podeGerenciarVendedores(): bool
+    {
+        return $this->isSuperAdmin() || $this->isGestorComercial();
+    }
+
+    /**
+     * Regra: Super Admin e Gestor Comercial podem gerenciar cupons de desconto
+     */
+    public function podeGerenciarCupons(): bool
+    {
+        return $this->isSuperAdmin() || $this->isGestorComercial();
     }
 
     /**

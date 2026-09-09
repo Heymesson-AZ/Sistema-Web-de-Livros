@@ -65,7 +65,7 @@ class LivroGestaoController extends Controller
         $query = Livro::with(['autor', 'genero', 'editora']);
 
         if ($this->isAdmin) {
-            $query->with('vendedor.user');
+            $query->with(['vendedor.user', 'moderador']);
         } else {
             $query->where('vendedor_id', $vendedor->id);
         }
@@ -97,6 +97,11 @@ class LivroGestaoController extends Controller
             $query->where('vendedor_id', $vendedorId);
         }
 
+        // Filtro por Status de Moderação
+        if ($statusModeracao = $request->input('status_moderacao')) {
+            $query->where('status_moderacao', $statusModeracao);
+        }
+
         // Filtro por Estoque
         if ($statusEstoque = $request->input('status_estoque')) {
             if ($statusEstoque === 'com_estoque') {
@@ -126,6 +131,11 @@ class LivroGestaoController extends Controller
         $totalSemEstoque = (clone $baseKpiQuery)->where('quantidade', '<=', 0)->count();
         $valorTotalEstoque = (clone $baseKpiQuery)->sum(DB::raw('preco * quantidade'));
 
+        // KPIs de Moderação
+        $totalAtivos = (clone $baseKpiQuery)->where('status_moderacao', Livro::STATUS_MODERACAO_ATIVO)->count();
+        $totalSobAnalise = (clone $baseKpiQuery)->where('status_moderacao', Livro::STATUS_MODERACAO_SOB_ANALISE)->count();
+        $totalBloqueados = (clone $baseKpiQuery)->whereIn('status_moderacao', [Livro::STATUS_MODERACAO_BLOQUEADO, Livro::STATUS_MODERACAO_BANIDO])->count();
+
         $generos = Genero::orderBy('nome')->get();
         $editoras = Editora::orderBy('nome')->get();
         $vendedores = $this->isAdmin ? Vendedor::with('user')->orderBy('nome_fantasia')->get() : collect();
@@ -139,6 +149,9 @@ class LivroGestaoController extends Controller
             'totalComEstoque' => $totalComEstoque,
             'totalSemEstoque' => $totalSemEstoque,
             'valorTotalEstoque' => $valorTotalEstoque,
+            'totalAtivos' => $totalAtivos,
+            'totalSobAnalise' => $totalSobAnalise,
+            'totalBloqueados' => $totalBloqueados,
             'generos' => $generos,
             'editoras' => $editoras,
             'vendedores' => $vendedores,
@@ -275,7 +288,7 @@ class LivroGestaoController extends Controller
             $vendedor = null;
         }
 
-        $livro->load(['autor', 'genero', 'editora', 'vendedor.user', 'itensPedido']);
+        $livro->load(['autor', 'genero', 'editora', 'vendedor.user', 'itensPedido', 'moderador']);
 
         $totalVendido = (int) $livro->itensPedido()->sum('quantidade_itens');
         $receitaGerada = (float) $livro->itensPedido()->sum(DB::raw('valor_unitario * quantidade_itens'));

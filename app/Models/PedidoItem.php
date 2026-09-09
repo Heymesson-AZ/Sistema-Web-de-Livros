@@ -18,6 +18,26 @@ class PedidoItem extends Model
         'valor_unitario',
     ];
 
+    protected $casts = [
+        'quantidade_itens' => 'integer',
+        'valor_unitario' => 'decimal:2',
+    ];
+
+    public function getSubtotalAttribute(): float
+    {
+        return (float) $this->valor_unitario * (int) $this->quantidade_itens;
+    }
+
+    public function getSubtotalFormatadoAttribute(): string
+    {
+        return 'R$ ' . number_format($this->subtotal, 2, ',', '.');
+    }
+
+    public function getValorUnitarioFormatadoAttribute(): string
+    {
+        return 'R$ ' . number_format((float) $this->valor_unitario, 2, ',', '.');
+    }
+
     // um item do pedido pertence a um pedido
     public function pedido()
     {

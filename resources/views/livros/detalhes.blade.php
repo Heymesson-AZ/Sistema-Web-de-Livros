@@ -24,7 +24,19 @@
 
             <!-- 1. CAPA DO LIVRO (ESQUERDA) -->
             <div class="col-12 col-md-5 col-lg-4">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-top" style="top: 85px;">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-top position-relative"
+                    style="top: 85px;">
+                    @php
+                        $isFavoritado = Auth::check() && $livro->isFavoritadoPor(Auth::user());
+                    @endphp
+                    <button type="button"
+                        class="position-absolute top-0 end-0 m-3 btn btn-light btn-sm rounded-circle shadow-sm p-1 z-2 border-0 d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;" data-favorito-toggle
+                        data-favorito-url="{{ route('favoritos.toggle', $livro) }}"
+                        title="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
+                        <i
+                            class="bi {{ $isFavoritado ? 'bi-heart-fill text-danger' : 'bi-heart text-secondary' }} fs-5"></i>
+                    </button>
                     <div class="bg-light p-4 text-center d-flex align-items-center justify-content-center"
                         style="min-height: 420px; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);">
                         <img src="{{ $livro->url_capa }}" alt="{{ $livro->titulo }}"
@@ -173,18 +185,21 @@
 
                     <!-- BOTÕES DE COMPRA -->
                     @if ($livro->isDisponivel())
-                        <div class="d-grid gap-2 mb-3">
-                            <button type="button"
+                        <form action="{{ route('carrinho.adicionar') }}" method="POST" class="d-grid gap-2 mb-3">
+                            @csrf
+                            <input type="hidden" name="livro_id" value="{{ $livro->id }}">
+                            <input type="hidden" name="quantidade" value="1">
+                            <button type="submit" name="comprar_agora" value="1"
                                 class="btn btn-warning btn-lg rounded-pill fw-bold text-dark shadow-sm d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-bag-check-fill"></i>
                                 <span>Comprar Agora</span>
                             </button>
-                            <button type="button"
+                            <button type="submit"
                                 class="btn btn-outline-primary rounded-pill fw-semibold d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-cart-plus"></i>
                                 <span>Adicionar ao Carrinho</span>
                             </button>
-                        </div>
+                        </form>
                     @else
                         <button type="button" class="btn btn-secondary rounded-pill w-100 disabled" disabled>
                             Produto Esgotado

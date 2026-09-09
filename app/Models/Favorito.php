@@ -18,6 +18,12 @@ class Favorito extends Model
     // um favorito pertence a um usuário
     public function user()
     {
-        return $this->belongsTo(User::class); // Relacionamento de um favorito para
+        return $this->belongsTo(User::class);
+    }
+
+    // um favorito pertence a um livro
+    public function livro()
+    {
+        return $this->belongsTo(Livro::class);
     }
 }

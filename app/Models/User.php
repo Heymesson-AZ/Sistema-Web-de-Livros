@@ -82,6 +82,15 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
+    /**
+     * Retorna apenas o primeiro nome do usuário.
+     */
+    public function getPrimeiroNomeAttribute(): string
+    {
+        $partes = explode(' ', trim((string) $this->name));
+        return $partes[0] ?: (string) $this->name;
+    }
+
     // Definição dos Perfis ( Verificar se o usuário é cliente, vendedor ou admin)
 
 
@@ -117,6 +126,34 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin()
     {
         return $this->tipo === 'admin';
+    }
+
+    /**
+     * Regras de permissão por cargo administrativo
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->isAdmin() && ($this->admin ? $this->admin->isSuperAdmin() : true);
+    }
+
+    public function podeGerenciarAdministradores(): bool
+    {
+        return $this->isAdmin() && ($this->admin ? $this->admin->podeGerenciarAdministradores() : true);
+    }
+
+    public function podeModerarLivros(): bool
+    {
+        return $this->isAdmin() && ($this->admin ? $this->admin->podeModerarLivros() : true);
+    }
+
+    public function podeGerenciarVendedores(): bool
+    {
+        return $this->isAdmin() && ($this->admin ? $this->admin->podeGerenciarVendedores() : true);
+    }
+
+    public function podeGerenciarCupons(): bool
+    {
+        return $this->isAdmin() && ($this->admin ? $this->admin->podeGerenciarCupons() : true);
     }
 
     public function isAtivo(): bool

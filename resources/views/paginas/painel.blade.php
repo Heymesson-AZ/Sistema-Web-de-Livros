@@ -114,9 +114,22 @@
                     </li>
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link {{ $tab === 'perfil' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
-                            id="perfil-tab" data-bs-toggle="tab" data-bs-target="#perfil" type="button" role="tab">
-                            <i class="bi bi-person-bounding-box me-1"></i> Meus Dados & Perfil
+                            class="nav-link {{ $tab === 'pedidos' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
+                            id="pedidos-tab" data-bs-toggle="tab" data-bs-target="#pedidos" type="button" role="tab">
+                            <i class="bi bi-box-seam me-1"></i> Meus Pedidos
+                            @if (isset($pedidos) && $pedidos->count() > 0)
+                                <span class="badge bg-primary rounded-pill ms-1">{{ $pedidos->count() }}</span>
+                            @endif
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link {{ $tab === 'favoritos' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
+                            id="favoritos-tab" data-bs-toggle="tab" data-bs-target="#favoritos" type="button" role="tab">
+                            <i class="bi bi-heart me-1"></i> Meus Favoritos
+                            @if (isset($favoritos) && $favoritos->count() > 0)
+                                <span class="badge bg-danger-subtle text-danger rounded-pill ms-1">{{ $favoritos->count() }}</span>
+                            @endif
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -129,6 +142,23 @@
                                 <span
                                     class="badge bg-secondary-subtle text-secondary rounded-pill ms-1">{{ $enderecos->count() }}</span>
                             @endif
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link {{ $tab === 'cartoes' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
+                            id="cartoes-tab" data-bs-toggle="tab" data-bs-target="#cartoes" type="button" role="tab">
+                            <i class="bi bi-credit-card-2-front me-1"></i> Meus Cartões
+                            @if (isset($cartoesSalvos) && $cartoesSalvos->count() > 0)
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill ms-1">{{ $cartoesSalvos->count() }}</span>
+                            @endif
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link {{ $tab === 'perfil' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-bottom border-2"
+                            id="perfil-tab" data-bs-toggle="tab" data-bs-target="#perfil" type="button" role="tab">
+                            <i class="bi bi-person-bounding-box me-1"></i> Meus Dados & Perfil
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -287,21 +317,32 @@
                             </h5>
                             <div class="d-flex flex-column gap-2">
                                 @if ($user->isAdmin())
-                                    <a href="{{ route('admin.livros.create') }}"
+                                    <a href="{{ route('admin.livros.index') }}"
                                         class="btn btn-primary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
-                                        <span><i class="bi bi-plus-circle me-2"></i> Publicar Novo Livro</span>
+                                        <span><i class="bi bi-shield-check me-2"></i> Moderação do Catálogo</span>
                                         <i class="bi bi-chevron-right small"></i>
                                     </a>
-                                    <a href="{{ route('admin.vendedores.index') }}"
-                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
-                                        <span><i class="bi bi-shop me-2"></i> Gerenciar Vendedores</span>
-                                        <i class="bi bi-chevron-right small"></i>
-                                    </a>
-                                    <a href="{{ route('admin.administradores.index') }}"
-                                        class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
-                                        <span><i class="bi bi-shield-check me-2"></i> Gestão de Administradores</span>
-                                        <i class="bi bi-chevron-right small"></i>
-                                    </a>
+                                    @if ($user->podeGerenciarVendedores())
+                                        <a href="{{ route('admin.vendedores.index') }}"
+                                            class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                            <span><i class="bi bi-shop me-2"></i> Gerenciar Vendedores</span>
+                                            <i class="bi bi-chevron-right small"></i>
+                                        </a>
+                                    @endif
+                                    @if ($user->podeGerenciarCupons())
+                                        <a href="{{ route('admin.cupons.index') }}"
+                                            class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                            <span><i class="bi bi-ticket me-2"></i> Cupons de Desconto</span>
+                                            <i class="bi bi-chevron-right small"></i>
+                                        </a>
+                                    @endif
+                                    @if ($user->podeGerenciarAdministradores())
+                                        <a href="{{ route('admin.administradores.index') }}"
+                                            class="btn btn-outline-secondary d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
+                                            <span><i class="bi bi-shield-lock me-2"></i> Gestão de Administradores</span>
+                                            <i class="bi bi-chevron-right small"></i>
+                                        </a>
+                                    @endif
                                 @elseif ($user->isVendedor())
                                     <a href="{{ route('vendedor.livros.create') }}"
                                         class="btn btn-success d-flex align-items-center justify-content-between rounded-3 py-2 px-3">
@@ -513,6 +554,155 @@
             </div>
 
             <!-- ========================================================
+                 ABA: MEUS PEDIDOS
+                 ======================================================== -->
+            <div class="tab-pane fade {{ $tab === 'pedidos' ? 'show active' : '' }}" id="pedidos" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5 mb-4">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                                <i class="bi bi-box-seam text-primary"></i> Meus Pedidos
+                            </h5>
+                            <p class="text-muted small mb-0">Acompanhe seus pedidos, status de envio, rastreamento e avaliações.</p>
+                        </div>
+                        <a href="{{ url('/#catalogo') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            <i class="bi bi-book me-1"></i> Explorar Catálogo
+                        </a>
+                    </div>
+
+                    @if ($pedidos->isEmpty())
+                        <div class="text-center py-5 bg-light rounded-4">
+                            <div class="rounded-circle bg-white shadow-sm d-inline-flex p-3 text-muted mb-3">
+                                <i class="bi bi-box display-6 text-primary"></i>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Nenhum pedido realizado ainda</h6>
+                            <p class="text-muted small mb-3">Quando você finalizar compras, elas aparecerão aqui detalhadamente.</p>
+                            <a href="{{ url('/#catalogo') }}" class="btn btn-primary btn-sm rounded-pill px-4">
+                                Começar a Comprar
+                            </a>
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Número</th>
+                                        <th>Data</th>
+                                        <th>Itens</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-3">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($pedidos as $ped)
+                                        <tr>
+                                            <td class="ps-3">
+                                                <span class="fw-bold font-monospace text-primary">{{ $ped->numero_pedido }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="small text-muted">{{ $ped->data_pedido?->format('d/m/Y') }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="small text-dark">{{ $ped->itens->sum('quantidade_itens') }} livro(s)</span>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-dark">{{ $ped->total_formatado }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ $ped->status_badge_class }} rounded-pill">
+                                                    {{ $ped->status_rotulo }}
+                                                </span>
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <a href="{{ route('pedidos.show', $ped) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                                    Detalhes
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 ABA: MEUS FAVORITOS
+                 ======================================================== -->
+            <div class="tab-pane fade {{ $tab === 'favoritos' ? 'show active' : '' }}" id="favoritos" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5 mb-4">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                                <i class="bi bi-heart-fill text-danger"></i> Meus Livros Favoritos
+                            </h5>
+                            <p class="text-muted small mb-0">Livros que você salvou para ler ou comprar mais tarde.</p>
+                        </div>
+                    </div>
+
+                    @if ($favoritos->isEmpty())
+                        <div class="text-center py-5 bg-light rounded-4">
+                            <div class="rounded-circle bg-white shadow-sm d-inline-flex p-3 text-muted mb-3">
+                                <i class="bi bi-heart display-6 text-danger"></i>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Nenhum livro favoritado</h6>
+                            <p class="text-muted small mb-3">Ao navegar pelo catálogo, clique no coração para salvar seus títulos preferidos.</p>
+                            <a href="{{ url('/#catalogo') }}" class="btn btn-primary btn-sm rounded-pill px-4">
+                                Ver Livros
+                            </a>
+                        </div>
+                    @else
+                        <div class="row g-3">
+                            @foreach ($favoritos as $fav)
+                                @if ($fav->livro)
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                        <div class="card h-100 border-light-subtle rounded-4 p-3 shadow-xs d-flex flex-column justify-content-between position-relative">
+                                            <div>
+                                                <div class="position-relative mb-2 text-center">
+                                                    <a href="{{ route('livros.detalhes', $fav->livro) }}">
+                                                        <img src="{{ $fav->livro->url_capa }}" alt="{{ $fav->livro->titulo }}"
+                                                            class="rounded-3 object-fit-cover shadow-sm"
+                                                            style="width: 100px; height: 140px;">
+                                                    </a>
+                                                    <form action="{{ route('favoritos.remover', $fav->livro) }}" method="POST"
+                                                        class="position-absolute top-0 end-0">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-light btn-sm rounded-circle p-1 shadow-sm text-danger"
+                                                            title="Remover dos favoritos">
+                                                            <i class="bi bi-x-lg" style="font-size: 12px;"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ $fav->livro->titulo }}">
+                                                    <a href="{{ route('livros.detalhes', $fav->livro) }}" class="text-decoration-none text-dark hover-primary">
+                                                        {{ $fav->livro->titulo }}
+                                                    </a>
+                                                </h6>
+                                                <p class="text-muted small mb-2 text-truncate">{{ $fav->livro->autor?->nome }}</p>
+                                                <div class="fw-bold text-primary mb-3">{{ $fav->livro->preco_formatado }}</div>
+                                            </div>
+                                            <form action="{{ route('carrinho.adicionar') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="livro_id" value="{{ $fav->livro->id }}">
+                                                <button type="submit" class="btn btn-outline-primary btn-sm w-100 rounded-pill"
+                                                    {{ $fav->livro->quantidade <= 0 ? 'disabled' : '' }}>
+                                                    <i class="bi bi-cart-plus me-1"></i>
+                                                    {{ $fav->livro->quantidade > 0 ? 'Adicionar ao Carrinho' : 'Esgotado' }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- ========================================================
                  ABA: MEUS ENDEREÇOS
                  ======================================================== -->
             <div class="tab-pane fade {{ $tab === 'enderecos' ? 'show active' : '' }}" id="enderecos"
@@ -582,6 +772,24 @@
                                                 </button>
                                                 <ul
                                                     class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                                                    <li>
+                                                        <button type="button" class="dropdown-item small py-2"
+                                                            data-bs-toggle="modal" data-bs-target="#modalEditarEndereco"
+                                                            data-editar-endereco
+                                                            data-endereco-id="{{ $end->id }}"
+                                                            data-endereco-tipo="{{ $end->tipo }}"
+                                                            data-endereco-cep="{{ $end->cep }}"
+                                                            data-endereco-rua="{{ $end->rua }}"
+                                                            data-endereco-numero="{{ $end->numero }}"
+                                                            data-endereco-bairro="{{ $end->bairro }}"
+                                                            data-endereco-cidade="{{ $end->cidade }}"
+                                                            data-endereco-estado="{{ $end->estado }}"
+                                                            data-endereco-complemento="{{ $end->complemento }}"
+                                                            data-endereco-principal="{{ $end->principal ? '1' : '0' }}"
+                                                            data-endereco-action="{{ route('enderecos.atualizar', $end) }}">
+                                                            <i class="bi bi-pencil-square me-2 text-primary"></i> Editar Endereço
+                                                        </button>
+                                                    </li>
                                                     @if (!$end->principal)
                                                         <li>
                                                             <form
@@ -621,9 +829,120 @@
                                         <p class="text-muted small mb-2">
                                             {{ $end->bairro }} &bull; {{ $end->cidade }} - {{ $end->estado }}
                                         </p>
-                                        <p class="small text-secondary mb-0">
+                                        <p class="small text-secondary mb-3">
                                             <strong>CEP:</strong> {{ $end->cep }}
                                         </p>
+
+                                        <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                                            <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 py-1 text-white fw-semibold shadow-sm"
+                                                data-bs-toggle="modal" data-bs-target="#modalEditarEndereco"
+                                                data-editar-endereco
+                                                data-endereco-id="{{ $end->id }}"
+                                                data-endereco-tipo="{{ $end->tipo }}"
+                                                data-endereco-cep="{{ $end->cep }}"
+                                                data-endereco-rua="{{ $end->rua }}"
+                                                data-endereco-numero="{{ $end->numero }}"
+                                                data-endereco-bairro="{{ $end->bairro }}"
+                                                data-endereco-cidade="{{ $end->cidade }}"
+                                                data-endereco-estado="{{ $end->estado }}"
+                                                data-endereco-complemento="{{ $end->complemento }}"
+                                                data-endereco-principal="{{ $end->principal ? '1' : '0' }}"
+                                                data-endereco-action="{{ route('enderecos.atualizar', $end) }}">
+                                                <i class="bi bi-pencil-square me-1"></i> Editar
+                                            </button>
+                                            @if (!$end->principal)
+                                                <form action="{{ route('enderecos.definir-principal', $end) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-link text-decoration-none btn-sm text-secondary p-0">
+                                                        Definir principal
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- ========================================================
+                 ABA: MEUS CARTÕES SALVOS
+                 ======================================================== -->
+            <div class="tab-pane fade {{ $tab === 'cartoes' ? 'show active' : '' }}" id="cartoes" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                                <i class="bi bi-credit-card-2-front text-primary"></i> Meus Cartões Salvos
+                            </h5>
+                            <p class="text-muted small mb-0">Gerencie com segurança seus cartões para pagamento rápido em 1 clique.</p>
+                        </div>
+                        <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold"
+                            data-bs-toggle="modal" data-bs-target="#modalNovoCartao">
+                            <i class="bi bi-plus-lg me-1"></i> Adicionar Cartão
+                        </button>
+                    </div>
+
+                    @if ($cartoesSalvos->isEmpty())
+                        <div class="text-center py-5 bg-light rounded-4">
+                            <div class="rounded-circle bg-white shadow-sm d-inline-flex p-3 text-muted mb-3">
+                                <i class="bi bi-credit-card-2-front display-6 text-primary"></i>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Nenhum cartão salvo ainda</h6>
+                            <p class="text-muted small mb-3">Cadastre um cartão para agilizar suas próximas compras de livros.</p>
+                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4"
+                                data-bs-toggle="modal" data-bs-target="#modalNovoCartao">
+                                Cadastrar Cartão
+                            </button>
+                        </div>
+                    @else
+                        <div class="row g-3">
+                            @foreach ($cartoesSalvos as $cartao)
+                                <div class="col-12 col-md-6 col-lg-4">
+                                    <div class="card h-100 border {{ $cartao->cartao_padrao ? 'border-primary border-2 shadow-sm bg-primary bg-opacity-10' : 'border-light-subtle shadow-xs' }} rounded-4 p-4 d-flex flex-column justify-content-between">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                <span class="badge bg-dark-subtle text-dark border rounded-pill px-3 py-1 text-uppercase fw-bold font-monospace">
+                                                    <i class="bi bi-credit-card me-1"></i> {{ $cartao->bandeira_cartao }}
+                                                </span>
+                                                @if ($cartao->cartao_padrao)
+                                                    <span class="badge bg-success rounded-pill px-2 py-1" style="font-size: 11px;">
+                                                        <i class="bi bi-star-fill me-1"></i> Padrão
+                                                    </span>
+                                                @endif
+                                            </div>
+
+                                            <div class="font-monospace fs-5 fw-bold text-dark mb-2">
+                                                •••• •••• •••• {{ $cartao->ultimos_digitos }}
+                                            </div>
+                                            <p class="small text-muted mb-0">Adicionado em {{ $cartao->created_at?->format('d/m/Y') }}</p>
+                                        </div>
+
+                                        <div class="mt-4 pt-2 border-top d-flex justify-content-between align-items-center">
+                                            @if (!$cartao->cartao_padrao)
+                                                <form action="{{ route('cartoes.definir-padrao', $cartao) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-link text-decoration-none btn-sm text-primary p-0 fw-semibold">
+                                                        Definir padrão
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="text-success small fw-semibold">
+                                                    <i class="bi bi-check2-circle me-1"></i> Principal
+                                                </span>
+                                            @endif
+
+                                            <form action="{{ route('cartoes.deletar', $cartao) }}" method="POST"
+                                                data-confirm="Tem certeza que deseja remover este cartão salvo?">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-link text-danger btn-sm p-0 text-decoration-none">
+                                                    <i class="bi bi-trash me-1"></i> Excluir
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
@@ -841,6 +1160,192 @@
                             data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
                             <i class="bi bi-check-lg me-1"></i> Salvar Endereço
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR ENDEREÇO COM INTEGRAÇÃO VIACEP -->
+    <div class="modal fade" id="modalEditarEndereco" tabindex="-1" aria-labelledby="modalEditarEnderecoLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header bg-primary text-white p-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-pencil-square fs-4"></i>
+                        <h5 class="modal-title fw-bold mb-0" id="modalEditarEnderecoLabel">Editar Endereço de Entrega</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
+                </div>
+                <form id="formEditarEndereco" action="" method="POST" data-viacep-container>
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <!-- Tipo de Endereço -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-bold text-secondary">Tipo de Endereço *</label>
+                                <select name="tipo" class="form-select rounded-3" required>
+                                    <option value="residencial">Residencial (Casa / Apartamento)</option>
+                                    <option value="comercial">Comercial (Trabalho / Empresa)</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+
+                            <!-- CEP com busca automática ViaCEP -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-bold text-secondary">CEP *</label>
+                                <div class="input-group">
+                                    <input type="text" name="cep" class="form-control rounded-start-3"
+                                        placeholder="00000-000" data-viacep="cep" data-mask="cep" maxlength="9"
+                                        required>
+                                    <span class="input-group-text bg-white text-muted">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                </div>
+                                <small class="d-block mt-1" data-viacep="mensagem"
+                                    style="font-size: 11.5px;"></small>
+                            </div>
+
+                            <!-- Rua / Logradouro -->
+                            <div class="col-12 col-md-8">
+                                <label class="form-label small fw-bold text-secondary">Rua / Logradouro *</label>
+                                <input type="text" name="rua" class="form-control rounded-3"
+                                    placeholder="Av. Paulista, Rua das Flores..." data-viacep="rua" required>
+                            </div>
+
+                            <!-- Número -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Número *</label>
+                                <input type="text" name="numero" class="form-control rounded-3"
+                                    placeholder="123 ou S/N" data-viacep="numero" required>
+                            </div>
+
+                            <!-- Complemento -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Complemento (Opcional)</label>
+                                <input type="text" name="complemento" class="form-control rounded-3"
+                                    placeholder="Apto 42, Bloco B...">
+                            </div>
+
+                            <!-- Bairro -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Bairro *</label>
+                                <input type="text" name="bairro" class="form-control rounded-3"
+                                    placeholder="Centro, Jardins..." data-viacep="bairro" required>
+                            </div>
+
+                            <!-- Cidade -->
+                            <div class="col-12 col-md-3">
+                                <label class="form-label small fw-bold text-secondary">Cidade *</label>
+                                <input type="text" name="cidade" class="form-control rounded-3"
+                                    placeholder="São Paulo" data-viacep="cidade" required>
+                            </div>
+
+                            <!-- UF / Estado -->
+                            <div class="col-12 col-md-1">
+                                <label class="form-label small fw-bold text-secondary">UF *</label>
+                                <input type="text" name="estado"
+                                    class="form-control rounded-3 text-uppercase text-center" placeholder="SP"
+                                    maxlength="2" data-viacep="estado" required>
+                            </div>
+
+                            <!-- Tornar Principal -->
+                            <div class="col-12 mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="principal" value="1"
+                                        id="switchPrincipalEdicao">
+                                    <label class="form-check-label small fw-semibold text-dark" for="switchPrincipalEdicao">
+                                        Definir como endereço de entrega principal
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light p-3 border-top">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
+                            <i class="bi bi-check-lg me-1"></i> Atualizar Endereço
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOVO CARTÃO SALVO -->
+    <div class="modal fade" id="modalNovoCartao" tabindex="-1" aria-labelledby="modalNovoCartaoLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header bg-primary text-white p-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-credit-card-2-front-fill fs-4"></i>
+                        <h5 class="modal-title fw-bold mb-0" id="modalNovoCartaoLabel">Adicionar Cartão de Crédito</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
+                </div>
+                <form action="{{ route('cartoes.salvar') }}" method="POST">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-secondary">Número do Cartão *</label>
+                                <div class="input-group">
+                                    <input type="text" name="numero_cartao" class="form-control rounded-start-3"
+                                        placeholder="0000 0000 0000 0000" data-mask="cartao" maxlength="23" required>
+                                    <span class="input-group-text bg-white text-muted">
+                                        <i class="bi bi-credit-card"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-secondary">Nome Impresso no Cartão *</label>
+                                <input type="text" name="nome_titular" class="form-control rounded-3 text-uppercase"
+                                    placeholder="NOME COMO NO CARTÃO" required>
+                            </div>
+
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-secondary">Validade (MM/AA) *</label>
+                                <input type="text" name="validade" class="form-control rounded-3 text-center"
+                                    placeholder="MM/AA" data-mask="validade" maxlength="5" required>
+                            </div>
+
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-secondary">CVV *</label>
+                                <input type="password" name="cvv" class="form-control rounded-3 text-center"
+                                    placeholder="123" data-mask="cvv" maxlength="4" required>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="padrao" value="1"
+                                        id="switchCartaoPadrao" {{ $cartoesSalvos->isEmpty() ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold text-dark" for="switchCartaoPadrao">
+                                        Definir como cartão de pagamento padrão
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="p-2 bg-light rounded-3 text-muted small d-flex align-items-center gap-2">
+                                    <i class="bi bi-shield-lock-fill text-success fs-5"></i>
+                                    <span>Seus dados são criptografados de ponta a ponta e tokenizados com segurança.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light p-3 border-top">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
+                            <i class="bi bi-check-lg me-1"></i> Salvar Cartão
                         </button>
                     </div>
                 </form>

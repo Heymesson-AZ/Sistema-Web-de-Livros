@@ -78,6 +78,10 @@ class AdministradorController extends Controller
      */
     public function cadastrar(): View
     {
+        if (!Auth::user()->podeGerenciarAdministradores()) {
+            abort(403, 'Acesso restrito. Somente o Super Administrador pode gerenciar outros administradores.');
+        }
+
         return view('administrador.cadastrar', [
             'cargos' => Admin::getCargos(),
             'departamentos' => Admin::getDepartamentos(),
@@ -89,6 +93,10 @@ class AdministradorController extends Controller
      */
     public function salvar(Request $request): RedirectResponse
     {
+        if (!Auth::user()->podeGerenciarAdministradores()) {
+            abort(403, 'Acesso restrito. Somente o Super Administrador pode gerenciar outros administradores.');
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
@@ -159,6 +167,10 @@ class AdministradorController extends Controller
      */
     public function editar(Admin $administrador): View
     {
+        if (!Auth::user()->podeGerenciarAdministradores() && Auth::id() !== $administrador->user_id) {
+            abort(403, 'Acesso restrito. Somente o Super Administrador pode gerenciar outros administradores.');
+        }
+
         $administrador->load('user');
 
         return view('administrador.editar', [
@@ -173,6 +185,10 @@ class AdministradorController extends Controller
      */
     public function atualizar(Request $request, Admin $administrador): RedirectResponse
     {
+        if (!Auth::user()->podeGerenciarAdministradores() && Auth::id() !== $administrador->user_id) {
+            abort(403, 'Acesso restrito. Somente o Super Administrador pode gerenciar outros administradores.');
+        }
+
         $user = $administrador->user;
 
         $request->validate([
@@ -251,6 +267,10 @@ class AdministradorController extends Controller
      */
     public function deletar(Admin $administrador): RedirectResponse
     {
+        if (!Auth::user()->podeGerenciarAdministradores()) {
+            abort(403, 'Acesso restrito. Somente o Super Administrador pode excluir contas de administradores.');
+        }
+
         // Trava de Segurança 1: Não permitir que o usuário logado exclua a si mesmo por esta rota
         if (Auth::id() === $administrador->user_id) {
             return redirect()->route('admin.administradores.index')

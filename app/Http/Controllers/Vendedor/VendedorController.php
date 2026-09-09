@@ -262,6 +262,10 @@ class VendedorController extends Controller
      */
     public function alterarStatus(Request $request, Vendedor $vendedor): RedirectResponse
     {
+        if (!Auth::user()->podeGerenciarVendedores()) {
+            abort(403, 'Acesso restrito. Seu cargo não possui permissão para aprovar ou rejeitar vendedores.');
+        }
+
         $request->validate([
             'status' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
         ]);

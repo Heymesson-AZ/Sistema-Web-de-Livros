@@ -3,7 +3,7 @@
         <button class="user-pill-btn dropdown-toggle border-0" type="button" id="userMenuDropdown" data-bs-toggle="dropdown"
             aria-expanded="false">
             <img src="{{ Auth::user()->foto }}" alt="{{ Auth::user()->name }}" class="user-avatar-img">
-            <span class="user-name-label d-none d-md-inline">{{ Auth::user()->name }}</span>
+            <span class="user-name-label d-none d-md-inline">{{ Auth::user()->primeiro_nome }}</span>
             <i data-lucide="chevron-down" class="dropdown-chevron-icon d-none d-md-inline"
                 style="width: 14px; height: 14px;"></i>
         </button>
@@ -65,6 +65,34 @@
                 </a>
             </li>
             <li>
+                <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                    href="{{ route('painel', ['tab' => 'pedidos']) }}">
+                    <i data-lucide="package" style="width: 16px; height: 16px;"></i>
+                    <span>Meus Pedidos</span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                    href="{{ route('painel', ['tab' => 'favoritos']) }}">
+                    <i data-lucide="heart" style="width: 16px; height: 16px;"></i>
+                    <span>Meus Favoritos</span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                    href="{{ route('painel', ['tab' => 'enderecos']) }}">
+                    <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+                    <span>Meus Endereços</span>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                    href="{{ route('painel', ['tab' => 'cartoes']) }}">
+                    <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i>
+                    <span>Meus Cartões</span>
+                </a>
+            </li>
+            <li>
                 <a class="dropdown-item d-flex align-items-center justify-content-between py-2"
                     href="{{ route('painel', ['tab' => 'visao-geral']) }}">
                     <div class="d-flex align-items-center gap-2">
@@ -79,13 +107,6 @@
                     @endif
                 </a>
             </li>
-            <li>
-                <a class="dropdown-item d-flex align-items-center gap-2 py-2"
-                    href="{{ route('painel', ['tab' => 'enderecos']) }}">
-                    <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
-                    <span>Meus Endereços</span>
-                </a>
-            </li>
 
             <!-- Ações por Tipo de Usuário -->
             @if (Auth::user()->isAdmin())
@@ -98,24 +119,36 @@
                 </li>
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ route('admin.livros.index') }}">
-                        <i data-lucide="book-marked" style="width: 16px; height: 16px;"></i>
-                        <span>Catálogo de Livros</span>
+                        <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+                        <span>Moderação de Livros</span>
                     </a>
                 </li>
-                <li>
-                    <a class="dropdown-item d-flex align-items-center gap-2 py-2"
-                        href="{{ route('admin.administradores.index') }}">
-                        <i data-lucide="shield" style="width: 16px; height: 16px;"></i>
-                        <span>Administradores</span>
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item d-flex align-items-center gap-2 py-2"
-                        href="{{ route('admin.vendedores.index') }}">
-                        <i data-lucide="store" style="width: 16px; height: 16px;"></i>
-                        <span>Vendedores</span>
-                    </a>
-                </li>
+                @if (Auth::user()->podeGerenciarCupons())
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ route('admin.cupons.index') }}">
+                            <i data-lucide="ticket" style="width: 16px; height: 16px;"></i>
+                            <span>Cupons de Desconto</span>
+                        </a>
+                    </li>
+                @endif
+                @if (Auth::user()->podeGerenciarAdministradores())
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                            href="{{ route('admin.administradores.index') }}">
+                            <i data-lucide="shield" style="width: 16px; height: 16px;"></i>
+                            <span>Administradores</span>
+                        </a>
+                    </li>
+                @endif
+                @if (Auth::user()->podeGerenciarVendedores())
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                            href="{{ route('admin.vendedores.index') }}">
+                            <i data-lucide="store" style="width: 16px; height: 16px;"></i>
+                            <span>Vendedores</span>
+                        </a>
+                    </li>
+                @endif
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2"
                         href="{{ route('admin.clientes.index') }}">

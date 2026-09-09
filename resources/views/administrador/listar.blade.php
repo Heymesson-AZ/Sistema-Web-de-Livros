@@ -13,11 +13,13 @@
                     Gerencie o acesso da equipe executiva, gerencial e de suporte da Universo de Papel.
                 </p>
             </div>
-            <a href="{{ route('admin.administradores.create') }}"
-                class="btn btn-primary px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2">
-                <i class="bi bi-person-plus-fill"></i>
-                <span>Novo Administrador</span>
-            </a>
+            @if (Auth::user()->podeGerenciarAdministradores())
+                <a href="{{ route('admin.administradores.create') }}"
+                    class="btn btn-primary px-3 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Novo Administrador</span>
+                </a>
+            @endif
         </div>
 
         <!-- MENSAGENS DE STATUS E ERRO -->
@@ -232,14 +234,18 @@
                                             class="btn btn-sm btn-outline-secondary" title="Ver Detalhes">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.administradores.edit', $admin) }}"
-                                            class="btn btn-sm btn-outline-primary" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
+                                        @if (Auth::user()->podeGerenciarAdministradores() || Auth::id() === $admin->user_id)
+                                             <a href="{{ route('admin.administradores.edit', $admin) }}"
+                                                 class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
+                                                 title="Editar Administrador">
+                                                 <i class="bi bi-pencil-square"></i>
+                                                 <span>Editar</span>
+                                             </a>
+                                         @endif
 
-                                        @if (Auth::id() !== $admin->user_id)
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                title="Excluir" data-bs-toggle="modal"
+                                         @if (Auth::id() !== $admin->user_id && Auth::user()->podeGerenciarAdministradores())
+                                             <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
+                                                 title="Excluir" data-bs-toggle="modal"
                                                 data-bs-target="#deleteModal{{ $admin->id }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>

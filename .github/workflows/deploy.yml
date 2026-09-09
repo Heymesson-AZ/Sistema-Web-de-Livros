@@ -65,18 +65,21 @@ jobs:
 
             grep -q "^MAIL_FROM_NAME=" .env && sed -i 's/^MAIL_FROM_NAME=.*/MAIL_FROM_NAME="Universo de Papel"/' .env || echo 'MAIL_FROM_NAME="Universo de Papel"' >> .env
 
+            grep -q "^APP_URL=" .env && sed -i 's|^APP_URL=.*|APP_URL=http://universopapel.duckdns.org|' .env || echo 'APP_URL=http://universopapel.duckdns.org' >> .env
+
             # 3. Garantir portas 80 e 443 abertas no firewall do host (Oracle Linux / Ubuntu)
             sudo iptables -I INPUT -p tcp -m multiport --dports 80,443 -j ACCEPT 2>/dev/null || true
 
             # 4. Reconstruir e subir os containers leves (já pegando o front-end compilado)
             docker compose up -d --build
 
-            # 4. Executar migrações e caches do Laravel
+            # 5. Executar migrações, limpeza profunda e caches do Laravel
             docker compose exec -T -u 0 app php artisan storage:link || true
             docker compose exec -T -u 0 app php artisan migrate --force || true
+            docker compose exec -T -u 0 app php artisan optimize:clear
             docker compose exec -T -u 0 app php artisan config:cache
             docker compose exec -T -u 0 app php artisan route:cache
-            docker compose exec -T -u 0 app php artisan view:clear
+            docker compose exec -T -u 0 app php artisan view:cache
 
 # Finalidade: Automatizar a publicação do seu sistema diretamente na sua
 # VPS da Oracle Cloud, sem que você precise acessar o servidor manualmente.

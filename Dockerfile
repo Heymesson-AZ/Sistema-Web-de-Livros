@@ -75,7 +75,8 @@ RUN mkdir -p /etc/nginx/ssl && \
     openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
     -keyout /etc/nginx/ssl/selfsigned.key \
     -out /etc/nginx/ssl/selfsigned.crt \
-    -subj "/C=BR/ST=State/L=City/O=UniversoDePapel/CN=localhost"
+    -subj "/C=BR/ST=State/L=City/O=UniversoDePapel/CN=universopapel.duckdns.org" \
+    -addext "subjectAltName=DNS:universopapel.duckdns.org,DNS:localhost,IP:163.176.81.174"
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost || exit 1

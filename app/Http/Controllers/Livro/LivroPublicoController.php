@@ -84,5 +84,44 @@ class LivroPublicoController extends Controller
 
         return view('livros.detalhes', compact('livro', 'relacionados'));
     }
+
+    /**
+     * Endpoint de busca dinâmica para sugestões rápidas via fetch/AJAX.
+     */
+    public function buscaRapida(Request $request)
+    {
+        $termo = trim($request->input('q', $request->input('busca', '')));
+
+        if (mb_strlen($termo) < 2) {
+            return response()->json([]);
+        }
+
+        $resultados = Livro::query()
+            ->with(['autor', 'genero'])
+            ->where(function ($q) use ($termo) {
+                $q->where('titulo', 'like', "%{$termo}%")
+                  ->orWhere('isbn', 'like', "%{$termo}%")
+                  ->orWhereHas('autor', function ($qa) use ($termo) {
+                      $qa->where('nome', 'like', "%{$termo}%");
+                  });
+            })
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $dados = $resultados->map(function ($livro) {
+            return [
+                'id' => $livro->id,
+                'titulo' => $livro->titulo,
+                'autor' => $livro->autor?->nome ?? 'Autor Desconhecido',
+                'genero' => $livro->genero?->nome ?? '',
+                'preco_formatado' => $livro->preco_formatado,
+                'capa_url' => $livro->url_capa,
+                'url' => route('livros.detalhes', $livro),
+            ];
+        });
+
+        return response()->json($dados);
+    }
 }
 

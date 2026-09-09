@@ -4,23 +4,23 @@ use App\Http\Controllers\Administrador\AdministradorController;
 use App\Http\Controllers\Administrador\LivroAdminController;
 use App\Http\Controllers\Cliente\ClienteController;
 use App\Http\Controllers\Livro\LivroPublicoController;
+use App\Http\Controllers\Painel\PainelController;
 use App\Http\Controllers\Vendedor\LivroVendedorController;
 use App\Http\Controllers\Vendedor\VendedorController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas públicas (Acesso livre a todos os visitantes)
 Route::get('/', [LivroPublicoController::class, 'index'])->name('inicio');
+Route::get('/busca-rapida', [LivroPublicoController::class, 'buscaRapida'])->name('livros.busca-rapida');
 Route::get('/livros/{livro}', [LivroPublicoController::class, 'show'])->name('livros.show');
 Route::get('/livro/{livro}', [LivroPublicoController::class, 'show'])->name('livros.detalhes');
 
-// Painel principal (Dashboard), acessível para usuários autenticados e verificados
-Route::get('/dashboard', function () {
-    return view('paginas.painel');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::get('/painel', function () {
-    return view('paginas.painel');
-})->middleware(['auth', 'verified'])->name('painel');
+// Painel principal e Perfil centralizado, acessível para usuários autenticados e verificados
+Route::get('/dashboard', [PainelController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/painel', [PainelController::class, 'index'])->middleware(['auth', 'verified'])->name('painel');
+Route::get('/perfil', function () {
+    return redirect()->route('painel', ['tab' => 'perfil']);
+})->middleware(['auth', 'verified'])->name('perfil');
 
 
 // Rotas para o perfil de Cliente

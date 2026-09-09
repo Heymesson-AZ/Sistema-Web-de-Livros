@@ -136,7 +136,7 @@
                                 <div class="col-12 col-md-6">
                                     <label for="cnpj" class="form-label small fw-bold text-secondary">CNPJ *</label>
                                     <input type="text" class="form-control @error('cnpj') is-invalid @enderror"
-                                        id="cnpj" name="cnpj" value="{{ old('cnpj') }}"
+                                        id="cnpj" name="cnpj" value="{{ old('cnpj') }}" data-mask="cnpj"
                                         placeholder="00.000.000/0000-00" maxlength="20" required>
                                     @error('cnpj')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -146,7 +146,7 @@
                                 <div class="col-12 col-md-6">
                                     <label for="telefone_comercial" class="form-label small fw-bold text-secondary">Telefone / WhatsApp Comercial *</label>
                                     <input type="text" class="form-control @error('telefone_comercial') is-invalid @enderror"
-                                        id="telefone_comercial" name="telefone_comercial" value="{{ old('telefone_comercial') }}"
+                                        id="telefone_comercial" name="telefone_comercial" value="{{ old('telefone_comercial') }}" data-mask="telefone"
                                         placeholder="(00) 00000-0000" maxlength="20" required>
                                     @error('telefone_comercial')
                                         <div class="invalid-feedback">{{ $message }}</div>

@@ -282,12 +282,8 @@ class AdministradorController extends Controller
      */
     public function editarPerfil(Request $request): View
     {
-        $user = $request->user();
-
-        return view('administrador.perfil-editar', [
-            'user' => $user,
-            'admin' => $user->admin,
-        ]);
+        $request->merge(['tab' => 'perfil']);
+        return app(\App\Http\Controllers\Painel\PainelController::class)->index($request);
     }
 
     /**
@@ -338,7 +334,11 @@ class AdministradorController extends Controller
             $user->admin()->update($request->only('telefone_urgencia'));
         }
 
-        return Redirect::route('admin.perfil.editar')->with('status', 'perfil-atualizado');
+        if ($request->headers->get('referer') && str_contains($request->headers->get('referer'), 'painel')) {
+            return redirect()->route('painel', ['tab' => 'perfil'])->with('status', 'perfil-atualizado');
+        }
+
+        return redirect()->route('admin.perfil.editar')->with('status', 'perfil-atualizado');
     }
 
     /**

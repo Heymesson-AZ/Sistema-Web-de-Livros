@@ -263,11 +263,8 @@ class ClienteController extends Controller
      */
     public function editarPerfil(Request $request): View
     {
-        $user = $request->user();
-
-        return view('cliente.perfil-editar', [
-            'user' => $user,
-        ]);
+        $request->merge(['tab' => 'perfil']);
+        return app(\App\Http\Controllers\Painel\PainelController::class)->index($request);
     }
 
     /**
@@ -320,7 +317,11 @@ class ClienteController extends Controller
             ]);
         }
 
-        return Redirect::route('cliente.perfil.editar')->with('status', 'perfil-atualizado');
+        if ($request->headers->get('referer') && str_contains($request->headers->get('referer'), 'painel')) {
+            return redirect()->route('painel', ['tab' => 'perfil'])->with('status', 'perfil-atualizado');
+        }
+
+        return redirect()->route('cliente.perfil.editar')->with('status', 'perfil-atualizado');
     }
 
     /**

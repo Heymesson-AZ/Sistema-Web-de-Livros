@@ -309,11 +309,8 @@ class VendedorController extends Controller
      */
     public function editarPerfil(Request $request): View
     {
-        $user = $request->user();
-
-        return view('vendedor.perfil-editar', [
-            'user' => $user,
-        ]);
+        $request->merge(['tab' => 'perfil']);
+        return app(\App\Http\Controllers\Painel\PainelController::class)->index($request);
     }
 
     /**
@@ -323,11 +320,14 @@ class VendedorController extends Controller
     {
         $user = $request->user();
 
+        $telefone = $request->input('telefone', $request->input('telefone_comercial'));
+        $request->merge(['telefone' => $telefone]);
+
         $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
             'telefone' => ['required', 'string', 'max:20'],
-            'razao_social' => ['required', 'string', 'max:255'],
+            'razao_social' => ['nullable', 'string', 'max:255'],
             'nome_fantasia' => ['required', 'string', 'max:255'],
             'inscricao_estadual' => ['nullable', 'string', 'max:50'],
             'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
@@ -337,8 +337,7 @@ class VendedorController extends Controller
             'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
             'email.required' => 'O e-mail é obrigatório.',
             'email.unique' => 'Este e-mail já está sendo utilizado.',
-            'telefone.required' => 'O telefone é obrigatório.',
-            'razao_social.required' => 'A razão social é obrigatória.',
+            'telefone.required' => 'O telefone comercial é obrigatório.',
             'nome_fantasia.required' => 'O nome fantasia da loja é obrigatório.',
             'foto_perfil.image' => 'O logotipo ou foto selecionado deve ser uma imagem válida.',
             'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
@@ -366,15 +365,24 @@ class VendedorController extends Controller
         $user->save();
 
         if ($user->vendedor) {
-            $user->vendedor()->update([
-                'telefone_comercial' => $request->telefone,
-                'razao_social' => $request->razao_social,
+            $vendorData = [
+                'telefone_comercial' => $telefone,
                 'nome_fantasia' => $request->nome_fantasia,
-                'inscricao_estadual' => $request->inscricao_estadual,
-            ]);
+            ];
+            if ($request->filled('razao_social')) {
+                $vendorData['razao_social'] = $request->razao_social;
+            }
+            if ($request->filled('inscricao_estadual')) {
+                $vendorData['inscricao_estadual'] = $request->inscricao_estadual;
+            }
+            $user->vendedor()->update($vendorData);
         }
 
-        return Redirect::route('vendedor.perfil.editar')->with('status', 'perfil-atualizado');
+        if ($request->headers->get('referer') && str_contains($request->headers->get('referer'), 'painel')) {
+            return redirect()->route('painel', ['tab' => 'perfil'])->with('status', 'perfil-atualizado');
+        }
+
+        return redirect()->route('vendedor.perfil.editar')->with('status', 'perfil-atualizado');
     }
 
     /**

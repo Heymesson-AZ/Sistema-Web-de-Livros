@@ -35,7 +35,7 @@
         <div class="topbar-right">
             <form action="{{ url('/') }}" method="GET" class="search-box">
                 <i data-lucide="search"></i>
-                <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Buscar livros...">
+                <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Buscar livros..." autocomplete="off" data-dynamic-search>
             </form>
 
             <!-- Menu Dropdown Centralizado do Usuário -->

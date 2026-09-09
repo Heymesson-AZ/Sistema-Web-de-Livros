@@ -71,9 +71,15 @@ RUN php artisan optimize:clear || true
 RUN chown -R www-data:www-data storage bootstrap/cache && \
     chmod -R 775 storage bootstrap/cache
 
+RUN mkdir -p /etc/nginx/ssl && \
+    openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+    -keyout /etc/nginx/ssl/selfsigned.key \
+    -out /etc/nginx/ssl/selfsigned.crt \
+    -subj "/C=BR/ST=State/L=City/O=UniversoDePapel/CN=localhost"
+
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost || exit 1
 
-EXPOSE 80
+EXPOSE 80 443
 
 CMD ["sh","-c","php-fpm -D && nginx -g 'daemon off;'"]

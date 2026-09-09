@@ -44,37 +44,32 @@
 
                             <form action="{{ url('/#catalogo') }}" method="GET" id="filtrosForm">
 
-                                <!-- Manter busca se houver -->
-                                @if (request('busca'))
-                                    <input type="hidden" name="busca" value="{{ request('busca') }}">
-                                @endif
-
-                                <!-- FILTRO: BUSCA RÁPIDA DENTRO DO CATÁLOGO -->
+                                <!-- FILTRO: BUSCA DENTRO DO CATÁLOGO COM BUSCA DINÂMICA -->
                                 <div class="mb-4">
                                     <label
                                         class="form-label small fw-bold text-secondary text-uppercase tracking-wider">Palavra-chave</label>
                                     <div class="input-group input-group-sm">
                                         <input type="text" name="busca" class="form-control rounded-start-pill"
-                                            placeholder="Título, autor, ISBN..." value="{{ request('busca') }}">
+                                            placeholder="Título, autor, ISBN..." value="{{ request('busca') }}"
+                                            data-dynamic-search autocomplete="off">
                                         <button class="btn btn-outline-primary rounded-end-pill" type="submit">
                                             <i class="bi bi-search"></i>
                                         </button>
                                     </div>
                                 </div>
 
-                                <!-- FILTRO: DEPARTAMENTOS / GÊNEROS -->
+                                <!-- FILTRO: DEPARTAMENTOS / GÊNEROS (SELEÇÃO MANUAL) -->
                                 <div class="mb-4">
-                                    <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Departamentos
-                                    </h6>
-                                    <ul class="list-unstyled mb-0 d-flex flex-column gap-1 small">
-                                        <li>
-                                            <a href="{{ request()->fullUrlWithQuery(['genero' => null]) }}"
-                                                class="d-flex align-items-center justify-content-between text-decoration-none py-1 px-2 rounded-2 {{ !request('genero') && !request('categoria') ? 'bg-primary text-white fw-bold' : 'text-secondary hover-bg-light' }}">
+                                    <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Departamentos</h6>
+                                    <div class="d-flex flex-column gap-2 small p-2 bg-light rounded-3" style="max-height: 220px; overflow-y: auto;">
+                                        <div class="form-check m-0">
+                                            <input class="form-check-input" type="radio" name="genero" id="gen_todos" value=""
+                                                {{ !request('genero') && !request('categoria') ? 'checked' : '' }}>
+                                            <label class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center" for="gen_todos">
                                                 <span>Todos os Gêneros</span>
-                                                <span
-                                                    class="badge {{ !request('genero') && !request('categoria') ? 'bg-white text-primary' : 'bg-light text-secondary' }}">{{ $totalLivros }}</span>
-                                            </a>
-                                        </li>
+                                                <span class="badge bg-white text-secondary border">{{ $totalLivros }}</span>
+                                            </label>
+                                        </div>
                                         @foreach ($generos as $gen)
                                             @php
                                                 $isSelected =
@@ -82,61 +77,56 @@
                                                     request('categoria') == $gen->nome ||
                                                     request('genero') == $gen->nome;
                                             @endphp
-                                            <li>
-                                                <a href="{{ request()->fullUrlWithQuery(['genero' => $gen->id]) }}"
-                                                    class="d-flex align-items-center justify-content-between text-decoration-none py-1 px-2 rounded-2 {{ $isSelected ? 'bg-primary text-white fw-bold' : 'text-secondary hover-bg-light' }}">
-                                                    <span class="text-truncate">{{ $gen->nome }}</span>
-                                                    <span
-                                                        class="badge {{ $isSelected ? 'bg-white text-primary' : 'bg-light text-secondary' }}">{{ $gen->livros_count }}</span>
-                                                </a>
-                                            </li>
+                                            <div class="form-check m-0">
+                                                <input class="form-check-input" type="radio" name="genero" id="gen_{{ $gen->id }}" value="{{ $gen->id }}"
+                                                    {{ $isSelected ? 'checked' : '' }}>
+                                                <label class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center" for="gen_{{ $gen->id }}">
+                                                    <span class="text-truncate" style="max-width: 140px;">{{ $gen->nome }}</span>
+                                                    <span class="badge bg-white text-secondary border">{{ $gen->livros_count }}</span>
+                                                </label>
+                                            </div>
                                         @endforeach
-                                    </ul>
+                                    </div>
                                 </div>
 
                                 <hr class="border-secondary border-opacity-25 my-3">
 
-                                <!-- FILTRO: PREÇO (PRESETS ESTILO AMAZON) -->
+                                <!-- FILTRO: PREÇO (PRESETS ESTILO AMAZON - DISPARO MANUAL) -->
                                 <div class="mb-4">
                                     <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Preço</h6>
                                     <div class="d-flex flex-column gap-2 small">
                                         <div class="form-check m-0">
                                             <input class="form-check-input" type="radio" name="faixa_preco"
                                                 id="preco_todos" value=""
-                                                {{ !request('faixa_preco') && !request('preco_min') && !request('preco_max') ? 'checked' : '' }}
-                                                onchange="this.form.submit()">
+                                                {{ !request('faixa_preco') && !request('preco_min') && !request('preco_max') ? 'checked' : '' }}>
                                             <label class="form-check-label text-secondary" for="preco_todos">Qualquer
                                                 preço</label>
                                         </div>
                                         <div class="form-check m-0">
                                             <input class="form-check-input" type="radio" name="faixa_preco"
                                                 id="preco_ate_30" value="ate-30"
-                                                {{ request('faixa_preco') == 'ate-30' ? 'checked' : '' }}
-                                                onchange="this.form.submit()">
+                                                {{ request('faixa_preco') == 'ate-30' ? 'checked' : '' }}>
                                             <label class="form-check-label text-secondary" for="preco_ate_30">Até R$
                                                 30,00</label>
                                         </div>
                                         <div class="form-check m-0">
                                             <input class="form-check-input" type="radio" name="faixa_preco"
                                                 id="preco_30_60" value="30-60"
-                                                {{ request('faixa_preco') == '30-60' ? 'checked' : '' }}
-                                                onchange="this.form.submit()">
+                                                {{ request('faixa_preco') == '30-60' ? 'checked' : '' }}>
                                             <label class="form-check-label text-secondary" for="preco_30_60">R$ 30 a R$
                                                 60,00</label>
                                         </div>
                                         <div class="form-check m-0">
                                             <input class="form-check-input" type="radio" name="faixa_preco"
                                                 id="preco_60_100" value="60-100"
-                                                {{ request('faixa_preco') == '60-100' ? 'checked' : '' }}
-                                                onchange="this.form.submit()">
+                                                {{ request('faixa_preco') == '60-100' ? 'checked' : '' }}>
                                             <label class="form-check-label text-secondary" for="preco_60_100">R$ 60 a R$
                                                 100,00</label>
                                         </div>
                                         <div class="form-check m-0">
                                             <input class="form-check-input" type="radio" name="faixa_preco"
                                                 id="preco_acima_100" value="acima-100"
-                                                {{ request('faixa_preco') == 'acima-100' ? 'checked' : '' }}
-                                                onchange="this.form.submit()">
+                                                {{ request('faixa_preco') == 'acima-100' ? 'checked' : '' }}>
                                             <label class="form-check-label text-secondary" for="preco_acima_100">Acima
                                                 de R$ 100,00</label>
                                         </div>
@@ -160,38 +150,32 @@
                                                     class="form-control" placeholder="Máx"
                                                     value="{{ request('preco_max') }}">
                                             </div>
-                                            <button type="submit" class="btn btn-outline-secondary btn-sm px-2"
-                                                title="Aplicar faixa">
-                                                Ir
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
 
                                 <hr class="border-secondary border-opacity-25 my-3">
 
-                                <!-- FILTRO: DISPONIBILIDADE / ESTOQUE -->
+                                <!-- FILTRO: DISPONIBILIDADE / ESTOQUE (DISPARO MANUAL) -->
                                 <div class="mb-4">
                                     <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">
                                         Disponibilidade</h6>
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="em_estoque"
                                             id="em_estoque" value="1"
-                                            {{ request('em_estoque') ? 'checked' : '' }}
-                                            onchange="this.form.submit()">
+                                            {{ request('em_estoque') ? 'checked' : '' }}>
                                         <label class="form-check-label text-secondary small" for="em_estoque">
                                             Somente livros em estoque ({{ $totalDisponiveis }})
                                         </label>
                                     </div>
                                 </div>
 
-                                <!-- FILTRO: EDITORAS -->
+                                <!-- FILTRO: EDITORAS (DISPARO MANUAL) -->
                                 @if ($editoras->isNotEmpty())
-                                    <div class="mb-3">
+                                    <div class="mb-4">
                                         <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Editoras
                                         </h6>
-                                        <select name="editora" class="form-select form-select-sm rounded-3"
-                                            onchange="this.form.submit()">
+                                        <select name="editora" class="form-select form-select-sm rounded-3">
                                             <option value="">Todas as Editoras</option>
                                             @foreach ($editoras as $ed)
                                                 <option value="{{ $ed->id }}"
@@ -202,6 +186,18 @@
                                         </select>
                                     </div>
                                 @endif
+
+                                <!-- BOTÕES DE APLICAÇÃO MANUAL DOS FILTROS -->
+                                <div class="d-grid gap-2 pt-2 border-top">
+                                    <button type="submit" class="btn btn-primary rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-funnel-fill"></i>
+                                        <span>Aplicar Filtros</span>
+                                    </button>
+                                    <a href="{{ url('/#catalogo') }}" class="btn btn-outline-secondary rounded-pill btn-sm py-1 d-flex align-items-center justify-content-center gap-1">
+                                        <i class="bi bi-x-circle"></i>
+                                        <span>Limpar Filtros</span>
+                                    </a>
+                                </div>
 
                             </form>
 

@@ -4,12 +4,20 @@ import "./menu";
 import "./carrosel";
 import { initMasks } from "./masks";
 import { initRealtimeValidation } from "./validation";
+import { initBuscaDinamica } from "./busca-dinamica";
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Inicializa máscaras de CPF e Telefone
+    // Inicializa máscaras completas
     initMasks();
+    // Inicializa busca dinâmica com debounce via fetch
+    initBuscaDinamica();
     // Inicializa validações em tempo real
     initRealtimeValidation();
+
+    // Re-aplica máscaras ao abrir modais Bootstrap
+    document.addEventListener("shown.bs.modal", function () {
+        initMasks();
+    });
     const togglePassword = document.querySelector("#togglePassword");
     const passwordInput = document.querySelector("#password");
     const toggleIcon = document.querySelector("#toggleIcon");

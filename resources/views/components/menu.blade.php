@@ -79,110 +79,6 @@
                     </a>
                 </li>
 
-                <!-- Conta do Usuário -->
-                <li
-                    class="menu-item has-submenu {{ request()->routeIs('dashboard', 'cliente.perfil.*', 'vendedor.perfil.*', 'admin.perfil.*') ? 'active' : '' }}">
-                    <div class="menu-item-header">
-                        <i data-lucide="user"></i>
-                        <span>{{ Auth::check() ? Auth::user()->name : 'Minha Conta' }}</span>
-                        <i class="submenu-arrow" data-lucide="chevron-down"></i>
-                    </div>
-
-                    <ul class="submenu">
-                        @guest
-                            <li>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                    <div class="menu-item-header">
-                                        <i data-lucide="log-in"></i>
-                                        <span>Entrar</span>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
-                                    <div class="menu-item-header">
-                                        <i data-lucide="user-plus"></i>
-                                        <span>Cadastrar</span>
-                                    </div>
-                                </a>
-                            </li>
-                        @else
-                            <li>
-                                <a href="{{ route('dashboard') }}">
-                                    <div class="menu-item-header">
-                                        <i data-lucide="layout-dashboard"></i>
-                                        <span>Painel</span>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                @php
-                                    $perfilRoute = match (Auth::user()->tipo) {
-                                        'cliente' => route('cliente.perfil.editar'),
-                                        'vendedor' => route('vendedor.perfil.editar'),
-                                        'admin' => route('admin.perfil.editar'),
-                                        default => route('dashboard'),
-                                    };
-                                @endphp
-                                <a href="{{ $perfilRoute }}">
-                                    <div class="menu-item-header">
-                                        <i data-lucide="user-check"></i>
-                                        <span>Meu Perfil</span>
-                                    </div>
-                                </a>
-                            </li>
-                        @endguest
-                    </ul>
-                </li>
-
-                @auth
-                    @if (Auth::user()->isAdmin())
-                        <!-- Administração (Apenas Admin) -->
-                        <li class="menu-item has-submenu {{ request()->routeIs('admin.*') ? 'active' : '' }}">
-                            <div class="menu-item-header">
-                                <i data-lucide="shield-check"></i>
-                                <span>Administração</span>
-                                <i class="submenu-arrow" data-lucide="chevron-down"></i>
-                            </div>
-
-                            <ul class="submenu">
-                                <li>
-                                    <a href="{{ route('admin.livros.index') }}">
-                                        <div class="menu-item-header">
-                                            <i data-lucide="book-marked"></i>
-                                            <span>Livros (Catálogo)</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.administradores.index') }}">
-                                        <div class="menu-item-header">
-                                            <i data-lucide="users"></i>
-                                            <span>Administradores</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.vendedores.index') }}">
-                                        <div class="menu-item-header">
-                                            <i data-lucide="store"></i>
-                                            <span>Vendedores</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.clientes.index') }}">
-                                        <div class="menu-item-header">
-                                            <i data-lucide="user-check"></i>
-                                            <span>Clientes</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    @endif
-                @endauth
-
                 <!-- Área do Vendedor / Seja um Vendedor -->
                 @guest
                     <li class="menu-item {{ request()->routeIs('vendedor.solicitar') ? 'active' : '' }}">
@@ -204,40 +100,6 @@
                                     <span class="menu-badge badge-sale">Parceria</span>
                                 </div>
                             </a>
-                        </li>
-                    @elseif (Auth::user()->isVendedor())
-                        <li class="menu-item has-submenu {{ request()->routeIs('vendedor.*') ? 'active' : '' }}">
-                            <div class="menu-item-header">
-                                <i data-lucide="store"></i>
-                                <span>Minha Loja</span>
-                                <i class="submenu-arrow" data-lucide="chevron-down"></i>
-                            </div>
-                            <ul class="submenu">
-                                <li>
-                                    <a href="{{ route('vendedor.painel') }}">
-                                        <div class="menu-item-header">
-                                            <i data-lucide="layout-dashboard"></i>
-                                            <span>Painel da Loja</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('vendedor.livros.index') }}">
-                                        <div class="menu-item-header">
-                                            <i data-lucide="book-marked"></i>
-                                            <span>Meus Livros</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('vendedor.livros.create') }}">
-                                        <div class="menu-item-header">
-                                            <i data-lucide="plus-circle"></i>
-                                            <span>Publicar Livro</span>
-                                        </div>
-                                    </a>
-                                </li>
-                            </ul>
                         </li>
                     @endif
                 @endguest
@@ -272,6 +134,11 @@
                 </div>
 
                 @auth
+                    <a href="{{ route('painel') }}" class="btn btn-outline-light w-100 mb-2 d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 text-decoration-none font-monospace small">
+                        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+                        <span>Meu Painel & Perfil</span>
+                    </a>
+
                     <form method="POST" action="{{ route('sair') }}" class="w-100">
                         @csrf
                         <button class="logout-btn" type="submit">

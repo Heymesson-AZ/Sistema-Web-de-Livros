@@ -57,26 +57,11 @@
                 </div>
             </li>
 
-            <!-- Links Principais -->
+            <!-- Acesso Centralizado ao Painel e Perfil -->
             <li class="pt-2">
-                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ route('dashboard') }}">
+                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ route('painel') }}">
                     <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
-                    <span>Painel Principal</span>
-                </a>
-            </li>
-
-            @php
-                $perfilRoute = match (Auth::user()->tipo) {
-                    'cliente' => route('cliente.perfil.editar'),
-                    'vendedor' => route('vendedor.perfil.editar'),
-                    'admin' => route('admin.perfil.editar'),
-                    default => route('dashboard'),
-                };
-            @endphp
-            <li>
-                <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ $perfilRoute }}">
-                    <i data-lucide="user-cog" style="width: 16px; height: 16px;"></i>
-                    <span>Meu Perfil</span>
+                    <span>Meu Painel & Perfil</span>
                 </a>
             </li>
 

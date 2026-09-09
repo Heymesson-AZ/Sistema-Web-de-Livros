@@ -65,7 +65,10 @@ jobs:
             
             grep -q "^MAIL_FROM_NAME=" .env && sed -i 's/^MAIL_FROM_NAME=.*/MAIL_FROM_NAME="Universo de Papel"/' .env || echo 'MAIL_FROM_NAME="Universo de Papel"' >> .env
 
-            # 3. Reconstruir e subir os containers leves (já pegando o front-end compilado)
+            # 3. Garantir portas 80 e 443 abertas no firewall do host (Oracle Linux / Ubuntu)
+            sudo iptables -I INPUT -p tcp -m multiport --dports 80,443 -j ACCEPT 2>/dev/null || true
+
+            # 4. Reconstruir e subir os containers leves (já pegando o front-end compilado)
             docker compose up -d --build
 
             # 4. Executar migrações e caches do Laravel

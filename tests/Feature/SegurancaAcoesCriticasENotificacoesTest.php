@@ -194,15 +194,64 @@ class SegurancaAcoesCriticasENotificacoesTest extends TestCase
 
     /**
      * Valida que o dropdown de notificações é renderizado na barra superior para usuários logados.
+     * Valida que o dropdown de notificações é renderizado na barra superior independente da página.
      */
     public function test_dropdown_de_notificacoes_renderiza_na_topbar(): void
     {
+        // 1. Em páginas internas
         $response = $this->actingAs($this->adminUser)->get(route('dashboard'));
 
         $response->assertStatus(200);
         $response->assertSee('dropdownNotificacoesWrapper');
         $response->assertSee('dropdownNotificacoesBtn');
         $response->assertSee('Notificações');
+
+        // 2. Na página inicial / vitrine
+        $responseHome = $this->actingAs($this->adminUser)->get(url('/'));
+        $responseHome->assertStatus(200);
+        $responseHome->assertSee('dropdownNotificacoesWrapper');
+        $responseHome->assertSee('dropdownNotificacoesBtn');
+    }
+
+    /**
+     * Valida que o menu lateral não contém mais o botão 'Meu Painel & Perfil'.
+     */
+    public function test_menu_lateral_nao_contem_botao_painel_e_perfil(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get(url('/'));
+        $response->assertStatus(200);
+        $response->assertDontSee('Meu Painel & Perfil');
+    }
+
+    /**
+     * Valida que a situação unificada do vendedor evita aberração de aprovado e banido.
+     */
+    public function test_situacao_unificada_do_vendedor_sincroniza_sem_inconsistencia(): void
+    {
+        // Alterar para banido via atualização administrativa com confirmação de senha
+        $response = $this->actingAs($this->adminUser)->put(route('admin.vendedores.update', $this->vendedor), [
+            'name' => $this->vendedorUser->name,
+            'email' => $this->vendedorUser->email,
+            'situacao' => 'banido',
+            'cnpj' => $this->vendedor->cnpj,
+            'razao_social' => $this->vendedor->razao_social,
+            'nome_fantasia' => $this->vendedor->nome_fantasia,
+            'inscricao_estadual' => $this->vendedor->inscricao_estadual,
+            'senha_confirmacao_admin' => 'SenhaAdmin@123',
+        ]);
+
+        $response->assertRedirect(route('admin.vendedores.index'));
+
+        $this->vendedor->refresh();
+        $this->assertEquals('banido', $this->vendedor->situacao);
+        $this->assertEquals('Banido', $this->vendedor->situacao_rotulo);
+        $this->assertEquals(Vendedor::STATUS_REJEITADO, $this->vendedor->status_aprovacao);
+        $this->assertEquals('banido', $this->vendedor->user->status);
+
+        // A listagem exibe badge de banido
+        $responseListagem = $this->actingAs($this->adminUser)->get(route('admin.vendedores.index'));
+        $responseListagem->assertSee('Banido');
+        $responseListagem->assertDontSee('<span>Editar</span>'); // Botão de edição é icon-only
     }
 
     /**

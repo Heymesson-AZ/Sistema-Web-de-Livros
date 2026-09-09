@@ -46,6 +46,9 @@
             </form>
 
             @auth
+                <!-- Dropdown de Notificações para Usuários Autenticados -->
+                <x-dropdown-notificacoes />
+
                 <!-- Menu Dropdown Centralizado do Usuário -->
                 <x-navbar-user-dropdown />
             @else

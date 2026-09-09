@@ -232,6 +232,9 @@
                                     <div class="d-flex justify-content-end gap-1">
                                         <a href="{{ route('admin.administradores.show', $admin) }}"
                                             class="btn btn-sm btn-outline-secondary" title="Ver Detalhes">
+                                            class="btn btn-sm btn-outline-secondary rounded-3 d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Ver Detalhes" aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         @if (Auth::user()->podeGerenciarAdministradores() || Auth::id() === $admin->user_id)
@@ -242,13 +245,29 @@
                                                  <span>Editar</span>
                                              </a>
                                          @endif
+                                            <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
+                                            <a href="{{ route('admin.administradores.edit', $admin) }}"
+                                                class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Editar Administrador" aria-label="Editar">
+                                                <i class="bi bi-pencil-square fs-6"></i>
+                                            </a>
+                                        @endif
 
                                          @if (Auth::id() !== $admin->user_id && Auth::user()->podeGerenciarAdministradores())
                                              <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
                                                  title="Excluir" data-bs-toggle="modal"
                                                 data-bs-target="#deleteModal{{ $admin->id }}">
+                                        @if (Auth::id() !== $admin->user_id && Auth::user()->podeGerenciarAdministradores())
+                                            <button type="button"
+                                                class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Excluir Administrador" aria-label="Excluir"
+                                                data-bs-toggle="modal" data-bs-target="#deleteModal{{ $admin->id }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
+                                        @endif
+                                    </div>
 
                                             <!-- Modal de Confirmação de Exclusão -->
                                             <div class="modal fade" id="deleteModal{{ $admin->id }}"

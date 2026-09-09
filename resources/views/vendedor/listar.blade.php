@@ -67,6 +67,7 @@
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <span class="text-muted small fw-semibold text-uppercase">Aprovados</span>
+                            <span class="text-muted small fw-semibold text-uppercase">Aprovados & Ativos</span>
                             <h3 class="fw-bold mb-0 text-success mt-1">{{ $totalAprovados }}</h3>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -83,6 +84,7 @@
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
                             <span class="text-muted small fw-semibold text-uppercase">Pendentes</span>
+                            <span class="text-muted small fw-semibold text-uppercase">Pendentes de Análise</span>
                             <h3 class="fw-bold mb-0 text-warning mt-1">{{ $totalPendentes }}</h3>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center"
@@ -100,6 +102,8 @@
                         <div>
                             <span class="text-muted small fw-semibold text-uppercase">Rejeitados</span>
                             <h3 class="fw-bold mb-0 text-danger mt-1">{{ $totalRejeitados }}</h3>
+                            <span class="text-muted small fw-semibold text-uppercase">Rejeitados / Banidos</span>
+                            <h3 class="fw-bold mb-0 text-danger mt-1">{{ $totalRejeitados + ($totalBanidos ?? 0) }}</h3>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center"
                             style="width: 48px; height: 48px; background-color: #fef2f2; color: #dc2626;">
@@ -114,6 +118,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
             <form method="GET" action="{{ route('admin.vendedores.index') }}" class="row g-2 align-items-center">
                 <div class="col-12 col-md-5">
+                <div class="col-12 col-md-6">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0 text-muted">
                             <i class="bi bi-search"></i>
@@ -133,6 +138,14 @@
                         </option>
                         <option value="rejeitado" {{ request('status') === 'rejeitado' ? 'selected' : '' }}>Rejeitados
                         </option>
+                <div class="col-12 col-md-4">
+                    <select name="situacao" class="form-select">
+                        <option value="">Situação da Loja (Todas)</option>
+                        <option value="aprovado" {{ ($situacaoSelecionada ?? request('status')) === 'aprovado' ? 'selected' : '' }}>Aprovados & Ativos</option>
+                        <option value="pendente" {{ ($situacaoSelecionada ?? request('status')) === 'pendente' ? 'selected' : '' }}>Pendentes de Análise</option>
+                        <option value="inativo" {{ ($situacaoSelecionada ?? request('status')) === 'inativo' ? 'selected' : '' }}>Inativos / Pausados</option>
+                        <option value="rejeitado" {{ ($situacaoSelecionada ?? request('status')) === 'rejeitado' ? 'selected' : '' }}>Rejeitados</option>
+                        <option value="banido" {{ ($situacaoSelecionada ?? request('status')) === 'banido' ? 'selected' : '' }}>Banidos</option>
                     </select>
                 </div>
 
@@ -153,6 +166,7 @@
                         <i class="bi bi-filter me-1"></i> Filtrar
                     </button>
                     @if (request()->hasAny(['busca', 'status', 'status_conta']))
+                    @if (request()->hasAny(['busca', 'situacao', 'status', 'status_conta']))
                         <a href="{{ route('admin.vendedores.index') }}" class="btn btn-outline-secondary"
                             title="Limpar Filtros">
                             <i class="bi bi-x-lg"></i>
@@ -164,15 +178,18 @@
 
         <!-- TABELA DE VENDEDORES -->
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light text-secondary text-uppercase small" style="letter-spacing: 0.5px;">
+                    <thead class="table-light border-bottom">
                         <tr>
                             <th class="ps-4 py-3">Loja / Empresa</th>
                             <th class="py-3">Responsável</th>
                             <th class="py-3">CNPJ / Contato</th>
                             <th class="py-3">Aprovação</th>
                             <th class="py-3">Conta</th>
+                            <th class="py-3">Situação da Loja</th>
                             <th class="py-3 text-center">Catálogo</th>
                             <th class="pe-4 py-3 text-end">Ações</th>
                         </tr>
@@ -223,6 +240,9 @@
                                             <i class="bi bi-x-circle-fill me-1"></i> Rejeitado
                                         </span>
                                     @endif
+                                    <span class="badge {{ $vendedor->situacao_badge_class }} rounded-pill px-3 py-1 fw-semibold">
+                                        <i class="bi {{ $vendedor->situacao_icone }} me-1"></i> {{ $vendedor->situacao_rotulo }}
+                                    </span>
                                 </td>
 
                                 <td class="py-3">
@@ -268,6 +288,10 @@
                                                     class="btn btn-sm btn-outline-success rounded-3"
                                                     title="Aprovar Vendedor">
                                                     <i class="bi bi-check-lg"></i>
+                                                    class="btn btn-sm btn-outline-success rounded-3 d-inline-flex align-items-center justify-content-center"
+                                                    style="width: 32px; height: 32px;"
+                                                    title="Aprovar Vendedor" aria-label="Aprovar">
+                                                    <i class="bi bi-check-lg fs-6"></i>
                                                 </button>
                                             </form>
                                         @endif
@@ -281,6 +305,10 @@
                                                 <input type="hidden" name="status" value="rejeitado">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger rounded-3"
                                                     title="Rejeitar Vendedor">
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
+                                                    style="width: 32px; height: 32px;"
+                                                    title="Rejeitar Vendedor" aria-label="Rejeitar">
                                                     <i class="bi bi-x-lg"></i>
                                                 </button>
                                             </form>
@@ -289,19 +317,31 @@
                                         <a href="{{ route('admin.vendedores.show', $vendedor) }}"
                                             class="btn btn-sm btn-outline-secondary rounded-3"
                                             title="Visualizar Detalhes">
+                                            class="btn btn-sm btn-outline-secondary rounded-3 d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Visualizar Detalhes" aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
+                                        <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
                                         <a href="{{ route('admin.vendedores.edit', $vendedor) }}"
                                             class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
                                             title="Editar Vendedor">
                                             <i class="bi bi-pencil-square"></i>
                                             <span>Editar</span>
+                                            class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Editar Vendedor" aria-label="Editar">
+                                            <i class="bi bi-pencil-square fs-6"></i>
                                         </a>
 
                                         <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
                                             data-bs-toggle="modal" data-bs-target="#deleteModal{{ $vendedor->id }}"
                                             title="Excluir Vendedor">
+                                            title="Excluir Vendedor" aria-label="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>

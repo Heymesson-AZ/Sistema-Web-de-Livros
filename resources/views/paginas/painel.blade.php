@@ -835,6 +835,8 @@
 
                                         <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
                                             <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 py-1 text-white fw-semibold shadow-sm"
+                                            <button type="button" class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
                                                 data-bs-toggle="modal" data-bs-target="#modalEditarEndereco"
                                                 data-editar-endereco
                                                 data-endereco-id="{{ $end->id }}"
@@ -849,6 +851,9 @@
                                                 data-endereco-principal="{{ $end->principal ? '1' : '0' }}"
                                                 data-endereco-action="{{ route('enderecos.atualizar', $end) }}">
                                                 <i class="bi bi-pencil-square me-1"></i> Editar
+                                                data-endereco-action="{{ route('enderecos.atualizar', $end) }}"
+                                                title="Editar Endereço" aria-label="Editar">
+                                                <i class="bi bi-pencil-square fs-6"></i>
                                             </button>
                                             @if (!$end->principal)
                                                 <form action="{{ route('enderecos.definir-principal', $end) }}" method="POST">

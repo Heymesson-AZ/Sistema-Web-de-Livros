@@ -101,6 +101,85 @@ class Vendedor extends Model
         return $this->status_aprovacao === self::STATUS_REJEITADO;
     }
 
+    /**
+     * Situação unificada da loja e conta do vendedor.
+     */
+    public function getSituacaoAttribute(): string
+    {
+        if ($this->user?->isBanido()) {
+            return 'banido';
+        }
+        if ($this->status_aprovacao === self::STATUS_REJEITADO) {
+            return 'rejeitado';
+        }
+        if ($this->status_aprovacao === self::STATUS_PENDENTE) {
+            return 'pendente';
+        }
+        if ($this->user?->isInativo()) {
+            return 'inativo';
+        }
+        return 'aprovado';
+    }
+
+    /**
+     * Rótulo descritivo da situação consolidada.
+     */
+    public function getSituacaoRotuloAttribute(): string
+    {
+        return match ($this->situacao) {
+            'banido' => 'Banido',
+            'rejeitado' => 'Rejeitado',
+            'pendente' => 'Pendente de Análise',
+            'inativo' => 'Inativo / Pausado',
+            default => 'Aprovado & Ativo',
+        };
+    }
+
+    /**
+     * Classe CSS de badge para a situação consolidada.
+     */
+    public function getSituacaoBadgeClassAttribute(): string
+    {
+        return match ($this->situacao) {
+            'banido' => 'bg-danger text-white',
+            'rejeitado' => 'bg-danger-subtle text-danger border border-danger-subtle',
+            'pendente' => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+            'inativo' => 'bg-secondary-subtle text-secondary border border-secondary-subtle',
+            default => 'bg-success-subtle text-success border border-success-subtle',
+        };
+    }
+
+    /**
+     * Ícone Bootstrap correspondente à situação.
+     */
+    public function getSituacaoIconeAttribute(): string
+    {
+        return match ($this->situacao) {
+            'banido' => 'bi-slash-circle-fill',
+            'rejeitado' => 'bi-x-circle-fill',
+            'pendente' => 'bi-hourglass-split',
+            'inativo' => 'bi-pause-circle-fill',
+            default => 'bi-check-circle-fill',
+        };
+    }
+
+    /**
+     * Scope para filtrar vendedores por situação consolidada.
+     */
+    public function scopeComSituacao($query, string $situacao)
+    {
+        return match ($situacao) {
+            'banido' => $query->whereHas('user', fn ($q) => $q->where('status', 'banido')),
+            'inativo' => $query->where('status_aprovacao', self::STATUS_APROVADO)
+                ->whereHas('user', fn ($q) => $q->where('status', 'inativo')),
+            'pendente' => $query->where('status_aprovacao', self::STATUS_PENDENTE),
+            'rejeitado' => $query->where('status_aprovacao', self::STATUS_REJEITADO),
+            'aprovado' => $query->where('status_aprovacao', self::STATUS_APROVADO)
+                ->whereHas('user', fn ($q) => $q->where('status', 'ativo')),
+            default => $query,
+        };
+    }
+
     // um vendedor pode ter muitos pedidos
     public function pedidos()
     {

@@ -209,20 +209,32 @@
                                         <a href="{{ route('admin.clientes.show', $cliente) }}"
                                             class="btn btn-sm btn-outline-secondary rounded-3"
                                             title="Visualizar Detalhes">
+                                            class="btn btn-sm btn-outline-secondary rounded-3 d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Visualizar Detalhes" aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
+                                        <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
                                         <a href="{{ route('admin.clientes.edit', $cliente) }}"
                                             class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
                                             title="Editar Cliente">
                                             <i class="bi bi-pencil-square"></i>
                                             <span>Editar</span>
+                                            class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Editar Cliente" aria-label="Editar">
+                                            <i class="bi bi-pencil-square fs-6"></i>
                                         </a>
 
                                         <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteClienteModal{{ $cliente->id }}"
                                             title="Excluir Cliente">
+                                            title="Excluir Cliente" aria-label="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>

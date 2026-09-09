@@ -50,6 +50,11 @@ class VendedorController extends Controller
 
         // Filtro por Status da Conta de Usuário
         if ($statusConta = $request->input('status_conta')) {
+        // Filtro por Situação Unificada da Loja
+        $situacao = $request->input('situacao') ?? $request->input('status');
+        if ($situacao && in_array($situacao, ['aprovado', 'pendente', 'inativo', 'rejeitado', 'banido'])) {
+            $query->comSituacao($situacao);
+        } elseif ($statusConta = $request->input('status_conta')) {
             $query->whereHas('user', function ($u) use ($statusConta) {
                 $u->where('status', $statusConta);
             });
@@ -62,6 +67,10 @@ class VendedorController extends Controller
         $totalAprovados = Vendedor::where('status_aprovacao', 'aprovado')->count();
         $totalPendentes = Vendedor::where('status_aprovacao', 'pendente')->count();
         $totalRejeitados = Vendedor::where('status_aprovacao', 'rejeitado')->count();
+        $totalAprovados = Vendedor::comSituacao('aprovado')->count();
+        $totalPendentes = Vendedor::comSituacao('pendente')->count();
+        $totalRejeitados = Vendedor::comSituacao('rejeitado')->count();
+        $totalBanidos = Vendedor::comSituacao('banido')->count();
 
         return view('vendedor.listar', [
             'vendedores' => $vendedores,
@@ -70,6 +79,9 @@ class VendedorController extends Controller
             'totalPendentes' => $totalPendentes,
             'totalRejeitados' => $totalRejeitados,
             'statusSelecionado' => $status,
+            'totalBanidos' => $totalBanidos,
+            'situacaoSelecionada' => $situacao,
+            'statusSelecionado' => $situacao,
         ]);
     }
 
@@ -91,6 +103,9 @@ class VendedorController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'situacao' => ['nullable', 'string', Rule::in(['aprovado', 'pendente', 'inativo', 'rejeitado', 'banido'])],
+            'status' => ['nullable', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'status_aprovacao' => ['nullable', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
             'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'cnpj' => ['required', 'string', 'max:20', 'unique:' . Vendedor::class . ',cnpj'],
             'razao_social' => ['required', 'string', 'max:255'],
@@ -117,6 +132,30 @@ class VendedorController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+        $situacao = $request->input('situacao');
+        if (!$situacao) {
+            if ($request->status === 'banido') {
+                $situacao = 'banido';
+            } elseif ($request->status_aprovacao === 'rejeitado') {
+                $situacao = 'rejeitado';
+            } elseif ($request->status_aprovacao === 'pendente') {
+                $situacao = 'pendente';
+            } elseif ($request->status === 'inativo') {
+                $situacao = 'inativo';
+            } else {
+                $situacao = 'aprovado';
+            }
+        }
+
+        [$userStatus, $statusAprovacao] = match ($situacao) {
+            'banido' => ['banido', 'rejeitado'],
+            'rejeitado' => ['inativo', 'rejeitado'],
+            'pendente' => ['ativo', 'pendente'],
+            'inativo' => ['inativo', 'aprovado'],
+            default => ['ativo', 'aprovado'],
+        };
+
+        DB::transaction(function () use ($request, $userStatus, $statusAprovacao) {
             $fotoPath = null;
             if ($request->hasFile('foto_perfil')) {
                 $fotoPath = $request->file('foto_perfil')->store('perfis', 'public');
@@ -128,6 +167,7 @@ class VendedorController extends Controller
                 'password' => Hash::make($request->password),
                 'tipo' => 'vendedor',
                 'status' => $request->status,
+                'status' => $userStatus,
                 'foto_perfil' => $fotoPath,
                 'email_verified_at' => now(),
             ]);
@@ -140,6 +180,7 @@ class VendedorController extends Controller
                 'nome_fantasia' => $request->nome_fantasia,
                 'inscricao_estadual' => $request->inscricao_estadual,
                 'status_aprovacao' => $request->status_aprovacao,
+                'status_aprovacao' => $statusAprovacao,
             ]);
         });
 
@@ -183,6 +224,9 @@ class VendedorController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'situacao' => ['nullable', 'string', Rule::in(['aprovado', 'pendente', 'inativo', 'rejeitado', 'banido'])],
+            'status' => ['nullable', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
+            'status_aprovacao' => ['nullable', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
             'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'remover_foto' => ['nullable', 'boolean'],
             'cnpj' => ['required', 'string', 'max:20', Rule::unique(Vendedor::class, 'cnpj')->ignore($vendedor->id)],
@@ -219,10 +263,35 @@ class VendedorController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $vendedor, $user) {
+        $situacao = $request->input('situacao');
+        if (!$situacao) {
+            if ($request->status === 'banido') {
+                $situacao = 'banido';
+            } elseif ($request->status_aprovacao === 'rejeitado') {
+                $situacao = 'rejeitado';
+            } elseif ($request->status_aprovacao === 'pendente') {
+                $situacao = 'pendente';
+            } elseif ($request->status === 'inativo') {
+                $situacao = 'inativo';
+            } else {
+                $situacao = 'aprovado';
+            }
+        }
+
+        [$userStatus, $statusAprovacao] = match ($situacao) {
+            'banido' => ['banido', 'rejeitado'],
+            'rejeitado' => ['inativo', 'rejeitado'],
+            'pendente' => ['ativo', 'pendente'],
+            'inativo' => ['inativo', 'aprovado'],
+            default => ['ativo', 'aprovado'],
+        };
+
+        DB::transaction(function () use ($request, $vendedor, $user, $userStatus, $statusAprovacao) {
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
                 'status' => $request->status,
+                'status' => $userStatus,
             ];
 
             if ($request->filled('password')) {
@@ -250,6 +319,7 @@ class VendedorController extends Controller
                 'nome_fantasia' => $request->nome_fantasia,
                 'inscricao_estadual' => $request->inscricao_estadual,
                 'status_aprovacao' => $request->status_aprovacao,
+                'status_aprovacao' => $statusAprovacao,
             ]);
         });
 
@@ -268,19 +338,41 @@ class VendedorController extends Controller
 
         $request->validate([
             'status' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
+            'status' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado', 'banido'])],
         ]);
 
         $vendedor->update([
             'status_aprovacao' => $request->status,
         ]);
+        $statusAlvo = $request->status;
+        [$userStatus, $statusAprovacao] = match ($statusAlvo) {
+            'banido' => ['banido', 'rejeitado'],
+            'rejeitado' => ['inativo', 'rejeitado'],
+            'pendente' => ['ativo', 'pendente'],
+            default => ['ativo', 'aprovado'],
+        };
+
+        DB::transaction(function () use ($vendedor, $statusAprovacao, $userStatus) {
+            $vendedor->update([
+                'status_aprovacao' => $statusAprovacao,
+            ]);
+
+            $vendedor->user?->update([
+                'status' => $userStatus,
+            ]);
+        });
 
         $mensagens = [
             'aprovado' => 'Vendedor aprovado com sucesso! Agora ele pode publicar livros e realizar vendas.',
             'rejeitado' => 'O cadastro do vendedor foi rejeitado.',
+            'aprovado' => 'Vendedor aprovado com sucesso! Agora a loja está autorizada e ativa para vendas.',
+            'rejeitado' => 'O cadastro do vendedor foi rejeitado e o acesso foi suspenso.',
+            'banido' => 'O vendedor foi banido por infração.',
             'pendente' => 'O status do vendedor foi retornado para pendente de análise.',
         ];
 
         return back()->with('status', $mensagens[$request->status] ?? 'Status alterado com sucesso!');
+        return back()->with('status', $mensagens[$request->status] ?? 'Situação alterada com sucesso!');
     }
 
     /**

@@ -308,17 +308,25 @@
                                 <td class="text-end pe-4">
                                     <div class="d-inline-flex align-items-center gap-1">
                                         <!-- BOTÃO DE EDIÇÃO EM ALTO DESTAQUE VISUAL -->
+                                        <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
                                         <a href="{{ route($rotaPrefix . '.edit', $livro) }}"
                                             class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
                                             title="Editar Livro">
                                             <i class="bi bi-pencil-square"></i>
                                             <span>Editar</span>
+                                            class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Editar Livro" aria-label="Editar">
+                                            <i class="bi bi-pencil-square fs-6"></i>
                                         </a>
 
                                         <!-- BOTÃO VER DETALHES -->
                                         <a href="{{ route($rotaPrefix . '.show', $livro) }}"
                                             class="btn btn-sm btn-outline-secondary rounded-3"
                                             title="Inspecionar Dados e Histórico">
+                                            class="btn btn-sm btn-outline-secondary rounded-3 d-inline-flex align-items-center justify-content-center"
+                                            style="width: 32px; height: 32px;"
+                                            title="Inspecionar Dados e Histórico" aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
@@ -326,9 +334,12 @@
                                             <!-- BOTÃO MODERAÇÃO RÁPIDA -->
                                             <button type="button"
                                                 class="btn btn-sm btn-outline-warning text-dark rounded-3"
+                                                class="btn btn-sm btn-outline-warning text-dark rounded-3 d-inline-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#modalModeracao{{ $livro->id }}"
                                                 title="Alterar Regra de Moderação">
+                                                title="Alterar Regra de Moderação" aria-label="Moderar">
                                                 <i class="bi bi-shield-exclamation"></i>
                                             </button>
 
@@ -394,16 +405,84 @@
                                             </div>
                                         @endif
 
+
                                         <!-- BOTÃO EXCLUIR -->
                                         <form action="{{ route($rotaPrefix . '.destroy', $livro) }}" method="POST" class="d-inline"
                                             data-confirm="Tem certeza de que deseja remover '{{ $livro->titulo }}' do catálogo?">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-3" title="Excluir">
+                                            <button type="submit"
+                                                class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Excluir Livro" aria-label="Excluir">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </div>
+
+                                    @if ($ehAdmin && Auth::user()->podeModerarLivros())
+                                        <!-- MODAL DE MODERAÇÃO ADMINISTRATIVA -->
+                                        <div class="modal fade" id="modalModeracao{{ $livro->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered text-start">
+                                                <div class="modal-content border-0 shadow-lg rounded-4">
+                                                    <form action="{{ route('admin.livros.status', $livro) }}" method="POST">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <div class="modal-header border-0 pb-0">
+                                                            <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                                                                <i class="bi bi-shield-check text-primary"></i> Moderação: {{ $livro->titulo }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                                        </div>
+                                                        <div class="modal-body py-3">
+                                                            <p class="text-muted small mb-3">
+                                                                Selecione a ação disciplinar ou liberação para este exemplar. Livros não ativos ficam ocultos da loja pública.
+                                                            </p>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label small fw-bold text-secondary">Status de Moderação</label>
+                                                                <select name="status_moderacao" class="form-select rounded-3" required>
+                                                                    <option value="ativo" {{ $livro->status_moderacao === 'ativo' ? 'selected' : '' }}>
+                                                                        Ativo (Aprovado para exibição e venda)
+                                                                    </option>
+                                                                    <option value="sob_analise" {{ $livro->status_moderacao === 'sob_analise' ? 'selected' : '' }}>
+                                                                        Sob Análise (Dados suspeitos ou pendência documental)
+                                                                    </option>
+                                                                    <option value="bloqueado_temporariamente" {{ $livro->status_moderacao === 'bloqueado_temporariamente' ? 'selected' : '' }}>
+                                                                        Bloqueado Temporariamente (Suspensão preventiva)
+                                                                    </option>
+                                                                    <option value="banido" {{ $livro->status_moderacao === 'banido' ? 'selected' : '' }}>
+                                                                        Banido (Infração grave ou violação legal)
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label small fw-bold text-secondary">Justificativa / Motivo da Moderação</label>
+                                                                <textarea name="motivo_moderacao" rows="3" class="form-control rounded-3"
+                                                                    placeholder="Descreva o motivo (ex: violação de direitos autorais, suspeita de falsificação de dados, crime ou conformidade)...">{{ $livro->motivo_moderacao }}</textarea>
+                                                            </div>
+
+                                                            @if ($livro->moderado_em)
+                                                                <div class="p-2.5 rounded-3 bg-light border small text-muted">
+                                                                    <i class="bi bi-clock-history me-1"></i>
+                                                                    Última moderação em <strong>{{ $livro->moderado_em->format('d/m/Y H:i') }}</strong>
+                                                                    por <strong>{{ $livro->moderador?->name ?? 'Administrador' }}</strong>.
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                        <div class="modal-footer border-0 pt-0">
+                                                            <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Cancelar</button>
+                                                            <button type="submit" class="btn btn-primary rounded-3 px-3 fw-semibold">
+                                                                <i class="bi bi-check2-circle me-1"></i> Salvar Moderação
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

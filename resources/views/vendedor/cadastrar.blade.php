@@ -173,9 +173,11 @@
                         <hr class="my-4 text-muted">
 
                         <!-- SEÇÃO 3: STATUS DE ACESSO E APROVAÇÃO -->
+                        <!-- SEÇÃO 3: SITUAÇÃO DA LOJA & ACESSO -->
                         <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                             <i class="bi bi-shield-check text-primary"></i>
                             Status da Conta & Aprovação
+                            Situação da Loja & Acesso
                         </h5>
 
                         <div class="row g-3 mb-4">
@@ -188,8 +190,27 @@
                                         Ativo</option>
                                     <option value="inativo" {{ old('status') === 'inativo' ? 'selected' : '' }}>
                                         Inativo</option>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-secondary">Situação Inicial da Loja <span class="text-danger">*</span></label>
+                                <select name="situacao" class="form-select @error('situacao') is-invalid @enderror" required>
+                                    <option value="aprovado" {{ old('situacao', 'aprovado') === 'aprovado' ? 'selected' : '' }}>
+                                        Aprovado & Ativo (Loja autorizada a operar, publicar livros e realizar vendas)
+                                    </option>
+                                    <option value="pendente" {{ old('situacao') === 'pendente' ? 'selected' : '' }}>
+                                        Pendente de Análise (Aguardando conferência de dados)
+                                    </option>
+                                    <option value="inativo" {{ old('situacao') === 'inativo' ? 'selected' : '' }}>
+                                        Inativo / Pausado (Loja cadastrada porém temporariamente inativa)
+                                    </option>
+                                    <option value="rejeitado" {{ old('situacao') === 'rejeitado' ? 'selected' : '' }}>
+                                        Rejeitado (Cadastro reprovado)
+                                    </option>
                                 </select>
                                 @error('status')
+                                <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
+                                    A situação define atomicamente as permissões operacionais do lojista e o status da sua conta de usuário.
+                                </small>
+                                @error('situacao')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

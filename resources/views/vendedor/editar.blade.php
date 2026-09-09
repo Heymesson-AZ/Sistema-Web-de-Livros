@@ -181,9 +181,11 @@
                         <hr class="my-4 text-muted">
 
                         <!-- SEÇÃO 3: STATUS DE ACESSO E APROVAÇÃO -->
+                        <!-- SEÇÃO 3: SITUAÇÃO DA LOJA & ACESSO -->
                         <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                             <i class="bi bi-shield-check text-primary"></i>
                             Status da Conta & Aprovação
+                            Situação da Loja & Acesso
                         </h5>
 
                         <div class="row g-3 mb-4">
@@ -201,8 +203,30 @@
                                     <option value="banido"
                                         {{ old('status', $vendedor->user?->status) === 'banido' ? 'selected' : '' }}>
                                         Banido</option>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-secondary">Situação Cadastral e Operacional <span class="text-danger">*</span></label>
+                                <select name="situacao" class="form-select @error('situacao') is-invalid @enderror" required>
+                                    <option value="aprovado" {{ old('situacao', $vendedor->situacao) === 'aprovado' ? 'selected' : '' }}>
+                                        Aprovado & Ativo (Loja autorizada a operar, publicar livros e realizar vendas)
+                                    </option>
+                                    <option value="pendente" {{ old('situacao', $vendedor->situacao) === 'pendente' ? 'selected' : '' }}>
+                                        Pendente de Análise (Aguardando conferência de dados e aprovação da moderação)
+                                    </option>
+                                    <option value="inativo" {{ old('situacao', $vendedor->situacao) === 'inativo' ? 'selected' : '' }}>
+                                        Inativo / Pausado (Operação pausada temporariamente pelo lojista ou administração)
+                                    </option>
+                                    <option value="rejeitado" {{ old('situacao', $vendedor->situacao) === 'rejeitado' ? 'selected' : '' }}>
+                                        Rejeitado (Cadastro reprovado na auditoria cadastral)
+                                    </option>
+                                    <option value="banido" {{ old('situacao', $vendedor->situacao) === 'banido' ? 'selected' : '' }}>
+                                        Banido (Acesso revogado, catálogo desativado por infração grave)
+                                    </option>
                                 </select>
                                 @error('status')
+                                <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
+                                    A alteração de situação sincroniza automaticamente as regras operacionais da loja e o estado da conta de acesso.
+                                </small>
+                                @error('situacao')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

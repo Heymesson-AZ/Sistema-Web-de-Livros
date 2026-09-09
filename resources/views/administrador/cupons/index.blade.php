@@ -72,11 +72,16 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="d-inline-flex gap-1 align-items-center">
+                                            <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
                                             <a href="{{ route('admin.cupons.edit', $cupom) }}"
                                                 class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
                                                 title="Editar Cupom">
                                                 <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
                                                 <span>Editar</span>
+                                                class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
+                                                style="width: 32px; height: 32px;"
+                                                title="Editar Cupom" aria-label="Editar">
+                                                <i class="bi bi-pencil-square fs-6"></i>
                                             </a>
                                             <form action="{{ route('admin.cupons.destroy', $cupom) }}" method="POST"
                                                 data-confirm="Deseja realmente excluir o cupom {{ $cupom->codigo }}?">
@@ -84,6 +89,11 @@
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-outline-danger btn-sm p-1 px-2" title="Excluir cupom">
                                                     <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
+                                                    style="width: 32px; height: 32px;"
+                                                    title="Excluir cupom" aria-label="Excluir">
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
                                         </div>

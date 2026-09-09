@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Autor extends Model
 {
@@ -26,6 +27,16 @@ class Autor extends Model
         'biografia',
         'foto_perfil',
     ];
+
+    /**
+     * Padroniza o nome do autor em Title Case.
+     */
+    protected function nome(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => trim(mb_convert_case(preg_replace('/\s+/', ' ', (string) $value), MB_CASE_TITLE, 'UTF-8'))
+        );
+    }
 
     /**
      * Opcional: Se você quiser que o Laravel trate a data_nascimento 

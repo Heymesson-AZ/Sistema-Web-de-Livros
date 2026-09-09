@@ -1,100 +1,109 @@
-// Gerenciamento do Menu Lateral & Drawer Mobile (Vanilla JS)
-document.addEventListener("DOMContentLoaded", () => {
-    const menuWrapper = document.getElementById("menuWrapper");
-    const menuToggle = document.getElementById("menuToggle");
-    const menuCloseBtn = document.getElementById("menuCloseBtn");
-    const menuBackdrop = document.getElementById("menuBackdrop");
+/**
+ * Gerenciamento do Menu Lateral & Gaveta Móvel (Drawer Mobile)
+ * Desenvolvido em Vanilla JavaScript puro (sem frameworks pesados).
+ */
 
-    // Funções de controle do Drawer Mobile
-    const openMobileMenu = () => {
-        if (menuWrapper) menuWrapper.classList.add("is-open");
-        if (menuBackdrop) menuBackdrop.classList.add("is-active");
-        document.body.style.overflow = "hidden"; // Impede rolagem de fundo no mobile
+document.addEventListener("DOMContentLoaded", () => {
+    // Elementos da interface do menu
+    const envoltorioMenu = document.getElementById("menuWrapper");
+    const botaoAbrirMenu = document.getElementById("menuToggle");
+    const botaoFecharMenu = document.getElementById("menuCloseBtn");
+    const cortinaFundo = document.getElementById("menuBackdrop");
+
+    /**
+     * Abre a gaveta móvel de navegação e bloqueia a rolagem de fundo
+     */
+    const abrirMenuMovel = () => {
+        if (envoltorioMenu) envoltorioMenu.classList.add("is-open");
+        if (cortinaFundo) cortinaFundo.classList.add("is-active");
+        document.body.style.overflow = "hidden"; // Impede rolagem indesejada do conteúdo
     };
 
-    const closeMobileMenu = () => {
-        if (menuWrapper) menuWrapper.classList.remove("is-open");
-        if (menuBackdrop) menuBackdrop.classList.remove("is-active");
+    /**
+     * Fecha a gaveta móvel de navegação e restaura a rolagem padrão
+     */
+    const fecharMenuMovel = () => {
+        if (envoltorioMenu) envoltorioMenu.classList.remove("is-open");
+        if (cortinaFundo) cortinaFundo.classList.remove("is-active");
         document.body.style.overflow = "";
     };
 
-    if (menuToggle) {
-        menuToggle.addEventListener("click", (e) => {
-            e.stopPropagation();
-            if (menuWrapper && menuWrapper.classList.contains("is-open")) {
-                closeMobileMenu();
+    // Evento de clique no botão hambúrguer do topo
+    if (botaoAbrirMenu) {
+        botaoAbrirMenu.addEventListener("click", (evento) => {
+            evento.stopPropagation();
+            if (envoltorioMenu && envoltorioMenu.classList.contains("is-open")) {
+                fecharMenuMovel();
             } else {
-                openMobileMenu();
+                abrirMenuMovel();
             }
         });
     }
 
-    if (menuCloseBtn) {
-        menuCloseBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            closeMobileMenu();
+    // Evento de clique no botão fechar ('X') da gaveta
+    if (botaoFecharMenu) {
+        botaoFecharMenu.addEventListener("click", (evento) => {
+            evento.stopPropagation();
+            fecharMenuMovel();
         });
     }
 
-    if (menuBackdrop) {
-        menuBackdrop.addEventListener("click", closeMobileMenu);
+    // Evento de clique no fundo escurecido para fechar a gaveta
+    if (cortinaFundo) {
+        cortinaFundo.addEventListener("click", fecharMenuMovel);
     }
 
-    // Fecha o menu móvel com a tecla Escape
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && menuWrapper && menuWrapper.classList.contains("is-open")) {
-            closeMobileMenu();
+    // Fecha a gaveta com a tecla Escape
+    document.addEventListener("keydown", (evento) => {
+        if (evento.key === "Escape" && envoltorioMenu && envoltorioMenu.classList.contains("is-open")) {
+            fecharMenuMovel();
         }
     });
 
-    // Fecha gaveta se a janela for redimensionada para desktop
+    // Se o usuário redimensionar para tela de computador (desktop), fecha a gaveta móvel
     window.addEventListener("resize", () => {
         if (window.innerWidth >= 992) {
-            closeMobileMenu();
+            fecharMenuMovel();
         }
     });
 
-    // Submenus (Acordeão)
-    const submenuItems = document.querySelectorAll(
-        ".menu-inner ul li.has-submenu"
-    );
+    // Controle de Submenus sanfonados (Acordeão)
+    const itensComSubmenu = document.querySelectorAll(".menu-inner ul li.has-submenu");
 
-    submenuItems.forEach((item) => {
-        const header = item.querySelector(".menu-item-header");
-        if (header) {
-            header.addEventListener("click", (e) => {
-                e.stopPropagation();
+    itensComSubmenu.forEach((item) => {
+        const cabecalhoItem = item.querySelector(".menu-item-header");
+        if (cabecalhoItem) {
+            cabecalhoItem.addEventListener("click", (evento) => {
+                evento.stopPropagation();
 
-                // Fecha outros submenus abertos para manter a visualização limpa
-                submenuItems.forEach((other) => {
-                    if (other !== item) {
-                        other.classList.remove("open");
+                // Fecha outros submenus abertos para manter visual limpo
+                itensComSubmenu.forEach((outroItem) => {
+                    if (outroItem !== item) {
+                        outroItem.classList.remove("open");
                     }
                 });
 
-                // Alterna o submenu atual
+                // Alterna o submenu clicado
                 item.classList.toggle("open");
             });
         }
     });
 
-    // Ao clicar em links ou gatilhos de modal dentro do menu no mobile, fecha a gaveta
-    const modalTriggers = document.querySelectorAll(
-        "#menu [data-bs-toggle='modal']"
-    );
-    modalTriggers.forEach((trigger) => {
-        trigger.addEventListener("click", () => {
-            closeMobileMenu();
+    // Fecha a gaveta móvel ao clicar em links ou abrir modais
+    const gatilhosModais = document.querySelectorAll("#menu [data-bs-toggle='modal'], #menu a.menu-item-link");
+    gatilhosModais.forEach((gatilho) => {
+        gatilho.addEventListener("click", () => {
+            fecharMenuMovel();
         });
     });
 
-    // Renderiza ícones Lucide
+    // Inicializa ícones Lucide caso a biblioteca externa esteja carregada
     if (typeof window.lucide !== "undefined") {
         window.lucide.createIcons();
     }
 });
 
-// Garante renderização dos ícones Lucide após carregamento dos scripts externos
+// Garante renderização dos ícones Lucide após o carregamento completo da página
 window.addEventListener("load", () => {
     if (typeof window.lucide !== "undefined") {
         window.lucide.createIcons();

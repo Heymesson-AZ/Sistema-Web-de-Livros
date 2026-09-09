@@ -79,6 +79,33 @@
                     </a>
                 </li>
 
+                <!-- Itens para Usuários Logados -->
+                @auth
+                    @php
+                        $notifsMenu = \App\Http\Controllers\Painel\PainelController::obterNotificacoes(Auth::user());
+                        $qtdNotifsMenu = count($notifsMenu);
+                    @endphp
+                    <li class="menu-item {{ request()->is('painel*') && request('tab') === 'visao-geral' ? 'active' : '' }}">
+                        <a href="{{ route('painel', ['tab' => 'visao-geral']) }}" class="menu-item-link">
+                            <div class="menu-item-header">
+                                <i data-lucide="bell"></i>
+                                <span>Notificações</span>
+                                @if ($qtdNotifsMenu > 0)
+                                    <span class="menu-badge badge-count bg-danger text-white">{{ $qtdNotifsMenu }}</span>
+                                @endif
+                            </div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ request()->is('painel*') && request('tab') === 'enderecos' ? 'active' : '' }}">
+                        <a href="{{ route('painel', ['tab' => 'enderecos']) }}" class="menu-item-link">
+                            <div class="menu-item-header">
+                                <i data-lucide="map-pin"></i>
+                                <span>Meus Endereços</span>
+                            </div>
+                        </a>
+                    </li>
+                @endauth
+
                 <!-- Área do Vendedor / Seja um Vendedor -->
                 @guest
                     <li class="menu-item {{ request()->routeIs('vendedor.solicitar') ? 'active' : '' }}">

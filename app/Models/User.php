@@ -13,6 +13,7 @@ use App\Models\Vendedor;
 use App\Models\Admin;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 // definição da classe User que estende Authenticatable
 // o Authenticatable fornece funcionalidades de autenticação para o modelo User(usuário)
@@ -59,6 +60,26 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Padroniza o nome do usuário com iniciais maiúsculas (Title Case) e remove espaços excessivos.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => trim(mb_convert_case(preg_replace('/\s+/', ' ', (string) $value), MB_CASE_TITLE, 'UTF-8'))
+        );
+    }
+
+    /**
+     * Padroniza o e-mail sempre em minúsculas e sem espaços ao redor.
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => trim(mb_strtolower((string) $value, 'UTF-8'))
+        );
     }
 
     // Definição dos Perfis ( Verificar se o usuário é cliente, vendedor ou admin)

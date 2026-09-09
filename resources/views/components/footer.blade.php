@@ -9,8 +9,8 @@
                     <span class="fs-4 fw-bold text-white">Universo de Papel</span>
                 </div>
                 <p class="text-light text-opacity-75 small mb-3 lh-base">
-                    Sua plataforma completa para descobrir, comprar e vender livros novos, usados e raros. Conectando
-                    leitores, livreiros e sebos por todo o Brasil com segurança e paixão pela leitura.
+                    Sua plataforma completa para descobrir, comprar e vender livros.
+                    Conectando leitores, livreiros e sebos por todo o Brasil com segurança e paixão pela leitura.
                 </p>
                 <div class="d-flex align-items-center gap-2 text-warning small">
                     <i class="bi bi-shield-check fs-5"></i>

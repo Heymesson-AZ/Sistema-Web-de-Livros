@@ -19,8 +19,33 @@ class Endereco extends Model
         'cep',
         'pais',
         'complemento',
+        'tipo',
+        'principal',
         'user_id',
     ];
+
+    protected $attributes = [
+        'pais' => 'Brasil',
+        'principal' => false,
+        'tipo' => 'residencial',
+    ];
+
+    protected $casts = [
+        'principal' => 'boolean',
+    ];
+
+    public function getEnderecoFormatadoAttribute(): string
+    {
+        $partes = ["{$this->rua}, {$this->numero}"];
+        if ($this->complemento) {
+            $partes[] = $this->complemento;
+        }
+        $partes[] = $this->bairro;
+        $partes[] = "{$this->cidade} - {$this->estado}";
+        $partes[] = "CEP {$this->cep}";
+
+        return implode(', ', $partes);
+    }
 
 
     public function user()

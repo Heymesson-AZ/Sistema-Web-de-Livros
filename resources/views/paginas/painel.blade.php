@@ -103,7 +103,7 @@
                 <ul class="nav nav-tabs border-0 px-3 px-md-4" id="painelTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link {{ $tab === 'visao-geral' || !$tab ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                            class="nav-link {{ $tab === 'visao-geral' || !$tab ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-2 border-bottom border-2"
                             id="visao-geral-tab" data-bs-toggle="tab" data-bs-target="#visao-geral" type="button"
                             role="tab">
                             <i class="bi bi-grid-1x2-fill me-1"></i> Visão Geral & Notificações
@@ -117,6 +117,17 @@
                             class="nav-link {{ $tab === 'perfil' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
                             id="perfil-tab" data-bs-toggle="tab" data-bs-target="#perfil" type="button" role="tab">
                             <i class="bi bi-person-bounding-box me-1"></i> Meus Dados & Perfil
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button
+                            class="nav-link {{ $tab === 'enderecos' ? 'active fw-bold text-primary' : 'text-secondary' }} py-3 px-3 border-0 border-bottom border-2"
+                            id="enderecos-tab" data-bs-toggle="tab" data-bs-target="#enderecos" type="button"
+                            role="tab">
+                            <i class="bi bi-geo-alt-fill me-1"></i> Meus Endereços
+                            @if (isset($enderecos) && $enderecos->count() > 0)
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill ms-1">{{ $enderecos->count() }}</span>
+                            @endif
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -501,6 +512,106 @@
             </div>
 
             <!-- ========================================================
+                 ABA: MEUS ENDEREÇOS
+                 ======================================================== -->
+            <div class="tab-pane fade {{ $tab === 'enderecos' ? 'show active' : '' }}" id="enderecos" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                                <i class="bi bi-geo-alt-fill text-primary"></i> Meus Endereços de Entrega
+                            </h5>
+                            <p class="text-muted small mb-0">Gerencie seus endereços residenciais e comerciais com carregamento dinâmico via CEP.</p>
+                        </div>
+                        <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#modalNovoEndereco">
+                            <i class="bi bi-plus-lg me-1"></i> Adicionar Endereço
+                        </button>
+                    </div>
+
+                    @if (session('status_endereco'))
+                        <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>{{ session('status_endereco') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if ($enderecos->isEmpty())
+                        <div class="text-center py-5 bg-light rounded-4">
+                            <div class="rounded-circle bg-white shadow-sm d-inline-flex p-3 text-muted mb-3">
+                                <i class="bi bi-geo-alt display-6 text-primary"></i>
+                            </div>
+                            <h6 class="fw-bold text-dark mb-1">Nenhum endereço cadastrado</h6>
+                            <p class="text-muted small mb-3">Adicione seus endereços para agilizar o fechamento de pedidos.</p>
+                            <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalNovoEndereco">
+                                Cadastrar Endereço
+                            </button>
+                        </div>
+                    @else
+                        <div class="row g-3">
+                            @foreach ($enderecos as $end)
+                                <div class="col-12 col-md-6">
+                                    <div class="card h-100 border {{ $end->principal ? 'border-primary border-2 shadow-sm bg-primary bg-opacity-10' : 'border-light-subtle shadow-xs' }} rounded-4 p-4 position-relative">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge {{ $end->tipo === 'comercial' ? 'bg-info-subtle text-info-emphasis border border-info-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle' }} rounded-pill text-capitalize px-3 py-1 fw-semibold">
+                                                    <i class="bi {{ $end->tipo === 'comercial' ? 'bi-building' : 'bi-house-door' }} me-1"></i>
+                                                    {{ $end->tipo ?? 'Residencial' }}
+                                                </span>
+                                                @if ($end->principal)
+                                                    <span class="badge bg-success rounded-pill px-2 py-1" style="font-size: 11px;">
+                                                        <i class="bi bi-star-fill me-1"></i> Principal
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-light border-0 rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                                                    @if (!$end->principal)
+                                                        <li>
+                                                            <form action="{{ route('enderecos.definir-principal', $end) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" class="dropdown-item small py-2">
+                                                                    <i class="bi bi-star me-2 text-warning"></i> Definir como Principal
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                    <li>
+                                                        <form action="{{ route('enderecos.deletar', $end) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja remover este endereço?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="dropdown-item small py-2 text-danger">
+                                                                <i class="bi bi-trash me-2"></i> Excluir Endereço
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="fw-bold text-dark mb-1">
+                                            {{ $end->rua }}, {{ $end->numero }}
+                                            @if ($end->complemento)
+                                                <span class="fw-normal text-muted">({{ $end->complemento }})</span>
+                                            @endif
+                                        </h6>
+                                        <p class="text-muted small mb-2">
+                                            {{ $end->bairro }} &bull; {{ $end->cidade }} - {{ $end->estado }}
+                                        </p>
+                                        <p class="small text-secondary mb-0">
+                                            <strong>CEP:</strong> {{ $end->cep }}
+                                        </p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- ========================================================
                  ABA 3: SEGURANÇA & CONTA
                  ======================================================== -->
             <div class="tab-pane fade {{ $tab === 'seguranca' ? 'show active' : '' }}" id="seguranca"
@@ -605,5 +716,101 @@
 
         </div>
 
+    </div>
+
+    <!-- MODAL NOVO ENDEREÇO COM INTEGRAÇÃO VIACEP -->
+    <div class="modal fade" id="modalNovoEndereco" tabindex="-1" aria-labelledby="modalNovoEnderecoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header bg-primary text-white p-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-geo-alt-fill fs-4"></i>
+                        <h5 class="modal-title fw-bold mb-0" id="modalNovoEnderecoLabel">Adicionar Novo Endereço</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <form action="{{ route('enderecos.salvar') }}" method="POST" data-viacep-container>
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <!-- Tipo de Endereço -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-bold text-secondary">Tipo de Endereço *</label>
+                                <select name="tipo" class="form-select rounded-3" required>
+                                    <option value="residencial">Residencial (Casa / Apartamento)</option>
+                                    <option value="comercial">Comercial (Trabalho / Empresa)</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+
+                            <!-- CEP com busca automática ViaCEP -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small fw-bold text-secondary">CEP *</label>
+                                <div class="input-group">
+                                    <input type="text" name="cep" class="form-control rounded-start-3"
+                                        placeholder="00000-000" data-viacep="cep" data-mask="cep" maxlength="9" required>
+                                    <span class="input-group-text bg-white text-muted">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                </div>
+                                <small class="d-block mt-1" data-viacep="mensagem" style="font-size: 11.5px;"></small>
+                            </div>
+
+                            <!-- Rua / Logradouro -->
+                            <div class="col-12 col-md-8">
+                                <label class="form-label small fw-bold text-secondary">Rua / Logradouro *</label>
+                                <input type="text" name="rua" class="form-control rounded-3" placeholder="Av. Paulista, Rua das Flores..." data-viacep="rua" required>
+                            </div>
+
+                            <!-- Número -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Número *</label>
+                                <input type="text" name="numero" class="form-control rounded-3" placeholder="123 ou S/N" data-viacep="numero" required>
+                            </div>
+
+                            <!-- Complemento -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Complemento (Opcional)</label>
+                                <input type="text" name="complemento" class="form-control rounded-3" placeholder="Apto 42, Bloco B...">
+                            </div>
+
+                            <!-- Bairro -->
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-bold text-secondary">Bairro *</label>
+                                <input type="text" name="bairro" class="form-control rounded-3" placeholder="Centro, Jardins..." data-viacep="bairro" required>
+                            </div>
+
+                            <!-- Cidade -->
+                            <div class="col-12 col-md-3">
+                                <label class="form-label small fw-bold text-secondary">Cidade *</label>
+                                <input type="text" name="cidade" class="form-control rounded-3" placeholder="São Paulo" data-viacep="cidade" required>
+                            </div>
+
+                            <!-- UF / Estado -->
+                            <div class="col-12 col-md-1">
+                                <label class="form-label small fw-bold text-secondary">UF *</label>
+                                <input type="text" name="estado" class="form-control rounded-3 text-uppercase text-center" placeholder="SP" maxlength="2" data-viacep="estado" required>
+                            </div>
+
+                            <!-- Tornar Principal -->
+                            <div class="col-12 mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="principal" value="1" id="switchPrincipal" {{ $enderecos->isEmpty() ? 'checked' : '' }}>
+                                    <label class="form-check-label small fw-semibold text-dark" for="switchPrincipal">
+                                        Definir como endereço de entrega principal
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light p-3 border-top">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
+                            <i class="bi bi-check-lg me-1"></i> Salvar Endereço
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </x-layouts.principal>

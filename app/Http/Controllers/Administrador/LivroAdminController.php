@@ -114,8 +114,29 @@ class LivroAdminController extends Controller
      */
     public function salvar(Request $request): RedirectResponse
     {
+        if ($request->has('preco')) {
+            $precoLimpo = str_replace(['R$', ' '], '', (string) $request->input('preco'));
+            if (str_contains($precoLimpo, ',') && str_contains($precoLimpo, '.')) {
+                $precoLimpo = str_replace('.', '', $precoLimpo);
+                $precoLimpo = str_replace(',', '.', $precoLimpo);
+            } elseif (str_contains($precoLimpo, ',')) {
+                $precoLimpo = str_replace(',', '.', $precoLimpo);
+            }
+            $request->merge(['preco' => $precoLimpo]);
+        }
+        if ($request->has('isbn')) {
+            $request->merge(['isbn' => strtoupper(trim(preg_replace('/[^0-9Xx]/', '', (string) $request->input('isbn'))))]);
+        }
+
         $dados = $request->validate([
-            'titulo' => ['required', 'string', 'min:2', 'max:255'],
+            'titulo' => [
+                'required',
+                'string',
+                'min:2',
+                'max:255',
+                Rule::unique('livros', 'titulo')
+                    ->where(fn ($q) => $q->where('autor_id', $request->input('autor_id'))->whereNull('deleted_at')),
+            ],
             'isbn' => ['required', 'string', 'max:30', 'unique:livros,isbn'],
             'data_publicacao' => ['required', 'date'],
             'preco' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
@@ -128,6 +149,7 @@ class LivroAdminController extends Controller
             'capa' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'titulo.required' => 'O título do livro é obrigatório.',
+            'titulo.unique' => 'Já existe um livro cadastrado com este título para o autor selecionado.',
             'isbn.required' => 'O código ISBN é obrigatório.',
             'isbn.unique' => 'Já existe um livro cadastrado com este ISBN.',
             'data_publicacao.required' => 'A data de publicação é obrigatória.',
@@ -188,8 +210,30 @@ class LivroAdminController extends Controller
      */
     public function atualizar(Request $request, Livro $livro): RedirectResponse
     {
+        if ($request->has('preco')) {
+            $precoLimpo = str_replace(['R$', ' '], '', (string) $request->input('preco'));
+            if (str_contains($precoLimpo, ',') && str_contains($precoLimpo, '.')) {
+                $precoLimpo = str_replace('.', '', $precoLimpo);
+                $precoLimpo = str_replace(',', '.', $precoLimpo);
+            } elseif (str_contains($precoLimpo, ',')) {
+                $precoLimpo = str_replace(',', '.', $precoLimpo);
+            }
+            $request->merge(['preco' => $precoLimpo]);
+        }
+        if ($request->has('isbn')) {
+            $request->merge(['isbn' => strtoupper(trim(preg_replace('/[^0-9Xx]/', '', (string) $request->input('isbn'))))]);
+        }
+
         $dados = $request->validate([
-            'titulo' => ['required', 'string', 'min:2', 'max:255'],
+            'titulo' => [
+                'required',
+                'string',
+                'min:2',
+                'max:255',
+                Rule::unique('livros', 'titulo')
+                    ->where(fn ($q) => $q->where('autor_id', $request->input('autor_id'))->whereNull('deleted_at'))
+                    ->ignore($livro->id),
+            ],
             'isbn' => ['required', 'string', 'max:30', Rule::unique('livros', 'isbn')->ignore($livro->id)],
             'data_publicacao' => ['required', 'date'],
             'preco' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
@@ -202,6 +246,7 @@ class LivroAdminController extends Controller
             'capa' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'titulo.required' => 'O título do livro é obrigatório.',
+            'titulo.unique' => 'Já existe um livro cadastrado com este título para o autor selecionado.',
             'isbn.required' => 'O código ISBN é obrigatório.',
             'isbn.unique' => 'Já existe um livro cadastrado com este ISBN.',
             'data_publicacao.required' => 'A data de publicação é obrigatória.',

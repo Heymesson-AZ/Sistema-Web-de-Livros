@@ -64,6 +64,28 @@
                     <span>Meu Painel & Perfil</span>
                 </a>
             </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center justify-content-between py-2"
+                    href="{{ route('painel', ['tab' => 'visao-geral']) }}">
+                    <div class="d-flex align-items-center gap-2">
+                        <i data-lucide="bell" style="width: 16px; height: 16px;"></i>
+                        <span>Notificações</span>
+                    </div>
+                    @php
+                        $notifsDrop = \App\Http\Controllers\Painel\PainelController::obterNotificacoes(Auth::user());
+                    @endphp
+                    @if (count($notifsDrop) > 0)
+                        <span class="badge bg-danger rounded-pill" style="font-size: 11px;">{{ count($notifsDrop) }}</span>
+                    @endif
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                    href="{{ route('painel', ['tab' => 'enderecos']) }}">
+                    <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+                    <span>Meus Endereços</span>
+                </a>
+            </li>
 
             <!-- Ações por Tipo de Usuário -->
             @if (Auth::user()->isAdmin())

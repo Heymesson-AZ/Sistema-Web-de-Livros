@@ -94,7 +94,7 @@ class AdministradorController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'string', Rule::in(['ativo', 'inativo'])],
-            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
             'cargo' => ['required', 'string', Rule::in(Admin::getCargos())],
             'departamento' => ['required', 'string', Rule::in(Admin::getDepartamentos())],
@@ -109,6 +109,7 @@ class AdministradorController extends Controller
             'status.in' => 'Selecione um status válido (ativo ou inativo).',
             'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
             'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
+            'foto_perfil.dimensions' => 'A foto de perfil deve ter entre 50x50px e 4000x4000px.',
             'cargo.in' => 'Selecione um cargo válido.',
             'departamento.in' => 'Selecione um departamento válido.',
         ]);
@@ -179,7 +180,7 @@ class AdministradorController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'string', Rule::in(['ativo', 'inativo'])],
-            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'remover_foto' => ['nullable', 'boolean'],
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
             'cargo' => ['required', 'string', Rule::in(Admin::getCargos())],
@@ -194,6 +195,7 @@ class AdministradorController extends Controller
             'status.in' => 'Selecione um status válido (ativo ou inativo).',
             'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
             'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
+            'foto_perfil.dimensions' => 'A foto de perfil deve ter entre 50x50px e 4000x4000px.',
             'cargo.in' => 'Selecione um cargo válido.',
             'departamento.in' => 'Selecione um departamento válido.',
         ]);
@@ -297,7 +299,7 @@ class AdministradorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
-            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'remover_foto' => ['nullable', 'boolean'],
         ], [
             'name.required' => 'O nome é obrigatório.',
@@ -307,6 +309,7 @@ class AdministradorController extends Controller
             'email.unique' => 'Este e-mail já está sendo utilizado.',
             'foto_perfil.image' => 'O arquivo selecionado deve ser uma imagem válida.',
             'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
+            'foto_perfil.dimensions' => 'A foto de perfil deve ter entre 50x50px e 4000x4000px.',
         ]);
 
         $user->fill($request->only('name', 'email'));

@@ -22,6 +22,15 @@ Route::get('/perfil', function () {
     return redirect()->route('painel', ['tab' => 'perfil']);
 })->middleware(['auth', 'verified'])->name('perfil');
 
+// Rotas de Gestão de Endereços do Usuário (Multi-endereço)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/enderecos', [\App\Http\Controllers\Cliente\EnderecoController::class, 'listar'])->name('enderecos.listar');
+    Route::post('/enderecos', [\App\Http\Controllers\Cliente\EnderecoController::class, 'salvar'])->name('enderecos.salvar');
+    Route::put('/enderecos/{endereco}', [\App\Http\Controllers\Cliente\EnderecoController::class, 'atualizar'])->name('enderecos.atualizar');
+    Route::patch('/enderecos/{endereco}/principal', [\App\Http\Controllers\Cliente\EnderecoController::class, 'definirPrincipal'])->name('enderecos.principal');
+    Route::delete('/enderecos/{endereco}', [\App\Http\Controllers\Cliente\EnderecoController::class, 'deletar'])->name('enderecos.deletar');
+});
+
 
 // Rotas para o perfil de Cliente
 Route::middleware(['auth', 'checkTipo:cliente'])->group(function () {

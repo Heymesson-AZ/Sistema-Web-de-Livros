@@ -39,6 +39,26 @@
                     autocomplete="off" data-dynamic-search>
             </form>
 
+            <!-- Botão de Notificações para Usuários Autenticados -->
+            @auth
+                @php
+                    $notificacoesUsuario = \App\Http\Controllers\Painel\PainelController::obterNotificacoes(Auth::user());
+                    $totalNotificacoes = count($notificacoesUsuario);
+                @endphp
+                <a href="{{ route('painel', ['tab' => 'visao-geral']) }}"
+                    class="btn position-relative p-2 text-white border-0 bg-transparent rounded-circle d-flex align-items-center justify-content-center"
+                    style="width: 38px; height: 38px;"
+                    title="{{ $totalNotificacoes > 0 ? $totalNotificacoes . ' notificações do sistema' : 'Notificações' }}">
+                    <i class="bi bi-bell-fill fs-5"></i>
+                    @if ($totalNotificacoes > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light"
+                            style="font-size: 10px; padding: 3px 6px;">
+                            {{ $totalNotificacoes }}
+                        </span>
+                    @endif
+                </a>
+            @endauth
+
             <!-- Menu Dropdown Centralizado do Usuário -->
             <x-navbar-user-dropdown />
         </div>

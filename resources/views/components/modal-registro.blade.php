@@ -109,9 +109,14 @@
                                 <!-- Senhas -->
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label small fw-bold text-secondary">Senha</label>
-                                    <input type="password" name="password" minlength="8"
-                                        class="form-control @error('password') is-invalid border-danger @enderror"
-                                        placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
+                                    <div class="input-group">
+                                        <input type="password" name="password" id="register_password" minlength="8"
+                                            class="form-control @error('password') is-invalid border-danger @enderror"
+                                            placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
+                                        <button class="btn btn-outline-secondary" type="button" data-toggle="password" data-target="#register_password" title="Mostrar/Ocultar Senha" aria-label="Mostrar/Ocultar Senha">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     <div class="invalid-feedback fw-semibold mt-1 text-danger small">
                                         @error('password')
                                             <i class="bi bi-exclamation-circle me-1"></i> {{ $message }}
@@ -121,9 +126,14 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label small fw-bold text-secondary">Confirmar Senha</label>
-                                    <input type="password" name="password_confirmation" minlength="8"
-                                        class="form-control @error('password_confirmation') is-invalid border-danger @enderror"
-                                        placeholder="Repita a senha" required>
+                                    <div class="input-group">
+                                        <input type="password" name="password_confirmation" id="register_password_confirmation" minlength="8"
+                                            class="form-control @error('password_confirmation') is-invalid border-danger @enderror"
+                                            placeholder="Repita a senha" required>
+                                        <button class="btn btn-outline-secondary" type="button" data-toggle="password" data-target="#register_password_confirmation" title="Mostrar/Ocultar Senha" aria-label="Mostrar/Ocultar Senha">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     <div class="invalid-feedback fw-semibold mt-1 text-danger small">
                                         @error('password_confirmation')
                                             <i class="bi bi-exclamation-circle me-1"></i> {{ $message }}

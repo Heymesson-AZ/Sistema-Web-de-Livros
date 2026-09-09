@@ -21,8 +21,44 @@ class PainelController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $notificacoes = [];
+        $notificacoes = self::obterNotificacoes($user);
         $kpis = [];
+
+        if ($user->isAdmin()) {
+            $user->load('admin');
+            $vendedoresPendentes = Vendedor::where('status_aprovacao', Vendedor::STATUS_PENDENTE)->count();
+            $kpis = [
+                'total_livros' => Livro::count(),
+                'total_vendedores' => Vendedor::count(),
+                'total_clientes' => Cliente::count(),
+                'vendedores_pendentes' => $vendedoresPendentes,
+            ];
+        } elseif ($user->isVendedor()) {
+            $user->load('vendedor.livros');
+            $vendedor = $user->vendedor;
+            if ($vendedor) {
+                $kpis = [
+                    'total_livros' => $vendedor->livros()->count(),
+                    'em_estoque' => $vendedor->livros()->where('quantidade', '>', 0)->count(),
+                    'esgotados' => $vendedor->livros()->where('quantidade', 0)->count(),
+                ];
+            }
+        } else {
+            $user->load('cliente');
+        }
+
+        $enderecos = $user->enderecos()->orderByDesc('principal')->latest()->get();
+        $tab = $request->query('tab', 'visao-geral');
+
+        return view('paginas.painel', compact('user', 'notificacoes', 'kpis', 'tab', 'enderecos'));
+    }
+
+    /**
+     * Retorna a lista de notificações relevantes do usuário autenticado.
+     */
+    public static function obterNotificacoes(User $user): array
+    {
+        $notificacoes = [];
 
         // Notificação universal: verificação de e-mail
         if (!$user->hasVerifiedEmail()) {
@@ -37,8 +73,6 @@ class PainelController extends Controller
         }
 
         if ($user->isAdmin()) {
-            $user->load('admin');
-
             // 1. Vendedores pendentes de aprovação
             $vendedoresPendentes = Vendedor::where('status_aprovacao', Vendedor::STATUS_PENDENTE)->count();
             if ($vendedoresPendentes > 0) {
@@ -64,16 +98,7 @@ class PainelController extends Controller
                     'link_texto' => 'Ver catálogo de livros',
                 ];
             }
-
-            $kpis = [
-                'total_livros' => Livro::count(),
-                'total_vendedores' => Vendedor::count(),
-                'total_clientes' => Cliente::count(),
-                'vendedores_pendentes' => $vendedoresPendentes,
-            ];
-
         } elseif ($user->isVendedor()) {
-            $user->load('vendedor.livros');
             $vendedor = $user->vendedor;
 
             // Notificação de status da loja
@@ -108,18 +133,9 @@ class PainelController extends Controller
                         'link_texto' => 'Gerenciar estoque',
                     ];
                 }
-
-                $kpis = [
-                    'total_livros' => $vendedor->livros()->count(),
-                    'em_estoque' => $vendedor->livros()->where('quantidade', '>', 0)->count(),
-                    'esgotados' => $vendedor->livros()->where('quantidade', 0)->count(),
-                ];
             }
-
         } else {
             // Cliente
-            $user->load('cliente');
-
             $solicitacaoVendedor = Vendedor::where('user_id', $user->id)->first();
             if ($solicitacaoVendedor) {
                 if ($solicitacaoVendedor->isPendente()) {
@@ -154,9 +170,7 @@ class PainelController extends Controller
             }
         }
 
-        $tab = $request->query('tab', 'visao-geral');
-
-        return view('paginas.painel', compact('user', 'notificacoes', 'kpis', 'tab'));
+        return $notificacoes;
     }
 }
 

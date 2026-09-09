@@ -30,7 +30,7 @@ test('new users can register', function () {
     ]);
 
     $this->assertDatabaseHas('cliente', [
-        'cpf' => '123.456.789-00',
-        'celular_contato' => '(61) 99999-9999',
+        'cpf' => '12345678900',
+        'celular_contato' => '61999999999',
     ]);
 });

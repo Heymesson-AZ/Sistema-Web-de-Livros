@@ -177,12 +177,13 @@ class LivroCrudTest extends TestCase
 
         $response->assertRedirect(route('admin.livros.index'));
         $response->assertSessionHas('status');
+        $isbnLimpo = preg_replace('/[^0-9Xx]/', '', $isbn);
         $this->assertDatabaseHas('livros', [
             'titulo' => 'O Alienista Teste',
-            'isbn' => $isbn,
+            'isbn' => $isbnLimpo,
         ]);
 
-        $livro = Livro::where('isbn', $isbn)->first();
+        $livro = Livro::where('isbn', $isbnLimpo)->first();
 
         // 4. Detalhes administrativos
         $response = $this->actingAs($this->adminUser)->get(route('admin.livros.show', $livro));
@@ -246,7 +247,8 @@ class LivroCrudTest extends TestCase
             'vendedor_id' => $this->vendedor->id,
         ]);
 
-        $livro = Livro::where('isbn', $isbn)->first();
+        $isbnLimpo = preg_replace('/[^0-9Xx]/', '', $isbn);
+        $livro = Livro::where('isbn', $isbnLimpo)->first();
 
         // 3. Vendedor pode editar seu livro
         $response = $this->actingAs($this->vendedorUser)->put(route('vendedor.livros.update', $livro), [

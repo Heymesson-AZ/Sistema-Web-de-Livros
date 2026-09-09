@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Livro extends Model
 {
@@ -32,6 +33,48 @@ class Livro extends Model
     protected $casts = [
         'data_publicacao' => 'date',
     ];
+
+    /**
+     * Padroniza o título do livro removendo espaços extras.
+     */
+    protected function titulo(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => trim(preg_replace('/\s+/', ' ', (string) $value))
+        );
+    }
+
+    /**
+     * Higieniza o ISBN removendo hífens e espaços.
+     */
+    protected function isbn(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => strtoupper(trim(preg_replace('/[^0-9Xx]/', '', (string) $value)))
+        );
+    }
+
+    /**
+     * Converte preços formatados (ex: 'R$ 49,90' ou '49,90') para float padronizado.
+     */
+    protected function preco(): Attribute
+    {
+        return Attribute::make(
+            set: function ($value) {
+                if (is_string($value)) {
+                    $limpo = str_replace(['R$', ' '], '', $value);
+                    if (str_contains($limpo, ',') && str_contains($limpo, '.')) {
+                        $limpo = str_replace('.', '', $limpo);
+                        $limpo = str_replace(',', '.', $limpo);
+                    } elseif (str_contains($limpo, ',')) {
+                        $limpo = str_replace(',', '.', $limpo);
+                    }
+                    return (float) $limpo;
+                }
+                return (float) $value;
+            }
+        );
+    }
 
 
     // um livro pertence a um autor

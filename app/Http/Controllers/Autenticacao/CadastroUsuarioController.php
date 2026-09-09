@@ -29,17 +29,27 @@ class CadastroUsuarioController extends Controller
     {
         $datalimite = Carbon::now()->subYears(18)->format('Y-m-d');
 
+        // Normaliza campos para formato padronizado antes da validação
+        if ($request->has('cpf')) {
+            $request->merge(['cpf' => preg_replace('/\D/', '', (string) $request->input('cpf'))]);
+        }
+        if ($request->has('telefone')) {
+            $request->merge(['telefone' => preg_replace('/\D/', '', (string) $request->input('telefone'))]);
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'cpf' => ['required', 'string', 'unique:cliente,cpf'],
-            'telefone' => ['required', 'string'],
+            'cpf' => ['required', 'string', 'size:11', 'unique:cliente,cpf'],
+            'telefone' => ['required', 'string', 'min:10', 'max:15'],
             'data_nascimento' => ['required', 'date', 'before_or_equal:' . $datalimite],
         ], [
             'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
             'name.max' => 'O nome não pode ter mais de 100 caracteres.',
             'data_nascimento.before_or_equal' => 'Você precisa ter pelo menos 18 anos para se cadastrar.',
+            'cpf.required' => 'O CPF é obrigatório.',
+            'cpf.size' => 'O CPF deve conter exatamente 11 números.',
             'cpf.unique' => 'Esse CPF já está cadastrado.',
             'email.unique' => 'O email informado já está em uso.',
         ]);
@@ -61,7 +71,7 @@ class CadastroUsuarioController extends Controller
         // Dispara o evento de usuário registrado (envio de e-mail de confirmação)
         event(new Registered($user));
 
-        Auth::login($user);
+        Auth::login($user, true);
 
         return redirect(route('dashboard', absolute: false));
     }

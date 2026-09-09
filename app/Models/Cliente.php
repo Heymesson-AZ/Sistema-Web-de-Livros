@@ -18,6 +18,26 @@ class Cliente extends Model
         'cpf',
     ];
 
+    /**
+     * Higieniza o CPF para conter apenas dígitos numéricos.
+     */
+    protected function cpf(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            set: fn ($value) => preg_replace('/\D/', '', (string) $value)
+        );
+    }
+
+    /**
+     * Higieniza o telefone de contato para conter apenas dígitos numéricos.
+     */
+    protected function celularContato(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            set: fn ($value) => preg_replace('/\D/', '', (string) $value)
+        );
+    }
+
     // o cliente pertence somente a um usuário
     public function user()
     {

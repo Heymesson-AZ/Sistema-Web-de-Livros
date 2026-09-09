@@ -91,7 +91,7 @@ class VendedorController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
-            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'cnpj' => ['required', 'string', 'max:20', 'unique:' . Vendedor::class . ',cnpj'],
             'razao_social' => ['required', 'string', 'max:255'],
             'nome_fantasia' => ['required', 'string', 'max:255'],
@@ -107,6 +107,7 @@ class VendedorController extends Controller
             'status.in' => 'Selecione um status de conta válido.',
             'foto_perfil.image' => 'O logotipo ou foto deve ser uma imagem válida.',
             'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
+            'foto_perfil.dimensions' => 'O logotipo ou foto deve ter entre 50x50px e 4000x4000px.',
             'cnpj.required' => 'O CNPJ é obrigatório.',
             'cnpj.unique' => 'Este CNPJ já está cadastrado.',
             'razao_social.required' => 'A razão social é obrigatória.',
@@ -182,7 +183,7 @@ class VendedorController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
-            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'remover_foto' => ['nullable', 'boolean'],
             'cnpj' => ['required', 'string', 'max:20', Rule::unique(Vendedor::class, 'cnpj')->ignore($vendedor->id)],
             'razao_social' => ['required', 'string', 'max:255'],
@@ -198,6 +199,7 @@ class VendedorController extends Controller
             'status.in' => 'Selecione um status de conta válido.',
             'foto_perfil.image' => 'O logotipo ou foto deve ser uma imagem válida.',
             'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
+            'foto_perfil.dimensions' => 'O logotipo ou foto deve ter entre 50x50px e 4000x4000px.',
             'cnpj.required' => 'O CNPJ é obrigatório.',
             'cnpj.unique' => 'Este CNPJ já está cadastrado por outro vendedor.',
             'razao_social.required' => 'A razão social é obrigatória.',
@@ -330,7 +332,7 @@ class VendedorController extends Controller
             'razao_social' => ['nullable', 'string', 'max:255'],
             'nome_fantasia' => ['required', 'string', 'max:255'],
             'inscricao_estadual' => ['nullable', 'string', 'max:50'],
-            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'foto_perfil' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048', 'dimensions:min_width=50,min_height=50,max_width=4000,max_height=4000'],
             'remover_foto' => ['nullable', 'boolean'],
         ], [
             'name.required' => 'O nome do responsável é obrigatório.',
@@ -341,6 +343,7 @@ class VendedorController extends Controller
             'nome_fantasia.required' => 'O nome fantasia da loja é obrigatório.',
             'foto_perfil.image' => 'O logotipo ou foto selecionado deve ser uma imagem válida.',
             'foto_perfil.max' => 'A imagem não pode ultrapassar 2MB.',
+            'foto_perfil.dimensions' => 'O logotipo ou foto deve ter entre 50x50px e 4000x4000px.',
         ]);
 
         $user->fill($request->only('name', 'email'));

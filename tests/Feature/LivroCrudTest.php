@@ -154,24 +154,18 @@ class LivroCrudTest extends TestCase
         // 1. Acesso à listagem
         $response = $this->actingAs($this->adminUser)->get(route('admin.livros.index'));
         $response->assertStatus(200);
-        $response->assertSee('Catálogo de Livros');
         $response->assertSee('Moderação do Catálogo');
 
-        // 2. Formulário de cadastro
         // 2. Formulário de cadastro redireciona admin para listagem (publicação exclusiva de lojistas)
         $response = $this->actingAs($this->adminUser)->get(route('admin.livros.create'));
-        $response->assertStatus(200);
         $response->assertRedirect(route('admin.livros.index'));
         $response->assertSessionHas('info');
 
-        // 3. Cadastrar livro via POST
         // 3. Livro cadastrado para moderação e inspeção pelo admin
         $isbn = '978-' . rand(100, 999) . '-' . rand(1000, 9999) . '-' . rand(0, 9);
-        $response = $this->actingAs($this->adminUser)->post(route('admin.livros.store'), [
         $isbnLimpo = preg_replace('/[^0-9Xx]/', '', $isbn);
         $livro = Livro::create([
             'titulo' => 'O Alienista Teste',
-            'isbn' => $isbn,
             'isbn' => $isbnLimpo,
             'data_publicacao' => '1882-03-15',
             'preco' => 35.50,
@@ -183,16 +177,6 @@ class LivroCrudTest extends TestCase
             'sinopse' => 'Simão Bacamarte e o manicômio de Itaguaí.',
             'status_moderacao' => Livro::STATUS_MODERACAO_ATIVO,
         ]);
-
-        $response->assertRedirect(route('admin.livros.index'));
-        $response->assertSessionHas('status');
-        $isbnLimpo = preg_replace('/[^0-9Xx]/', '', $isbn);
-        $this->assertDatabaseHas('livros', [
-            'titulo' => 'O Alienista Teste',
-            'isbn' => $isbnLimpo,
-        ]);
-
-        $livro = Livro::where('isbn', $isbnLimpo)->first();
 
         // 4. Detalhes administrativos
         $response = $this->actingAs($this->adminUser)->get(route('admin.livros.show', $livro));

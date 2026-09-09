@@ -185,7 +185,17 @@ class AdministradorController extends Controller
             'telefone_urgencia' => ['nullable', 'string', 'max:20'],
             'cargo' => ['required', 'string', Rule::in(Admin::getCargos())],
             'departamento' => ['required', 'string', Rule::in(Admin::getDepartamentos())],
+            'senha_confirmacao_admin' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!Hash::check($value, Auth::user()->password)) {
+                        $fail('Sua senha de administrador está incorreta para confirmar esta alteração crítica.');
+                    }
+                },
+            ],
         ], [
+            'senha_confirmacao_admin.required' => 'Informe sua senha de administrador para autorizar esta alteração crítica.',
             'name.required' => 'O nome é obrigatório.',
             'name.min' => 'O nome deve ter pelo menos 3 caracteres.',
             'email.required' => 'O e-mail é obrigatório.',

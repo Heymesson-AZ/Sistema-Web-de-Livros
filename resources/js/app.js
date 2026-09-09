@@ -1,6 +1,6 @@
 /**
  * Ponto de Entrada Principal do Front-end (Vanilla JavaScript)
- * 
+ *
  * Centraliza a inicialização de:
  * 1. Máscaras de formulários brasileiros (CPF, CNPJ, Telefone, CEP, etc.)
  * 2. Busca dinâmica inteligente com debounce e autocompletar via fetch
@@ -17,6 +17,7 @@ import { inicializarMascaras } from "./masks";
 import { initRealtimeValidation as inicializarValidacaoEmTempoReal } from "./validation";
 import { initBuscaDinamica as inicializarBuscaDinamica } from "./busca-dinamica";
 import { inicializarBuscaCep } from "./viacep";
+import { inicializarInteracoesDeclarativas, inicializarIconesLucide } from "./interacoes";
 
 /**
  * Configura o alternador de visualização de senha para todos os campos
@@ -24,14 +25,18 @@ import { inicializarBuscaCep } from "./viacep";
  */
 function configurarAlternadoresDeSenha() {
     document.addEventListener("click", function (evento) {
-        const botao = evento.target.closest("[data-toggle='password'], #togglePassword, .toggle-password-btn");
+        const botao = evento.target.closest(
+            "[data-toggle='password'], #togglePassword, .toggle-password-btn",
+        );
         if (!botao) return;
 
         evento.preventDefault();
 
         // Identifica o campo de senha correspondente
         const seletorAlvo = botao.getAttribute("data-target");
-        let campoSenha = seletorAlvo ? document.querySelector(seletorAlvo) : null;
+        let campoSenha = seletorAlvo
+            ? document.querySelector(seletorAlvo)
+            : null;
         if (!campoSenha) {
             const grupoPai = botao.closest(".input-group");
             campoSenha = grupoPai ? grupoPai.querySelector("input") : null;
@@ -60,13 +65,19 @@ function configurarAlternadoresDeSenha() {
  * Pré-visualização instantânea e validação de tamanho para uploads de imagens
  * Impede envio de arquivos maiores que o limite permitido (ex: 2MB).
  */
-window.previsualizarImagem = function (campoInput, idPrevisualizacao, limiteMegabytes = 2) {
+window.previsualizarImagem = function (
+    campoInput,
+    idPrevisualizacao,
+    limiteMegabytes = 2,
+) {
     if (campoInput.files && campoInput.files[0]) {
         const arquivo = campoInput.files[0];
         const tamanhoMegabytes = arquivo.size / (1024 * 1024);
 
         if (tamanhoMegabytes > limiteMegabytes) {
-            alert(`A foto selecionada possui ${tamanhoMegabytes.toFixed(1)}MB e ultrapassa o limite recomendado de ${limiteMegabytes}MB. Por favor, selecione uma imagem menor.`);
+            alert(
+                `A foto selecionada possui ${tamanhoMegabytes.toFixed(1)}MB e ultrapassa o limite recomendado de ${limiteMegabytes}MB. Por favor, selecione uma imagem menor.`,
+            );
             campoInput.value = "";
             return;
         }
@@ -102,9 +113,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // 5. Configura botões de mostrar/ocultar senha
     configurarAlternadoresDeSenha();
 
-    // 6. Re-executa as máscaras e ViaCEP ao exibir qualquer modal do Bootstrap
+    // 6. Inicializa comportamentos declarativos (prévias, confirmações, modais, lucide)
+    inicializarInteracoesDeclarativas();
+
+    // 7. Re-executa as máscaras e ViaCEP ao exibir qualquer modal do Bootstrap
     document.addEventListener("shown.bs.modal", function () {
         inicializarMascaras();
         inicializarBuscaCep();
+        inicializarIconesLucide();
     });
 });

@@ -39,24 +39,9 @@
                     autocomplete="off" data-dynamic-search>
             </form>
 
-            <!-- Botão de Notificações para Usuários Autenticados -->
+            <!-- Dropdown de Notificações para Usuários Autenticados -->
             @auth
-                @php
-                    $notificacoesUsuario = \App\Http\Controllers\Painel\PainelController::obterNotificacoes(Auth::user());
-                    $totalNotificacoes = count($notificacoesUsuario);
-                @endphp
-                <a href="{{ route('painel', ['tab' => 'visao-geral']) }}"
-                    class="btn position-relative p-2 text-white border-0 bg-transparent rounded-circle d-flex align-items-center justify-content-center"
-                    style="width: 38px; height: 38px;"
-                    title="{{ $totalNotificacoes > 0 ? $totalNotificacoes . ' notificações do sistema' : 'Notificações' }}">
-                    <i class="bi bi-bell-fill fs-5"></i>
-                    @if ($totalNotificacoes > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light"
-                            style="font-size: 10px; padding: 3px 6px;">
-                            {{ $totalNotificacoes }}
-                        </span>
-                    @endif
-                </a>
+                <x-dropdown-notificacoes />
             @endauth
 
             <!-- Menu Dropdown Centralizado do Usuário -->
@@ -84,14 +69,9 @@
     <!-- RODAPÉ -->
     <x-footer />
 
-    <!-- SCRIPTS -->
+    <!-- SCRIPTS EXTERNOS -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    </script>
 </body>
 
 </html>

@@ -191,7 +191,17 @@ class VendedorController extends Controller
             'inscricao_estadual' => ['required', 'string', 'max:50'],
             'telefone_comercial' => ['nullable', 'string', 'max:20'],
             'status_aprovacao' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
+            'senha_confirmacao_admin' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!Hash::check($value, Auth::user()->password)) {
+                        $fail('Sua senha de administrador está incorreta para confirmar esta alteração crítica.');
+                    }
+                },
+            ],
         ], [
+            'senha_confirmacao_admin.required' => 'Informe sua senha de administrador para autorizar esta alteração crítica.',
             'name.required' => 'O nome do responsável é obrigatório.',
             'email.required' => 'O e-mail é obrigatório.',
             'email.unique' => 'Este e-mail já está sendo utilizado.',

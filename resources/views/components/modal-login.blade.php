@@ -60,7 +60,9 @@
                                     <input type="password" name="password" id="password"
                                         class="form-control @error('password') is-invalid border-danger @enderror"
                                         placeholder="Digite sua senha" required>
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword" data-toggle="password" data-target="#password" title="Mostrar/Ocultar Senha" aria-label="Mostrar/Ocultar Senha">
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword"
+                                        data-toggle="password" data-target="#password" title="Mostrar/Ocultar Senha"
+                                        aria-label="Mostrar/Ocultar Senha">
                                         <i class="bi bi-eye" id="toggleIcon"></i>
                                     </button>
                                 </div>
@@ -72,7 +74,8 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember_modal" value="1" checked>
+                                    <input class="form-check-input" type="checkbox" name="remember" id="remember_modal"
+                                        value="1" checked>
                                     <label class="form-check-label small text-muted" for="remember_modal">
                                         Manter conectado por 15 dias
                                     </label>

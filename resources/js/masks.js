@@ -11,7 +11,8 @@ export function inicializarMascaras() {
     function formatarCPF(valor) {
         const digitos = valor.replace(/\D/g, "").slice(0, 11);
         if (digitos.length <= 3) return digitos;
-        if (digitos.length <= 6) return digitos.replace(/(\d{3})(\d+)/, "$1.$2");
+        if (digitos.length <= 6)
+            return digitos.replace(/(\d{3})(\d+)/, "$1.$2");
         if (digitos.length <= 9)
             return digitos.replace(/(\d{3})(\d{3})(\d+)/, "$1.$2.$3");
         return digitos.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
@@ -23,14 +24,15 @@ export function inicializarMascaras() {
     function formatarCNPJ(valor) {
         const digitos = valor.replace(/\D/g, "").slice(0, 14);
         if (digitos.length <= 2) return digitos;
-        if (digitos.length <= 5) return digitos.replace(/(\d{2})(\d+)/, "$1.$2");
+        if (digitos.length <= 5)
+            return digitos.replace(/(\d{2})(\d+)/, "$1.$2");
         if (digitos.length <= 8)
             return digitos.replace(/(\d{2})(\d{3})(\d+)/, "$1.$2.$3");
         if (digitos.length <= 12)
             return digitos.replace(/(\d{2})(\d{3})(\d{3})(\d+)/, "$1.$2.$3/$4");
         return digitos.replace(
             /(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})/,
-            "$1.$2.$3/$4-$5"
+            "$1.$2.$3/$4-$5",
         );
     }
 
@@ -64,18 +66,14 @@ export function inicializarMascaras() {
     function formatarISBN(valor) {
         let limpo = valor.replace(/[^0-9Xx]/g, "").slice(0, 13);
         if (limpo.length <= 3) return limpo;
-        if (limpo.length <= 5)
-            return limpo.replace(/(\d{3})(\d+)/, "$1-$2");
+        if (limpo.length <= 5) return limpo.replace(/(\d{3})(\d+)/, "$1-$2");
         if (limpo.length <= 8)
             return limpo.replace(/(\d{3})(\d{2})(\d+)/, "$1-$2-$3");
         if (limpo.length <= 12)
-            return limpo.replace(
-                /(\d{3})(\d{2})(\d{3,5})(\d+)/,
-                "$1-$2-$3-$4"
-            );
+            return limpo.replace(/(\d{3})(\d{2})(\d{3,5})(\d+)/, "$1-$2-$3-$4");
         return limpo.replace(
             /(\d{3})(\d{2})(\d{3,5})(\d{1,4})([0-9Xx])/,
-            "$1-$2-$3-$4-$5"
+            "$1-$2-$3-$4-$5",
         );
     }
 
@@ -85,7 +83,8 @@ export function inicializarMascaras() {
     function formatarData(valor) {
         const digitos = valor.replace(/\D/g, "").slice(0, 8);
         if (digitos.length <= 2) return digitos;
-        if (digitos.length <= 4) return digitos.replace(/(\d{2})(\d+)/, "$1/$2");
+        if (digitos.length <= 4)
+            return digitos.replace(/(\d{2})(\d+)/, "$1/$2");
         return digitos.replace(/(\d{2})(\d{2})(\d{1,4})/, "$1/$2/$3");
     }
 
@@ -126,13 +125,34 @@ export function inicializarMascaras() {
     }
 
     // Vinculação de máscaras aos respectivos campos identificados
-    vincularMascara('input[data-mask="cpf"], input#cpf, input[name="cpf"]', formatarCPF);
-    vincularMascara('input[data-mask="cnpj"], input#cnpj, input[name="cnpj"]', formatarCNPJ);
-    vincularMascara('input[data-mask="telefone"], input#telefone, input[name="telefone"], input[name="celular_contato"], input[name="telefone_comercial"], input[name="telefone_urgencia"], input#telefone_comercial, input#telefone_urgencia', formatarTelefone);
-    vincularMascara('input[data-mask="cep"], input#cep, input[name="cep"], [data-viacep="cep"]', formatarCEP);
-    vincularMascara('input[data-mask="isbn"], input#isbn, input[name="isbn"]', formatarISBN);
-    vincularMascara('input[data-mask="data"], input[data-mask="date"]', formatarData);
-    vincularMascara('input[data-mask="money"], input.mask-money', formatarMoeda);
+    vincularMascara(
+        'input[data-mask="cpf"], input#cpf, input[name="cpf"]',
+        formatarCPF,
+    );
+    vincularMascara(
+        'input[data-mask="cnpj"], input#cnpj, input[name="cnpj"]',
+        formatarCNPJ,
+    );
+    vincularMascara(
+        'input[data-mask="telefone"], input#telefone, input[name="telefone"], input[name="celular_contato"], input[name="telefone_comercial"], input[name="telefone_urgencia"], input#telefone_comercial, input#telefone_urgencia',
+        formatarTelefone,
+    );
+    vincularMascara(
+        'input[data-mask="cep"], input#cep, input[name="cep"], [data-viacep="cep"]',
+        formatarCEP,
+    );
+    vincularMascara(
+        'input[data-mask="isbn"], input#isbn, input[name="isbn"]',
+        formatarISBN,
+    );
+    vincularMascara(
+        'input[data-mask="data"], input[data-mask="date"]',
+        formatarData,
+    );
+    vincularMascara(
+        'input[data-mask="money"], input.mask-money',
+        formatarMoeda,
+    );
 }
 
 // Alias em inglês para retrocompatibilidade

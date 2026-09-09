@@ -9,7 +9,7 @@ class Editora extends Model
 {
     use HasFactory;
 
-    protected $table = 'editoras';  
+    protected $table = 'editoras';
     protected $fillable = ['nome'];
 
     /**
@@ -27,5 +27,5 @@ class Editora extends Model
     {
         return $this->hasMany(Livro::class); // Relacionamento de uma editora para muitos livros
     }
-    
+
 }

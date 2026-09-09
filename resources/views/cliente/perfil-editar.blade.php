@@ -47,7 +47,7 @@
                                         <input type="file" name="foto_perfil" id="foto_perfil_cliente"
                                             class="form-control form-control-sm @error('foto_perfil') is-invalid @enderror"
                                             accept="image/png, image/jpeg, image/jpg, image/webp"
-                                            onchange="window.previewImage(this, 'avatarPreviewCliente')">
+                                            data-preview-target="avatarPreviewCliente">
                                         <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
                                             Formatos aceitos: JPG, PNG, WEBP até 2MB.
                                         </small>

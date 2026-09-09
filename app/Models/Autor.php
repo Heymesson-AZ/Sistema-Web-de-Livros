@@ -39,7 +39,7 @@ class Autor extends Model
     }
 
     /**
-     * Opcional: Se você quiser que o Laravel trate a data_nascimento 
+     * Opcional: Se você quiser que o Laravel trate a data_nascimento
      * como um objeto Carbon (data) automaticamente.
      */
     protected $casts = [

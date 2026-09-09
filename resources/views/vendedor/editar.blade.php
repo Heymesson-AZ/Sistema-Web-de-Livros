@@ -46,7 +46,7 @@
                                     <input type="file" name="foto_perfil" id="foto_perfil"
                                         class="form-control form-control-sm @error('foto_perfil') is-invalid @enderror"
                                         accept="image/png, image/jpeg, image/jpg, image/webp"
-                                        onchange="window.previewImage(this, 'avatarPreviewVendedorEdit')">
+                                        data-preview-target="avatarPreviewVendedorEdit">
                                     <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
                                         JPG, PNG ou WEBP até 2MB. Selecione um novo arquivo para substituir o logotipo
                                         atual.
@@ -225,6 +225,33 @@
                                 @error('status_aprovacao')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+                        </div>
+
+                        <!-- CONFIRMAÇÃO DE SEGURANÇA (SENHA DO ADMINISTRADOR) -->
+                        <div class="p-3 mb-4 rounded-3 border border-warning bg-warning bg-opacity-10">
+                            <div class="d-flex align-items-center gap-2 mb-2 text-warning-emphasis">
+                                <i class="bi bi-shield-lock-fill fs-5"></i>
+                                <h6 class="fw-bold mb-0">Confirmação de Segurança do Administrador</h6>
+                            </div>
+                            <p class="text-muted small mb-2">
+                                Para autorizar esta alteração cadastral ou de status deste vendedor, digite a <strong>sua senha de administrador</strong>:
+                            </p>
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="input-group input-group-sm">
+                                        <input type="password" name="senha_confirmacao_admin" id="senha_confirmacao_admin_vend"
+                                            class="form-control @error('senha_confirmacao_admin') is-invalid @enderror"
+                                            placeholder="Digite sua senha de administrador" required>
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            data-toggle="password" data-target="#senha_confirmacao_admin_vend" title="Mostrar/Ocultar Senha">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    @error('senha_confirmacao_admin')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 

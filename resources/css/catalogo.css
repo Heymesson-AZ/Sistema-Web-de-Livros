@@ -1,0 +1,51 @@
+/**
+ * Estilos do Catálogo de Livros (Estilo Amazon)
+ * Extraído de inicio.blade.php para modularização limpa de assets
+ */
+
+.hover-bg-light:hover {
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+.hover-primary:hover {
+    color: #2563eb !important;
+}
+
+.book-title-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6rem;
+    line-height: 1.3;
+}
+
+.amazon-book-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.amazon-book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.12) !important;
+}
+
+.book-cover-wrapper {
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.book-cover-img {
+    max-height: 220px;
+    max-width: 150px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.amazon-book-card:hover .book-cover-img {
+    transform: scale(1.04);
+}
+

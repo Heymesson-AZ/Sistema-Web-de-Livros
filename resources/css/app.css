@@ -1,6 +1,8 @@
 @import "./menu.css";
 @import "./login.css";
 @import "./carrosel.css";
+@import "./catalogo.css";
+@import "./site-footer.css";
 
 @tailwind base;
 @tailwind components;

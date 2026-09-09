@@ -85,7 +85,8 @@
                         $notifsMenu = \App\Http\Controllers\Painel\PainelController::obterNotificacoes(Auth::user());
                         $qtdNotifsMenu = count($notifsMenu);
                     @endphp
-                    <li class="menu-item {{ request()->is('painel*') && request('tab') === 'visao-geral' ? 'active' : '' }}">
+                    <li
+                        class="menu-item {{ request()->is('painel*') && request('tab') === 'visao-geral' ? 'active' : '' }}">
                         <a href="{{ route('painel', ['tab' => 'visao-geral']) }}" class="menu-item-link">
                             <div class="menu-item-header">
                                 <i data-lucide="bell"></i>

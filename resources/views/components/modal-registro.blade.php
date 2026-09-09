@@ -15,7 +15,8 @@
                     </div>
 
                     <!-- Lado Direito (Formulário) -->
-                    <div class="col-md-8 p-3 p-sm-4 p-md-5 position-relative" style="max-height: 85vh; overflow-y: auto;">
+                    <div class="col-md-8 p-3 p-sm-4 p-md-5 position-relative"
+                        style="max-height: 85vh; overflow-y: auto;">
                         <button type="button" class="btn-close position-absolute top-0 end-0 m-3"
                             data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -113,7 +114,9 @@
                                         <input type="password" name="password" id="register_password" minlength="8"
                                             class="form-control @error('password') is-invalid border-danger @enderror"
                                             placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
-                                        <button class="btn btn-outline-secondary" type="button" data-toggle="password" data-target="#register_password" title="Mostrar/Ocultar Senha" aria-label="Mostrar/Ocultar Senha">
+                                        <button class="btn btn-outline-secondary" type="button" data-toggle="password"
+                                            data-target="#register_password" title="Mostrar/Ocultar Senha"
+                                            aria-label="Mostrar/Ocultar Senha">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
@@ -127,10 +130,13 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label small fw-bold text-secondary">Confirmar Senha</label>
                                     <div class="input-group">
-                                        <input type="password" name="password_confirmation" id="register_password_confirmation" minlength="8"
+                                        <input type="password" name="password_confirmation"
+                                            id="register_password_confirmation" minlength="8"
                                             class="form-control @error('password_confirmation') is-invalid border-danger @enderror"
                                             placeholder="Repita a senha" required>
-                                        <button class="btn btn-outline-secondary" type="button" data-toggle="password" data-target="#register_password_confirmation" title="Mostrar/Ocultar Senha" aria-label="Mostrar/Ocultar Senha">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            data-toggle="password" data-target="#register_password_confirmation"
+                                            title="Mostrar/Ocultar Senha" aria-label="Mostrar/Ocultar Senha">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>

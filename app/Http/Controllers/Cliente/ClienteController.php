@@ -172,7 +172,17 @@ class ClienteController extends Controller
             'cpf' => ['required', 'string', 'max:20', Rule::unique(Cliente::class, 'cpf')->ignore($cliente->id)],
             'celular_contato' => ['nullable', 'string', 'max:20'],
             'data_nascimento' => ['required', 'date', 'before:today'],
+            'senha_confirmacao_admin' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    if (!Hash::check($value, Auth::user()->password)) {
+                        $fail('Sua senha de administrador está incorreta para confirmar esta alteração crítica.');
+                    }
+                },
+            ],
         ], [
+            'senha_confirmacao_admin.required' => 'Informe sua senha de administrador para autorizar esta alteração crítica.',
             'name.required' => 'O nome do cliente é obrigatório.',
             'email.required' => 'O e-mail é obrigatório.',
             'email.unique' => 'Este e-mail já está em uso.',

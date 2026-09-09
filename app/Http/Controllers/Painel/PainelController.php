@@ -73,99 +73,146 @@ class PainelController extends Controller
         }
 
         if ($user->isAdmin()) {
-            // 1. Vendedores pendentes de aprovação
+            // 1. Vendedores pendentes de moderação/aprovação (Prioridade Alta)
             $vendedoresPendentes = Vendedor::where('status_aprovacao', Vendedor::STATUS_PENDENTE)->count();
             if ($vendedoresPendentes > 0) {
                 $notificacoes[] = [
                     'tipo' => 'warning',
                     'icone' => 'bi-hourglass-split',
                     'titulo' => 'Solicitações de Vendedores Pendentes',
-                    'mensagem' => "Existem {$vendedoresPendentes} loja(s) de vendedor aguardando avaliação da moderação.",
-                    'link' => route('admin.vendedores.index'),
-                    'link_texto' => 'Avaliar solicitações',
+                    'mensagem' => "Existem {$vendedoresPendentes} solicitação(ões) de vendedores pendentes de análise administrativa.",
+                    'link' => route('admin.vendedores.index', ['status_aprovacao' => 'pendente']),
+                    'link_texto' => 'Avaliar Vendedores',
                 ];
             }
 
-            // 2. Livros com estoque crítico
-            $livrosEstoqueBaixo = Livro::where('quantidade', '<=', 3)->count();
-            if ($livrosEstoqueBaixo > 0) {
+            // 2. Ruptura de estoque no catálogo da plataforma
+            $livrosSemEstoque = Livro::where('quantidade', '<=', 0)->count();
+            if ($livrosSemEstoque > 0) {
                 $notificacoes[] = [
                     'tipo' => 'danger',
-                    'icone' => 'bi-exclamation-triangle-fill',
-                    'titulo' => 'Alerta de Estoque Crítico',
-                    'mensagem' => "Existem {$livrosEstoqueBaixo} exemplar(es) com estoque zerado ou em nível crítico (<= 3 unidades).",
-                    'link' => route('admin.livros.index'),
-                    'link_texto' => 'Ver catálogo de livros',
+                    'icone' => 'bi-exclamation-octagon-fill',
+                    'titulo' => 'Ruptura de Estoque no Catálogo',
+                    'mensagem' => "Existem {$livrosSemEstoque} título(s) com estoque totalmente esgotado no catálogo geral.",
+                    'link' => route('admin.livros.index', ['status_estoque' => 'sem_estoque']),
+                    'link_texto' => 'Auditar Catálogo',
+                ];
+            }
+
+            // 3. Novos usuários cadastrados nas últimas 24 horas
+            $novosUsuarios = User::where('created_at', '>=', now()->subDay())->count();
+            if ($novosUsuarios > 0) {
+                $notificacoes[] = [
+                    'tipo' => 'info',
+                    'icone' => 'bi-people-fill',
+                    'titulo' => 'Novos Usuários na Plataforma',
+                    'mensagem' => "{$novosUsuarios} novo(s) usuário(s) cadastrado(s) nas últimas 24 horas no sistema.",
+                    'link' => route('admin.clientes.index'),
+                    'link_texto' => 'Gerenciar Usuários',
                 ];
             }
         } elseif ($user->isVendedor()) {
             $vendedor = $user->vendedor;
 
-            // Notificação de status da loja
+            // 1. Notificação de status da loja
             if ($vendedor && $vendedor->isPendente()) {
                 $notificacoes[] = [
                     'tipo' => 'warning',
                     'icone' => 'bi-clock-history',
                     'titulo' => 'Loja em Análise Cadastral',
-                    'mensagem' => 'Seus dados comerciais foram recebidos e estão sob avaliação da equipe. Em breve você receberá a confirmação por e-mail.',
+                    'mensagem' => 'Seus dados comerciais estão em análise pela administração. Você será notificado assim que aprovado.',
+                ];
+            } elseif ($vendedor && $vendedor->isRejeitado()) {
+                $notificacoes[] = [
+                    'tipo' => 'danger',
+                    'icone' => 'bi-x-octagon-fill',
+                    'titulo' => 'Loja Recusada pela Moderação',
+                    'mensagem' => 'Sua solicitação de vendedor não foi aprovada. Revise suas informações comerciais.',
+                    'link' => route('vendedor.perfil.editar'),
+                    'link_texto' => 'Revisar Dados',
                 ];
             } elseif ($vendedor && $vendedor->isAprovado()) {
                 $notificacoes[] = [
                     'tipo' => 'success',
                     'icone' => 'bi-patch-check-fill',
-                    'titulo' => 'Loja Ativa e Habilitada',
-                    'mensagem' => 'Sua livraria parceira está aprovada e apta para publicar e comercializar livros.',
+                    'titulo' => 'Loja Ativa & Habilitada',
+                    'mensagem' => 'Sua loja parceira está apta para publicar e comercializar livros no catálogo oficial.',
                     'link' => route('vendedor.livros.create'),
-                    'link_texto' => 'Publicar novo livro',
+                    'link_texto' => 'Publicar Novo Livro',
                 ];
             }
 
-            // Livros com estoque crítico da loja
+            // 2. Livros com estoque esgotado da própria loja
             if ($vendedor) {
-                $estoqueCriticoLoja = $vendedor->livros()->where('quantidade', '<=', 3)->count();
-                if ($estoqueCriticoLoja > 0) {
+                $estoqueZeradoLoja = $vendedor->livros()->where('quantidade', '<=', 0)->count();
+                if ($estoqueZeradoLoja > 0) {
                     $notificacoes[] = [
                         'tipo' => 'danger',
                         'icone' => 'bi-box-seam-fill',
+                        'titulo' => 'Estoque Esgotado na Loja',
+                        'mensagem' => "Você possui {$estoqueZeradoLoja} livro(s) com quantidade zerada aguardando reposição.",
+                        'link' => route('vendedor.livros.index', ['status_estoque' => 'sem_estoque']),
+                        'link_texto' => 'Repor Estoque',
+                    ];
+                }
+
+                // 3. Livros com estoque baixo (1 a 3 unidades)
+                $estoqueBaixoLoja = $vendedor->livros()->where('quantidade', '>', 0)->where('quantidade', '<=', 3)->count();
+                if ($estoqueBaixoLoja > 0) {
+                    $notificacoes[] = [
+                        'tipo' => 'warning',
+                        'icone' => 'bi-exclamation-triangle-fill',
                         'titulo' => 'Estoque Baixo na sua Loja',
-                        'mensagem' => "Você possui {$estoqueCriticoLoja} livro(s) com quantidade menor ou igual a 3 unidades.",
+                        'mensagem' => "Você tem {$estoqueBaixoLoja} livro(s) com 3 ou menos unidades disponíveis.",
                         'link' => route('vendedor.livros.index'),
-                        'link_texto' => 'Gerenciar estoque',
+                        'link_texto' => 'Ajustar Quantidades',
                     ];
                 }
             }
         } else {
             // Cliente
+            // 1. Ausência de endereço principal para compras
+            $temEnderecoPrincipal = $user->enderecos()->where('principal', true)->exists();
+            if (!$temEnderecoPrincipal) {
+                $notificacoes[] = [
+                    'tipo' => 'warning',
+                    'icone' => 'bi-geo-alt-fill',
+                    'titulo' => 'Defina seu Endereço de Entrega',
+                    'mensagem' => 'Você ainda não possui um endereço principal configurado. Cadastre para agilizar seus pedidos.',
+                    'link' => route('painel', ['tab' => 'enderecos']),
+                    'link_texto' => 'Cadastrar Endereço',
+                ];
+            }
+
+            // 2. Dados cadastrais essenciais incompletos
+            if (empty($user->cliente?->celular_contato) || empty($user->cliente?->cpf)) {
+                $notificacoes[] = [
+                    'tipo' => 'info',
+                    'icone' => 'bi-person-badge-fill',
+                    'titulo' => 'Complete seus Dados Pessoais',
+                    'mensagem' => 'Preencha seu telefone e CPF no painel para facilitar contato e emissão de notas.',
+                    'link' => route('painel', ['tab' => 'perfil']),
+                    'link_texto' => 'Completar Perfil',
+                ];
+            }
+
+            // 3. Convite para venda
             $solicitacaoVendedor = Vendedor::where('user_id', $user->id)->first();
-            if ($solicitacaoVendedor) {
-                if ($solicitacaoVendedor->isPendente()) {
-                    $notificacoes[] = [
-                        'tipo' => 'info',
-                        'icone' => 'bi-hourglass-split',
-                        'titulo' => 'Solicitação de Vendedor em Análise',
-                        'mensagem' => "Sua solicitação de abertura da loja '{$solicitacaoVendedor->nome_fantasia}' está sendo avaliada.",
-                    ];
-                }
-            } else {
+            if ($solicitacaoVendedor && $solicitacaoVendedor->isPendente()) {
+                $notificacoes[] = [
+                    'tipo' => 'info',
+                    'icone' => 'bi-hourglass-split',
+                    'titulo' => 'Solicitação de Vendedor em Análise',
+                    'mensagem' => "Sua solicitação para abrir a loja '{$solicitacaoVendedor->nome_fantasia}' está em avaliação.",
+                ];
+            } elseif (!$solicitacaoVendedor) {
                 $notificacoes[] = [
                     'tipo' => 'primary',
                     'icone' => 'bi-shop',
                     'titulo' => 'Abra sua Loja Parceira',
-                    'mensagem' => 'Cadastre sua livraria ou sebo e alcance leitores em todo o Brasil sem mensalidades.',
+                    'mensagem' => 'Deseja comercializar seus títulos em nosso catálogo? Cadastre sua loja parceira!',
                     'link' => route('vendedor.solicitar'),
-                    'link_texto' => 'Quero ser vendedor',
-                ];
-            }
-
-            // Notificação de perfil incompleto
-            if (!$user->foto_perfil || empty($user->cliente?->celular_contato)) {
-                $notificacoes[] = [
-                    'tipo' => 'info',
-                    'icone' => 'bi-person-circle',
-                    'titulo' => 'Complete seu Perfil',
-                    'mensagem' => 'Adicione uma foto de perfil e seu celular de contato para uma experiência personalizada.',
-                    'link' => '#aba-perfil',
-                    'link_texto' => 'Completar dados',
+                    'link_texto' => 'Quero Vender',
                 ];
             }
         }

@@ -109,21 +109,3 @@
         </div>
     </div>
 </footer>
-
-<style>
-    .site-footer {
-        background: #0f172a !important;
-        margin-left: var(--menu-width-closed, 74px);
-    }
-
-    @media (max-width: 991.98px) {
-        .site-footer {
-            margin-left: 0 !important;
-        }
-    }
-
-    .site-footer .hover-white:hover {
-        color: #fff !important;
-        text-decoration: underline !important;
-    }
-</style>

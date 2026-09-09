@@ -14,9 +14,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+@php
+    $modalAutomatico = '';
+    if (old('formulario') === 'registro' || $errors->hasAny(['name', 'cpf', 'data_nascimento', 'telefone', 'password_confirmation'])) {
+        $modalAutomatico = 'registerModal';
+    } elseif (old('formulario') === 'recuperar_senha' || session('form_sucesso') === 'recuperar_senha') {
+        $modalAutomatico = 'forgotPasswordModal';
+    } elseif ($errors->any() || session('status')) {
+        $modalAutomatico = 'loginModal';
+    }
+@endphp
 
-<body>
+<body @if($modalAutomatico) data-auth-modal="{{ $modalAutomatico }}" @endif>
 
     <!-- NAVBAR -->
     <nav class="topbar">
@@ -76,40 +85,9 @@
     <!-- RODAPÉ -->
     <x-footer />
 
-    <!-- LUCIDE -->
+    <!-- SCRIPTS EXTERNOS -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-
-            // Abre o modal correto quando houver erro de validação ou status de sessão
-            @if (old('formulario') === 'registro' ||
-                    $errors->hasAny(['name', 'cpf', 'data_nascimento', 'telefone', 'password_confirmation']))
-                var regEl = document.getElementById('registerModal');
-                if (regEl) {
-                    var regModal = new bootstrap.Modal(regEl);
-                    regModal.show();
-                }
-            @elseif (old('formulario') === 'recuperar_senha' || session('form_sucesso') === 'recuperar_senha')
-                var forgotEl = document.getElementById('forgotPasswordModal');
-                if (forgotEl) {
-                    var forgotModal = new bootstrap.Modal(forgotEl);
-                    forgotModal.show();
-                }
-            @elseif ($errors->any() || session('status'))
-                var logEl = document.getElementById('loginModal');
-                if (logEl) {
-                    var logModal = new bootstrap.Modal(logEl);
-                    logModal.show();
-                }
-            @endif
-        });
-    </script>
-
 </body>
 
 </html>

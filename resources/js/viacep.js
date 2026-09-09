@@ -1,6 +1,6 @@
 /**
  * Módulo de Integração com a API ViaCEP (Vanilla JavaScript)
- * 
+ *
  * Funcionalidade:
  * - Realiza consulta assíncrona automática ao digitar o CEP (8 dígitos).
  * - Preenche automaticamente os campos de Rua, Bairro, Cidade e Estado.
@@ -19,7 +19,9 @@ export function inicializarBuscaCep() {
         const campoCidade = conteiner.querySelector("[data-viacep='cidade']");
         const campoEstado = conteiner.querySelector("[data-viacep='estado']");
         const campoNumero = conteiner.querySelector("[data-viacep='numero']");
-        const elementoMensagem = conteiner.querySelector("[data-viacep='mensagem']");
+        const elementoMensagem = conteiner.querySelector(
+            "[data-viacep='mensagem']",
+        );
 
         if (!campoCep) return;
 
@@ -61,26 +63,35 @@ export function inicializarBuscaCep() {
                 try {
                     const resposta = await fetch(
                         `https://viacep.com.br/ws/${cepLimpo}/json/`,
-                        { signal: controladorRequisicao.signal }
+                        { signal: controladorRequisicao.signal },
                     );
 
                     if (!resposta.ok) {
-                        throw new Error("Erro na comunicação com o serviço ViaCEP");
+                        throw new Error(
+                            "Erro na comunicação com o serviço ViaCEP",
+                        );
                     }
 
                     const dados = await resposta.json();
 
                     // O serviço ViaCEP retorna { erro: "true" } quando o CEP não é localizado
                     if (dados.erro) {
-                        exibirMensagem("CEP não encontrado. Por favor, digite os dados manualmente.", "warning");
+                        exibirMensagem(
+                            "CEP não encontrado. Por favor, digite os dados manualmente.",
+                            "warning",
+                        );
                         return;
                     }
 
                     // Preenche os campos com os dados retornados
-                    if (campoRua && dados.logradouro) campoRua.value = dados.logradouro;
-                    if (campoBairro && dados.bairro) campoBairro.value = dados.bairro;
-                    if (campoCidade && dados.localidade) campoCidade.value = dados.localidade;
-                    if (campoEstado && dados.uf) campoEstado.value = dados.uf.toUpperCase();
+                    if (campoRua && dados.logradouro)
+                        campoRua.value = dados.logradouro;
+                    if (campoBairro && dados.bairro)
+                        campoBairro.value = dados.bairro;
+                    if (campoCidade && dados.localidade)
+                        campoCidade.value = dados.localidade;
+                    if (campoEstado && dados.uf)
+                        campoEstado.value = dados.uf.toUpperCase();
 
                     limparMensagem();
 
@@ -90,7 +101,10 @@ export function inicializarBuscaCep() {
                     }
                 } catch (erro) {
                     if (erro.name === "AbortError") return;
-                    exibirMensagem("Não foi possível consultar o CEP automaticamente. Digite os dados manualmente.", "secondary");
+                    exibirMensagem(
+                        "Não foi possível consultar o CEP automaticamente. Digite os dados manualmente.",
+                        "secondary",
+                    );
                 }
             }
         });

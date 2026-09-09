@@ -59,7 +59,7 @@
                                         <input type="file" name="foto_perfil" id="foto_perfil_input"
                                             class="form-control form-control-sm @error('foto_perfil') is-invalid @enderror"
                                             accept="image/png, image/jpeg, image/jpg, image/webp"
-                                            onchange="window.previewImage(this, 'avatarPreviewAdmin')">
+                                            data-preview-target="avatarPreviewAdmin">
                                         <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
                                             Formatos aceitos: JPG, PNG, WEBP até 2MB.
                                         </small>
@@ -162,7 +162,7 @@
 
                                 <div class="d-grid d-sm-flex justify-content-sm-end">
                                     <button type="submit" class="btn btn-outline-danger px-4 py-2"
-                                        onclick="return confirm('Tem certeza de que deseja excluir sua conta de administrador? Esta ação é irreversível.')">
+                                        data-confirm="Tem certeza de que deseja excluir sua conta de administrador? Esta ação é irreversível.">
                                         <i class="bi bi-trash me-1"></i>
                                         Excluir minha conta
                                     </button>

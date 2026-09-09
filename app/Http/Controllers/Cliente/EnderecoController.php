@@ -177,3 +177,4 @@ class EnderecoController extends Controller
             ->with('status', 'Endereço removido com sucesso.');
     }
 }
+

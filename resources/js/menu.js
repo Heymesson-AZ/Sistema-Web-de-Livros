@@ -32,7 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (botaoAbrirMenu) {
         botaoAbrirMenu.addEventListener("click", (evento) => {
             evento.stopPropagation();
-            if (envoltorioMenu && envoltorioMenu.classList.contains("is-open")) {
+            if (
+                envoltorioMenu &&
+                envoltorioMenu.classList.contains("is-open")
+            ) {
                 fecharMenuMovel();
             } else {
                 abrirMenuMovel();
@@ -55,7 +58,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fecha a gaveta com a tecla Escape
     document.addEventListener("keydown", (evento) => {
-        if (evento.key === "Escape" && envoltorioMenu && envoltorioMenu.classList.contains("is-open")) {
+        if (
+            evento.key === "Escape" &&
+            envoltorioMenu &&
+            envoltorioMenu.classList.contains("is-open")
+        ) {
             fecharMenuMovel();
         }
     });
@@ -68,7 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Controle de Submenus sanfonados (Acordeão)
-    const itensComSubmenu = document.querySelectorAll(".menu-inner ul li.has-submenu");
+    const itensComSubmenu = document.querySelectorAll(
+        ".menu-inner ul li.has-submenu",
+    );
 
     itensComSubmenu.forEach((item) => {
         const cabecalhoItem = item.querySelector(".menu-item-header");
@@ -90,7 +99,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Fecha a gaveta móvel ao clicar em links ou abrir modais
-    const gatilhosModais = document.querySelectorAll("#menu [data-bs-toggle='modal'], #menu a.menu-item-link");
+    const gatilhosModais = document.querySelectorAll(
+        "#menu [data-bs-toggle='modal'], #menu a.menu-item-link",
+    );
     gatilhosModais.forEach((gatilho) => {
         gatilho.addEventListener("click", () => {
             fecharMenuMovel();

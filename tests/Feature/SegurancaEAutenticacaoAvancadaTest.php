@@ -96,3 +96,4 @@ class SegurancaEAutenticacaoAvancadaTest extends TestCase
         $this->assertEquals('joao@teste.com', $user->email);
     }
 }
+

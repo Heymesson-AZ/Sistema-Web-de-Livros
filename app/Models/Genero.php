@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class Genero extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'generos'; // Especifica o nome da tabela no banco de dados
     protected $fillable = ['nome'];
 

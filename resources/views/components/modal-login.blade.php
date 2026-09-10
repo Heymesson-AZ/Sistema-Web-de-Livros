@@ -61,8 +61,8 @@
                                         class="form-control @error('password') is-invalid border-danger @enderror"
                                         placeholder="Digite sua senha" required>
                                     <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword"
-                                        data-toggle="password" data-target="#login_password" title="Mostrar ou Ocultar Senha"
-                                        aria-label="Mostrar ou Ocultar Senha">
+                                        data-toggle="password" data-target="#login_password"
+                                        title="Mostrar ou Ocultar Senha" aria-label="Mostrar ou Ocultar Senha">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>

@@ -18,18 +18,32 @@
                 <!-- SIDEBAR DE FILTROS (MOBILE-FIRST COM TOGGLE SANFONADO NO CELULAR) -->
                 <aside class="col-12 col-lg-3">
                     @php
-                        $filtrosAtivosCount = collect(['busca', 'genero', 'categoria', 'editora', 'faixa_preco', 'preco_min', 'preco_max', 'em_estoque'])->filter(fn($f) => request()->filled($f))->count();
+                        $filtrosAtivosCount = collect([
+                            'busca',
+                            'genero',
+                            'categoria',
+                            'editora',
+                            'faixa_preco',
+                            'preco_min',
+                            'preco_max',
+                            'em_estoque',
+                        ])
+                            ->filter(fn($f) => request()->filled($f))
+                            ->count();
                     @endphp
 
                     <!-- Botão Expansível Exclusivo Mobile (< 992px) -->
                     <div class="d-lg-none mb-3">
-                        <button class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center py-2.5 px-3 rounded-3 shadow-xs"
+                        <button
+                            class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center py-2.5 px-3 rounded-3 shadow-xs"
                             type="button" data-bs-toggle="collapse" data-bs-target="#filtrosMobileCollapse"
-                            aria-expanded="{{ $filtrosAtivosCount > 0 ? 'true' : 'false' }}" aria-controls="filtrosMobileCollapse">
+                            aria-expanded="{{ $filtrosAtivosCount > 0 ? 'true' : 'false' }}"
+                            aria-controls="filtrosMobileCollapse">
                             <span class="fw-semibold d-flex align-items-center gap-2">
                                 <i class="bi bi-funnel-fill"></i> Filtrar Catálogo
                                 @if ($filtrosAtivosCount > 0)
-                                    <span class="badge bg-primary text-white rounded-pill px-2" style="font-size: 11px;">
+                                    <span class="badge bg-primary text-white rounded-pill px-2"
+                                        style="font-size: 11px;">
                                         {{ $filtrosAtivosCount }} ativo(s)
                                     </span>
                                 @endif
@@ -38,207 +52,215 @@
                         </button>
                     </div>
 
-                    <div class="collapse d-lg-block {{ $filtrosAtivosCount > 0 ? 'show' : '' }}" id="filtrosMobileCollapse">
+                    <div class="collapse d-lg-block {{ $filtrosAtivosCount > 0 ? 'show' : '' }}"
+                        id="filtrosMobileCollapse">
                         <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 85px; z-index: 10;">
                             <div class="card-body p-4">
 
-                            <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
-                                <h5 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
-                                    <i class="bi bi-funnel-fill text-primary"></i> Filtros
-                                </h5>
-                                @if (request()->hasAny([
-                                        'busca',
-                                        'genero',
-                                        'categoria',
-                                        'editora',
-                                        'faixa_preco',
-                                        'preco_min',
-                                        'preco_max',
-                                        'em_estoque',
-                                        'ordem',
-                                    ]))
-                                    <a href="{{ url('/#catalogo') }}"
-                                        class="small text-danger text-decoration-none fw-semibold">
-                                        <i class="bi bi-x-circle me-1"></i>Limpar
-                                    </a>
-                                @endif
-                            </div>
-
-                            <form action="{{ url('/#catalogo') }}" method="GET" id="filtrosForm">
-
-                                <!-- FILTRO: BUSCA DENTRO DO CATÁLOGO COM BUSCA DINÂMICA -->
-                                <div class="mb-4">
-                                    <label
-                                        class="form-label small fw-bold text-secondary text-uppercase tracking-wider">Palavra-chave</label>
-                                    <div class="input-group input-group-sm">
-                                        <input type="text" name="busca" class="form-control rounded-start-pill"
-                                            placeholder="Título, autor, ISBN..." value="{{ request('busca') }}"
-                                            data-dynamic-search autocomplete="off">
-                                        <button class="btn btn-outline-primary rounded-end-pill" type="submit">
-                                            <i class="bi bi-search"></i>
-                                        </button>
-                                    </div>
+                                <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
+                                    <h5 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
+                                        <i class="bi bi-funnel-fill text-primary"></i> Filtros
+                                    </h5>
+                                    @if (request()->hasAny([
+                                            'busca',
+                                            'genero',
+                                            'categoria',
+                                            'editora',
+                                            'faixa_preco',
+                                            'preco_min',
+                                            'preco_max',
+                                            'em_estoque',
+                                            'ordem',
+                                        ]))
+                                        <a href="{{ url('/#catalogo') }}"
+                                            class="small text-danger text-decoration-none fw-semibold">
+                                            <i class="bi bi-x-circle me-1"></i>Limpar
+                                        </a>
+                                    @endif
                                 </div>
 
-                                <!-- FILTRO: DEPARTAMENTOS / GÊNEROS (SELEÇÃO MANUAL) -->
-                                <div class="mb-4">
-                                    <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Departamentos
-                                    </h6>
-                                    <div class="d-flex flex-column gap-2 small p-2 bg-light rounded-3"
-                                        style="max-height: 220px; overflow-y: auto;">
-                                        <div class="form-check m-0">
-                                            <input class="form-check-input" type="radio" name="genero" id="gen_todos"
-                                                value=""
-                                                {{ !request('genero') && !request('categoria') ? 'checked' : '' }}>
-                                            <label
-                                                class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center"
-                                                for="gen_todos">
-                                                <span>Todos os Gêneros</span>
-                                                <span
-                                                    class="badge bg-white text-secondary border">{{ $totalLivros }}</span>
-                                            </label>
+                                <form action="{{ url('/#catalogo') }}" method="GET" id="filtrosForm">
+
+                                    <!-- FILTRO: BUSCA DENTRO DO CATÁLOGO COM BUSCA DINÂMICA -->
+                                    <div class="mb-4">
+                                        <label
+                                            class="form-label small fw-bold text-secondary text-uppercase tracking-wider">Palavra-chave</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" name="busca" class="form-control rounded-start-pill"
+                                                placeholder="Título, autor, ISBN..." value="{{ request('busca') }}"
+                                                data-dynamic-search autocomplete="off">
+                                            <button class="btn btn-outline-primary rounded-end-pill" type="submit">
+                                                <i class="bi bi-search"></i>
+                                            </button>
                                         </div>
-                                        @foreach ($generos as $gen)
-                                            @php
-                                                $isSelected =
-                                                    request('genero') == $gen->id ||
-                                                    request('categoria') == $gen->nome ||
-                                                    request('genero') == $gen->nome;
-                                            @endphp
+                                    </div>
+
+                                    <!-- FILTRO: DEPARTAMENTOS / GÊNEROS (SELEÇÃO MANUAL) -->
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">
+                                            Departamentos
+                                        </h6>
+                                        <div class="d-flex flex-column gap-2 small p-2 bg-light rounded-3"
+                                            style="max-height: 220px; overflow-y: auto;">
                                             <div class="form-check m-0">
                                                 <input class="form-check-input" type="radio" name="genero"
-                                                    id="gen_{{ $gen->id }}" value="{{ $gen->id }}"
-                                                    {{ $isSelected ? 'checked' : '' }}>
+                                                    id="gen_todos" value=""
+                                                    {{ !request('genero') && !request('categoria') ? 'checked' : '' }}>
                                                 <label
                                                     class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center"
-                                                    for="gen_{{ $gen->id }}">
-                                                    <span class="text-truncate"
-                                                        style="max-width: 140px;">{{ $gen->nome }}</span>
+                                                    for="gen_todos">
+                                                    <span>Todos os Gêneros</span>
                                                     <span
-                                                        class="badge bg-white text-secondary border">{{ $gen->livros_count }}</span>
+                                                        class="badge bg-white text-secondary border">{{ $totalLivros }}</span>
                                                 </label>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <hr class="border-secondary border-opacity-25 my-3">
-
-                                <!-- FILTRO: PREÇO (PRESETS ESTILO AMAZON - DISPARO MANUAL) -->
-                                <div class="mb-4">
-                                    <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Preço</h6>
-                                    <div class="d-flex flex-column gap-2 small">
-                                        <div class="form-check m-0">
-                                            <input class="form-check-input" type="radio" name="faixa_preco"
-                                                id="preco_todos" value=""
-                                                {{ !request('faixa_preco') && !request('preco_min') && !request('preco_max') ? 'checked' : '' }}>
-                                            <label class="form-check-label text-secondary" for="preco_todos">Qualquer
-                                                preço</label>
-                                        </div>
-                                        <div class="form-check m-0">
-                                            <input class="form-check-input" type="radio" name="faixa_preco"
-                                                id="preco_ate_30" value="ate-30"
-                                                {{ request('faixa_preco') == 'ate-30' ? 'checked' : '' }}>
-                                            <label class="form-check-label text-secondary" for="preco_ate_30">Até R$
-                                                30,00</label>
-                                        </div>
-                                        <div class="form-check m-0">
-                                            <input class="form-check-input" type="radio" name="faixa_preco"
-                                                id="preco_30_60" value="30-60"
-                                                {{ request('faixa_preco') == '30-60' ? 'checked' : '' }}>
-                                            <label class="form-check-label text-secondary" for="preco_30_60">R$ 30 a R$
-                                                60,00</label>
-                                        </div>
-                                        <div class="form-check m-0">
-                                            <input class="form-check-input" type="radio" name="faixa_preco"
-                                                id="preco_60_100" value="60-100"
-                                                {{ request('faixa_preco') == '60-100' ? 'checked' : '' }}>
-                                            <label class="form-check-label text-secondary" for="preco_60_100">R$ 60 a R$
-                                                100,00</label>
-                                        </div>
-                                        <div class="form-check m-0">
-                                            <input class="form-check-input" type="radio" name="faixa_preco"
-                                                id="preco_acima_100" value="acima-100"
-                                                {{ request('faixa_preco') == 'acima-100' ? 'checked' : '' }}>
-                                            <label class="form-check-label text-secondary" for="preco_acima_100">Acima
-                                                de R$ 100,00</label>
-                                        </div>
-                                    </div>
-
-                                    <!-- FAIXA PERSONALIZADA -->
-                                    <div class="mt-3 pt-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="input-group input-group-sm">
-                                                <span
-                                                    class="input-group-text bg-light text-muted border-end-0">R$</span>
-                                                <input type="number" step="0.5" name="preco_min"
-                                                    class="form-control" placeholder="Mín"
-                                                    value="{{ request('preco_min') }}">
-                                            </div>
-                                            <span class="text-muted small">a</span>
-                                            <div class="input-group input-group-sm">
-                                                <span
-                                                    class="input-group-text bg-light text-muted border-end-0">R$</span>
-                                                <input type="number" step="0.5" name="preco_max"
-                                                    class="form-control" placeholder="Máx"
-                                                    value="{{ request('preco_max') }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <hr class="border-secondary border-opacity-25 my-3">
-
-                                <!-- FILTRO: DISPONIBILIDADE / ESTOQUE (DISPARO MANUAL) -->
-                                <div class="mb-4">
-                                    <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">
-                                        Disponibilidade</h6>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="em_estoque"
-                                            id="em_estoque" value="1"
-                                            {{ request('em_estoque') ? 'checked' : '' }}>
-                                        <label class="form-check-label text-secondary small" for="em_estoque">
-                                            Somente livros em estoque ({{ $totalDisponiveis }})
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- FILTRO: EDITORAS (DISPARO MANUAL) -->
-                                @if ($editoras->isNotEmpty())
-                                    <div class="mb-4">
-                                        <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Editoras
-                                        </h6>
-                                        <select name="editora" class="form-select form-select-sm rounded-3">
-                                            <option value="">Todas as Editoras</option>
-                                            @foreach ($editoras as $ed)
-                                                <option value="{{ $ed->id }}"
-                                                    {{ request('editora') == $ed->id ? 'selected' : '' }}>
-                                                    {{ $ed->nome }} ({{ $ed->livros_count }})
-                                                </option>
+                                            @foreach ($generos as $gen)
+                                                @php
+                                                    $isSelected =
+                                                        request('genero') == $gen->id ||
+                                                        request('categoria') == $gen->nome ||
+                                                        request('genero') == $gen->nome;
+                                                @endphp
+                                                <div class="form-check m-0">
+                                                    <input class="form-check-input" type="radio" name="genero"
+                                                        id="gen_{{ $gen->id }}" value="{{ $gen->id }}"
+                                                        {{ $isSelected ? 'checked' : '' }}>
+                                                    <label
+                                                        class="form-check-label text-secondary w-100 d-flex justify-content-between align-items-center"
+                                                        for="gen_{{ $gen->id }}">
+                                                        <span class="text-truncate"
+                                                            style="max-width: 140px;">{{ $gen->nome }}</span>
+                                                        <span
+                                                            class="badge bg-white text-secondary border">{{ $gen->livros_count }}</span>
+                                                    </label>
+                                                </div>
                                             @endforeach
-                                        </select>
+                                        </div>
                                     </div>
-                                @endif
 
-                                <!-- BOTÕES DE APLICAÇÃO MANUAL DOS FILTROS -->
-                                <div class="d-grid gap-2 pt-2 border-top">
-                                    <button type="submit"
-                                        class="btn btn-primary rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
-                                        <i class="bi bi-funnel-fill"></i>
-                                        <span>Aplicar Filtros</span>
-                                    </button>
-                                    <a href="{{ url('/#catalogo') }}"
-                                        class="btn btn-outline-secondary rounded-pill btn-sm py-1 d-flex align-items-center justify-content-center gap-1">
-                                        <i class="bi bi-x-circle"></i>
-                                        <span>Limpar Filtros</span>
-                                    </a>
-                                </div>
+                                    <hr class="border-secondary border-opacity-25 my-3">
 
-                            </form>
+                                    <!-- FILTRO: PREÇO (PRESETS ESTILO AMAZON - DISPARO MANUAL) -->
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">Preço
+                                        </h6>
+                                        <div class="d-flex flex-column gap-2 small">
+                                            <div class="form-check m-0">
+                                                <input class="form-check-input" type="radio" name="faixa_preco"
+                                                    id="preco_todos" value=""
+                                                    {{ !request('faixa_preco') && !request('preco_min') && !request('preco_max') ? 'checked' : '' }}>
+                                                <label class="form-check-label text-secondary"
+                                                    for="preco_todos">Qualquer
+                                                    preço</label>
+                                            </div>
+                                            <div class="form-check m-0">
+                                                <input class="form-check-input" type="radio" name="faixa_preco"
+                                                    id="preco_ate_30" value="ate-30"
+                                                    {{ request('faixa_preco') == 'ate-30' ? 'checked' : '' }}>
+                                                <label class="form-check-label text-secondary" for="preco_ate_30">Até R$
+                                                    30,00</label>
+                                            </div>
+                                            <div class="form-check m-0">
+                                                <input class="form-check-input" type="radio" name="faixa_preco"
+                                                    id="preco_30_60" value="30-60"
+                                                    {{ request('faixa_preco') == '30-60' ? 'checked' : '' }}>
+                                                <label class="form-check-label text-secondary" for="preco_30_60">R$ 30 a
+                                                    R$
+                                                    60,00</label>
+                                            </div>
+                                            <div class="form-check m-0">
+                                                <input class="form-check-input" type="radio" name="faixa_preco"
+                                                    id="preco_60_100" value="60-100"
+                                                    {{ request('faixa_preco') == '60-100' ? 'checked' : '' }}>
+                                                <label class="form-check-label text-secondary" for="preco_60_100">R$
+                                                    60 a R$
+                                                    100,00</label>
+                                            </div>
+                                            <div class="form-check m-0">
+                                                <input class="form-check-input" type="radio" name="faixa_preco"
+                                                    id="preco_acima_100" value="acima-100"
+                                                    {{ request('faixa_preco') == 'acima-100' ? 'checked' : '' }}>
+                                                <label class="form-check-label text-secondary"
+                                                    for="preco_acima_100">Acima
+                                                    de R$ 100,00</label>
+                                            </div>
+                                        </div>
 
+                                        <!-- FAIXA PERSONALIZADA -->
+                                        <div class="mt-3 pt-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="input-group input-group-sm">
+                                                    <span
+                                                        class="input-group-text bg-light text-muted border-end-0">R$</span>
+                                                    <input type="number" step="0.5" name="preco_min"
+                                                        class="form-control" placeholder="Mín"
+                                                        value="{{ request('preco_min') }}">
+                                                </div>
+                                                <span class="text-muted small">a</span>
+                                                <div class="input-group input-group-sm">
+                                                    <span
+                                                        class="input-group-text bg-light text-muted border-end-0">R$</span>
+                                                    <input type="number" step="0.5" name="preco_max"
+                                                        class="form-control" placeholder="Máx"
+                                                        value="{{ request('preco_max') }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="border-secondary border-opacity-25 my-3">
+
+                                    <!-- FILTRO: DISPONIBILIDADE / ESTOQUE (DISPARO MANUAL) -->
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">
+                                            Disponibilidade</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="em_estoque"
+                                                id="em_estoque" value="1"
+                                                {{ request('em_estoque') ? 'checked' : '' }}>
+                                            <label class="form-check-label text-secondary small" for="em_estoque">
+                                                Somente livros em estoque ({{ $totalDisponiveis }})
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- FILTRO: EDITORAS (DISPARO MANUAL) -->
+                                    @if ($editoras->isNotEmpty())
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold text-dark small text-uppercase tracking-wider mb-2">
+                                                Editoras
+                                            </h6>
+                                            <select name="editora" class="form-select form-select-sm rounded-3">
+                                                <option value="">Todas as Editoras</option>
+                                                @foreach ($editoras as $ed)
+                                                    <option value="{{ $ed->id }}"
+                                                        {{ request('editora') == $ed->id ? 'selected' : '' }}>
+                                                        {{ $ed->nome }} ({{ $ed->livros_count }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endif
+
+                                    <!-- BOTÕES DE APLICAÇÃO MANUAL DOS FILTROS -->
+                                    <div class="d-grid gap-2 pt-2 border-top">
+                                        <button type="submit"
+                                            class="btn btn-primary rounded-pill py-2 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                            <i class="bi bi-funnel-fill"></i>
+                                            <span>Aplicar Filtros</span>
+                                        </button>
+                                        <a href="{{ url('/#catalogo') }}"
+                                            class="btn btn-outline-secondary rounded-pill btn-sm py-1 d-flex align-items-center justify-content-center gap-1">
+                                            <i class="bi bi-x-circle"></i>
+                                            <span>Limpar Filtros</span>
+                                        </a>
+                                    </div>
+
+                                </form>
+
+                            </div>
                         </div>
                     </div>
-                </div>
                 </aside>
 
                 <!-- GRID DE RESULTADOS & CABEÇALHO DO CATÁLOGO -->
@@ -382,7 +404,8 @@
                                         <!-- CAPA DO LIVRO -->
                                         <div
                                             class="position-relative bg-light text-center p-2 p-sm-3 overflow-hidden book-cover-wrapper">
-                                            <a href="{{ route('livros.detalhes', $livro) }}" aria-label="Ver detalhes de {{ $livro->titulo }}">
+                                            <a href="{{ route('livros.detalhes', $livro) }}"
+                                                aria-label="Ver detalhes de {{ $livro->titulo }}">
                                                 <img src="{{ $livro->url_capa }}" alt="{{ $livro->titulo }}"
                                                     class="img-fluid rounded-3 shadow-sm book-cover-img"
                                                     loading="lazy"

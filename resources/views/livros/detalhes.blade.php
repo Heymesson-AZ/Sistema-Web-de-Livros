@@ -29,10 +29,8 @@
                     @php
                         $isFavoritado = Auth::check() && $livro->isFavoritadoPor(Auth::user());
                     @endphp
-                    <button type="button"
-                        class="btn-favorito-card position-absolute top-0 end-0 m-3 z-2"
-                        data-favorito-toggle
-                        data-favorito-url="{{ route('favoritos.toggle', $livro) }}"
+                    <button type="button" class="btn-favorito-card position-absolute top-0 end-0 m-3 z-2"
+                        data-favorito-toggle data-favorito-url="{{ route('favoritos.toggle', $livro) }}"
                         title="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}"
                         aria-label="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
                         <i

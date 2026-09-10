@@ -1,4 +1,5 @@
-<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
             <div class="modal-header border-0 pt-4 px-4 pb-2">
@@ -63,7 +64,8 @@
                         <input type="hidden" name="formulario" value="recuperar_senha">
 
                         <div class="mb-3">
-                            <label for="forgot_email" class="form-label small fw-bold text-secondary">E-mail de Cadastro</label>
+                            <label for="forgot_email" class="form-label small fw-bold text-secondary">E-mail de
+                                Cadastro</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0 text-muted">
                                     <i class="bi bi-envelope"></i>

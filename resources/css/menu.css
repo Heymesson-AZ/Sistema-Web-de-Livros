@@ -753,7 +753,9 @@ body {
         height: 38px;
         padding: 0 12px;
         border-radius: 9999px;
-        transition: width 0.25s ease, box-shadow 0.25s ease;
+        transition:
+            width 0.25s ease,
+            box-shadow 0.25s ease;
     }
 
     .search-box:focus-within {

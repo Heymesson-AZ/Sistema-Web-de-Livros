@@ -295,34 +295,27 @@
                                             </div>
                                         </div>
                                     </div>
-                                @else
-                                    <button type="button" class="btn btn-sm btn-outline-secondary disabled"
-                                        title="Você não pode excluir sua própria conta">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                        @endif
-            </div>
-            </td>
-            </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center py-5">
-                        <div class="py-4">
-                            <i class="bi bi-search text-muted fs-1 mb-3 d-block"></i>
-                            <h5 class="text-secondary fw-semibold">Nenhum administrador encontrado</h5>
-                            <p class="text-muted small">Tente ajustar os termos de busca ou filtros
-                                aplicados.</p>
-                            @if (request()->hasAny(['busca', 'departamento', 'cargo', 'status']))
-                                <a href="{{ route('admin.administradores.index') }}"
-                                    class="btn btn-sm btn-outline-primary rounded-3">
-                                    Limpar Filtros
-                                </a>
-                            @endif
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
-                </tbody>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="py-4">
+                                        <i class="bi bi-search text-muted fs-1 mb-3 d-block"></i>
+                                        <h5 class="text-secondary fw-semibold">Nenhum administrador encontrado</h5>
+                                        <p class="text-muted small">Tente ajustar os termos de busca ou filtros
+                                            aplicados.</p>
+                                        @if (request()->hasAny(['busca', 'departamento', 'cargo', 'status']))
+                                            <a href="{{ route('admin.administradores.index') }}"
+                                                class="btn btn-sm btn-outline-primary rounded-3">
+                                                Limpar Filtros
+                                            </a>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
                 </table>
             </div>
 
@@ -334,5 +327,5 @@
             @endif
         </div>
 
-        </div>
-    </x-layouts.principal>
+    </div>
+</x-layouts.principal>

@@ -17,7 +17,10 @@ import { inicializarMascaras } from "./masks";
 import { initRealtimeValidation as inicializarValidacaoEmTempoReal } from "./validation";
 import { initBuscaDinamica as inicializarBuscaDinamica } from "./busca-dinamica";
 import { inicializarBuscaCep } from "./viacep";
-import { inicializarInteracoesDeclarativas, inicializarIconesLucide } from "./interacoes";
+import {
+    inicializarInteracoesDeclarativas,
+    inicializarIconesLucide,
+} from "./interacoes";
 
 /**
  * Configura o alternador de visualização de senha para todos os campos
@@ -122,4 +125,11 @@ document.addEventListener("DOMContentLoaded", function () {
         inicializarBuscaCep();
         inicializarIconesLucide();
     });
+});
+
+// Previne páginas e formulários com token CSRF expirado ao usar os botões Voltar/Avançar (bfcache)
+window.addEventListener("pageshow", function (evento) {
+    if (evento.persisted) {
+        window.location.reload();
+    }
 });

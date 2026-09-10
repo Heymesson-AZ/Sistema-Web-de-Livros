@@ -340,4 +340,26 @@ class SegurancaAcoesCriticasENotificacoesTest extends TestCase
         $responseLogado->assertSee('name="busca"', false);
         $responseLogado->assertDontSee('id="filtrosAvancadosCollapse"');
     }
+
+    /**
+     * Valida que a tela de Gestão de Administradores renderiza com sucesso sem erro 500.
+     */
+    public function test_listagem_de_administradores_retorna_200_sem_erro_500(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get(route('admin.administradores.index'));
+        $response->assertStatus(200);
+        $response->assertSee('Gestão de Administradores');
+        $response->assertSee($this->adminUser->name);
+    }
+
+    /**
+     * Valida que a view personalizada de erro 419 (Página Expirada) renderiza com sucesso.
+     */
+    public function test_pagina_de_erro_419_renderiza_com_sucesso(): void
+    {
+        $view = $this->view('errors.419');
+        $view->assertSee('Página Expirada');
+        $view->assertSee('Atualizar Página');
+        $view->assertSee('Voltar ao Início');
+    }
 }

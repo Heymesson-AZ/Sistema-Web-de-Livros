@@ -66,9 +66,8 @@
                     style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <span class="text-muted small fw-semibold text-uppercase">Aprovados</span>
-                            <span class="text-muted small fw-semibold text-uppercase">Aprovados & Ativos</span>
-                            <h3 class="fw-bold mb-0 text-success mt-1">{{ $totalAprovados }}</h3>
+                            <span class="text-muted small fw-semibold text-uppercase">Aptos para Vender</span>
+                            <h3 class="fw-bold mb-0 text-success mt-1">{{ $totalAptos ?? $totalAprovados }}</h3>
                         </div>
                         <div class="rounded-circle d-flex align-items-center justify-content-center"
                             style="width: 48px; height: 48px; background-color: #f0fdf4; color: #16a34a;">
@@ -83,7 +82,6 @@
                     style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <span class="text-muted small fw-semibold text-uppercase">Pendentes</span>
                             <span class="text-muted small fw-semibold text-uppercase">Pendentes de Análise</span>
                             <h3 class="fw-bold mb-0 text-warning mt-1">{{ $totalPendentes }}</h3>
                         </div>
@@ -100,8 +98,6 @@
                     style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <span class="text-muted small fw-semibold text-uppercase">Rejeitados</span>
-                            <h3 class="fw-bold mb-0 text-danger mt-1">{{ $totalRejeitados }}</h3>
                             <span class="text-muted small fw-semibold text-uppercase">Rejeitados / Banidos</span>
                             <h3 class="fw-bold mb-0 text-danger mt-1">{{ $totalRejeitados + ($totalBanidos ?? 0) }}</h3>
                         </div>
@@ -117,75 +113,75 @@
         <!-- FILTROS E BUSCA -->
         <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
             <form method="GET" action="{{ route('admin.vendedores.index') }}" class="row g-2 align-items-center">
-                <div class="col-12 col-md-5">
-                    <div class="col-12 col-md-6">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0 text-muted">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" name="busca" class="form-control border-start-0 ps-0"
-                                placeholder="Buscar por nome, e-mail, CNPJ ou razão social..."
-                                value="{{ request('busca') }}">
-                        </div>
+                <!-- Busca textual -->
+                <div class="col-12 col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="busca" class="form-control border-start-0 ps-0"
+                            placeholder="Buscar responsável, e-mail, CNPJ ou loja..." value="{{ request('busca') }}"
+                            data-dynamic-search autocomplete="off">
                     </div>
+                </div>
 
-                    <div class="col-6 col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">Aprovação (Todos)</option>
-                            <option value="aprovado" {{ request('status') === 'aprovado' ? 'selected' : '' }}>Aprovados
-                            </option>
-                            <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendentes
-                            </option>
-                            <option value="rejeitado" {{ request('status') === 'rejeitado' ? 'selected' : '' }}>
-                                Rejeitados
-                            </option>
-                            <div class="col-12 col-md-4">
-                                <select name="situacao" class="form-select">
-                                    <option value="">Situação da Loja (Todas)</option>
-                                    <option value="aprovado"
-                                        {{ ($situacaoSelecionada ?? request('status')) === 'aprovado' ? 'selected' : '' }}>
-                                        Aprovados & Ativos</option>
-                                    <option value="pendente"
-                                        {{ ($situacaoSelecionada ?? request('status')) === 'pendente' ? 'selected' : '' }}>
-                                        Pendentes de Análise</option>
-                                    <option value="inativo"
-                                        {{ ($situacaoSelecionada ?? request('status')) === 'inativo' ? 'selected' : '' }}>
-                                        Inativos / Pausados</option>
-                                    <option value="rejeitado"
-                                        {{ ($situacaoSelecionada ?? request('status')) === 'rejeitado' ? 'selected' : '' }}>
-                                        Rejeitados</option>
-                                    <option value="banido"
-                                        {{ ($situacaoSelecionada ?? request('status')) === 'banido' ? 'selected' : '' }}>
-                                        Banidos</option>
-                                </select>
-                            </div>
+                <!-- Filtro de Aprovação Cadastral -->
+                <div class="col-6 col-md-2">
+                    <select name="status_aprovacao" class="form-select">
+                        <option value="">Aprovação (Todas)</option>
+                        <option value="aprovado"
+                            {{ ($statusAprovacaoSelecionado ?? request('status_aprovacao')) === 'aprovado' ? 'selected' : '' }}>
+                            Aprovados</option>
+                        <option value="pendente"
+                            {{ ($statusAprovacaoSelecionado ?? request('status_aprovacao')) === 'pendente' ? 'selected' : '' }}>
+                            Pendentes</option>
+                        <option value="rejeitado"
+                            {{ ($statusAprovacaoSelecionado ?? request('status_aprovacao')) === 'rejeitado' ? 'selected' : '' }}>
+                            Rejeitados</option>
+                    </select>
+                </div>
 
-                            <div class="col-6 col-md-2">
-                                <select name="status_conta" class="form-select">
-                                    <option value="">Conta (Todas)</option>
-                                    <option value="ativo" {{ request('status_conta') === 'ativo' ? 'selected' : '' }}>
-                                        Ativo
-                                    </option>
-                                    <option value="inativo"
-                                        {{ request('status_conta') === 'inativo' ? 'selected' : '' }}>Inativo
-                                    </option>
-                                    <option value="banido"
-                                        {{ request('status_conta') === 'banido' ? 'selected' : '' }}>Banido
-                                    </option>
-                                </select>
-                            </div>
+                <!-- Filtro de Status da Conta -->
+                <div class="col-6 col-md-2">
+                    <select name="status_conta" class="form-select">
+                        <option value="">Conta (Todas)</option>
+                        <option value="ativo"
+                            {{ ($statusContaSelecionado ?? request('status_conta')) === 'ativo' ? 'selected' : '' }}>
+                            Ativo</option>
+                        <option value="inativo"
+                            {{ ($statusContaSelecionado ?? request('status_conta')) === 'inativo' ? 'selected' : '' }}>
+                            Inativo</option>
+                        <option value="banido"
+                            {{ ($statusContaSelecionado ?? request('status_conta')) === 'banido' ? 'selected' : '' }}>
+                            Banido</option>
+                    </select>
+                </div>
 
-                            <div class="col-12 col-md-2 d-flex gap-2">
-                                <button type="submit" class="btn-search-submit flex-grow-1">
-                                    <i class="bi bi-filter me-1"></i> Filtrar
-                                </button>
-                                @if (request()->hasAny(['busca', 'situacao', 'status', 'status_conta']))
-                                    <a href="{{ route('admin.vendedores.index') }}" class="btn-search-clear"
-                                        title="Limpar Filtros" aria-label="Limpar Filtros">
-                                        <i class="bi bi-x-lg"></i>
-                                    </a>
-                                @endif
-                            </div>
+                <!-- Filtro de Aptidão Operacional -->
+                <div class="col-6 col-md-2">
+                    <select name="situacao" class="form-select">
+                        <option value="">Aptidão (Todas)</option>
+                        <option value="apto"
+                            {{ ($situacaoSelecionada ?? request('situacao')) === 'apto' ? 'selected' : '' }}>Aptos para
+                            Vender</option>
+                        <option value="inapto"
+                            {{ ($situacaoSelecionada ?? request('situacao')) === 'inapto' ? 'selected' : '' }}>Inaptos
+                            / Bloqueados</option>
+                    </select>
+                </div>
+
+                <!-- Botões de Filtrar e Limpar -->
+                <div class="col-6 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn-search-submit flex-grow-1">
+                        <i class="bi bi-filter me-1"></i> Filtrar
+                    </button>
+                    @if (request()->hasAny(['busca', 'situacao', 'status', 'status_aprovacao', 'status_conta', 'aprovacao', 'conta']))
+                        <a href="{{ route('admin.vendedores.index') }}" class="btn-search-clear" title="Limpar Filtros"
+                            aria-label="Limpar Filtros">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    @endif
+                </div>
             </form>
         </div>
 
@@ -195,101 +191,131 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light border-bottom">
                         <tr>
-                            <th class="ps-4 py-3">Loja / Empresa</th>
-                            <th class="py-3">Responsável</th>
-                            <th class="py-3">CNPJ / Contato</th>
-                            <th class="py-3">Aprovação</th>
-                            <th class="py-3">Conta</th>
-                            <th class="py-3">Situação da Loja</th>
-                            <th class="py-3 text-center">Catálogo</th>
-                            <th class="pe-4 py-3 text-end">Ações</th>
+                            <th class="ps-4 py-3" style="min-width: 220px;">Loja / Empresa</th>
+                            <th class="py-3" style="min-width: 200px;">Responsável & Contato</th>
+                            <th class="py-3 text-center" style="width: 110px;">Conta</th>
+                            <th class="py-3 text-center" style="width: 130px;">Aprovação</th>
+                            <th class="py-3" style="min-width: 170px;">Aptidão de Venda</th>
+                            <th class="py-3 text-center" style="width: 140px;">Catálogo</th>
+                            <th class="pe-4 py-3 text-end" style="min-width: 180px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
                         @forelse ($vendedores as $vendedor)
                             <tr>
+                                <!-- 1. Loja / Empresa -->
                                 <td class="ps-4 py-3">
                                     <div class="d-flex align-items-center gap-3">
-                                        <img src="{{ $vendedor->user?->foto }}" alt="{{ $vendedor->nome_fantasia }}"
-                                            class="rounded-3 shadow-sm object-fit-cover"
-                                            style="width: 44px; height: 44px;">
+                                        @if ($vendedor->user?->foto_perfil)
+                                            <img src="{{ asset('storage/' . $vendedor->user->foto_perfil) }}"
+                                                alt="{{ $vendedor->nome_fantasia }}"
+                                                class="rounded-3 shadow-xs object-fit-cover flex-shrink-0"
+                                                style="width: 44px; height: 44px;">
+                                        @else
+                                            <div class="rounded-3 shadow-xs d-flex align-items-center justify-content-center flex-shrink-0"
+                                                style="width: 44px; height: 44px; background-color: #eff6ff; color: #2563eb;">
+                                                <i class="bi bi-shop fs-5"></i>
+                                            </div>
+                                        @endif
                                         <div>
                                             <div class="fw-bold text-dark">{{ $vendedor->nome_fantasia }}</div>
-                                            <div class="text-muted small">{{ $vendedor->razao_social }}</div>
+                                            <div class="text-muted small text-truncate" style="max-width: 180px;"
+                                                title="{{ $vendedor->razao_social }}">
+                                                {{ $vendedor->razao_social }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
 
+                                <!-- 2. Responsável & Contato -->
                                 <td class="py-3">
                                     <div class="fw-semibold text-dark">
                                         {{ $vendedor->user?->name ?? 'Usuário Removido' }}</div>
-                                    <div class="text-muted small">{{ $vendedor->user?->email ?? '-' }}</div>
-                                </td>
-
-                                <td class="py-3">
-                                    <div class="fw-medium text-secondary">{{ $vendedor->cnpj }}</div>
-                                    <div class="text-muted small">
-                                        <i
-                                            class="bi bi-telephone me-1"></i>{{ $vendedor->telefone_comercial ?? 'Não informado' }}
+                                    <div class="text-muted small mb-1">{{ $vendedor->user?->email ?? '-' }}</div>
+                                    <div class="d-flex flex-wrap gap-2 text-secondary" style="font-size: 11.5px;">
+                                        <span title="CNPJ da Loja"><i
+                                                class="bi bi-card-text me-1"></i>{{ $vendedor->cnpj }}</span>
+                                        @if ($vendedor->telefone_comercial)
+                                            <span title="Telefone Comercial"><i
+                                                    class="bi bi-telephone me-1"></i>{{ $vendedor->telefone_comercial }}</span>
+                                        @endif
                                     </div>
                                 </td>
 
-                                <td class="py-3">
-                                    @if ($vendedor->status_aprovacao === 'aprovado')
-                                        <span
-                                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold">
-                                            <i class="bi bi-check-circle-fill me-1"></i> Aprovado
-                                        </span>
-                                    @elseif ($vendedor->status_aprovacao === 'pendente')
-                                        <span
-                                            class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-1 fw-semibold">
-                                            <i class="bi bi-hourglass-split me-1"></i> Pendente
-                                        </span>
-                                    @else
-                                        <span
-                                            class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 fw-semibold">
-                                            <i class="bi bi-x-circle-fill me-1"></i> Rejeitado
-                                        </span>
-                                    @endif
-                                    <span
-                                        class="badge {{ $vendedor->situacao_badge_class }} rounded-pill px-3 py-1 fw-semibold">
-                                        <i class="bi {{ $vendedor->situacao_icone }} me-1"></i>
-                                        {{ $vendedor->situacao_rotulo }}
-                                    </span>
-                                </td>
-
-                                <td class="py-3">
+                                <!-- 3. Conta de Acesso -->
+                                <td class="py-3 text-center">
                                     @if ($vendedor->user?->status === 'ativo')
                                         <span
-                                            class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill"
-                                            style="font-size: 11px;">Ativo</span>
+                                            class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill fw-semibold"
+                                            style="font-size: 11px;">
+                                            <i class="bi bi-person-check-fill me-1"></i> Ativo
+                                        </span>
                                     @elseif($vendedor->user?->status === 'inativo')
                                         <span
-                                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1 rounded-pill"
-                                            style="font-size: 11px;">Inativo</span>
+                                            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1 rounded-pill fw-semibold"
+                                            style="font-size: 11px;">
+                                            <i class="bi bi-pause-circle-fill me-1"></i> Inativo
+                                        </span>
                                     @else
-                                        <span
-                                            class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill"
-                                            style="font-size: 11px;">Banido</span>
+                                        <span class="badge bg-danger text-white px-2.5 py-1 rounded-pill fw-semibold"
+                                            style="font-size: 11px;">
+                                            <i class="bi bi-slash-circle-fill me-1"></i> Banido
+                                        </span>
                                     @endif
                                 </td>
 
+                                <!-- 4. Aprovação Cadastral -->
                                 <td class="py-3 text-center">
-                                    <span class="badge bg-light text-dark border px-2 py-1 me-1"
-                                        title="Livros cadastrados">
-                                        <i class="bi bi-book me-1 text-primary"></i>
-                                        {{ $vendedor->livros_count ?? 0 }}
-                                    </span>
-                                    <span class="badge bg-light text-dark border px-2 py-1"
-                                        title="Pedidos vinculados">
-                                        <i class="bi bi-bag-check me-1 text-success"></i>
-                                        {{ $vendedor->pedidos_count ?? 0 }}
+                                    <span
+                                        class="badge {{ $vendedor->aprovacao_badge_class }} rounded-pill px-2.5 py-1 fw-semibold"
+                                        style="font-size: 11px;">
+                                        <i class="bi {{ $vendedor->aprovacao_icone }} me-1"></i>
+                                        {{ $vendedor->aprovacao_rotulo }}
                                     </span>
                                 </td>
 
+                                <!-- 5. Aptidão Operacional -->
+                                <td class="py-3">
+                                    @if ($vendedor->isAptoParaVender())
+                                        <span
+                                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-semibold d-inline-flex align-items-center gap-1">
+                                            <i class="bi bi-check-circle-fill"></i> Apto para Vender
+                                        </span>
+                                    @else
+                                        <span
+                                            class="badge {{ $vendedor->situacao_badge_class }} rounded-pill px-2.5 py-1 fw-semibold d-inline-flex align-items-center gap-1"
+                                            title="{{ $vendedor->motivo_inapto }}">
+                                            <i class="bi {{ $vendedor->situacao_icone }}"></i>
+                                            {{ $vendedor->situacao_rotulo }}
+                                        </span>
+                                        @if ($vendedor->motivo_inapto)
+                                            <small class="d-block text-muted text-truncate mt-0.5"
+                                                style="font-size: 11px; max-width: 170px;"
+                                                title="{{ $vendedor->motivo_inapto }}">
+                                                {{ $vendedor->motivo_inapto }}
+                                            </small>
+                                        @endif
+                                    @endif
+                                </td>
+
+                                <!-- 6. Catálogo & Pedidos -->
+                                <td class="py-3 text-center">
+                                    <a href="{{ route('admin.livros.index', ['vendedor_id' => $vendedor->id]) }}"
+                                        class="badge bg-primary-subtle text-primary border border-primary-subtle text-decoration-none px-2 py-1 me-1"
+                                        title="Ver e moderar títulos desta loja">
+                                        <i class="bi bi-book me-1"></i>{{ $vendedor->livros_count ?? 0 }}
+                                    </a>
+                                    <span class="badge bg-light text-secondary border px-2 py-1"
+                                        title="Pedidos recebidos">
+                                        <i
+                                            class="bi bi-bag-check me-1 text-success"></i>{{ $vendedor->pedidos_count ?? 0 }}
+                                    </span>
+                                </td>
+
+                                <!-- 7. Ações Padronizadas -->
                                 <td class="pe-4 py-3 text-end">
                                     <div class="actions-group justify-content-end">
-                                        <!-- Ações rápidas de aprovação/rejeição -->
+                                        <!-- Aprovação rápida se não aprovado -->
                                         @if ($vendedor->status_aprovacao !== 'aprovado')
                                             <form method="POST"
                                                 action="{{ route('admin.vendedores.status', $vendedor) }}"
@@ -297,14 +323,14 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="aprovado">
-                                                <button type="submit"
-                                                    class="btn-action btn-action-approve" title="Aprovar Vendedor"
-                                                    aria-label="Aprovar">
+                                                <button type="submit" class="btn-action btn-action-approve"
+                                                    title="Aprovar Cadastro da Loja" aria-label="Aprovar">
                                                     <i class="bi bi-check-lg"></i>
                                                 </button>
                                             </form>
                                         @endif
 
+                                        <!-- Rejeição rápida se não rejeitado -->
                                         @if ($vendedor->status_aprovacao !== 'rejeitado')
                                             <form method="POST"
                                                 action="{{ route('admin.vendedores.status', $vendedor) }}"
@@ -312,31 +338,38 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="rejeitado">
-                                                <button type="submit"
-                                                    class="btn-action btn-action-reject" title="Rejeitar Vendedor"
-                                                    aria-label="Rejeitar">
+                                                <button type="submit" class="btn-action btn-action-reject"
+                                                    title="Rejeitar Cadastro da Loja" aria-label="Rejeitar">
                                                     <i class="bi bi-x-lg"></i>
                                                 </button>
                                             </form>
                                         @endif
 
+                                        <!-- Acesso Direto aos Livros da Loja -->
+                                        <a href="{{ route('admin.livros.index', ['vendedor_id' => $vendedor->id]) }}"
+                                            class="btn-action btn-action-view" title="Moderar Livros da Loja"
+                                            aria-label="Livros">
+                                            <i class="bi bi-book"></i>
+                                        </a>
+
+                                        <!-- Detalhes do Vendedor -->
                                         <a href="{{ route('admin.vendedores.show', $vendedor) }}"
-                                            class="btn-action btn-action-view" title="Visualizar Detalhes"
+                                            class="btn-action btn-action-view" title="Visualizar Detalhes Cadastrais"
                                             aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
-                                        <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
+                                        <!-- Editar Vendedor -->
                                         <a href="{{ route('admin.vendedores.edit', $vendedor) }}"
                                             class="btn-action btn-action-edit" title="Editar Vendedor"
                                             aria-label="Editar">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
 
-                                        <button type="button"
-                                            class="btn-action btn-action-delete" data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal{{ $vendedor->id }}" title="Excluir Vendedor"
-                                            aria-label="Excluir">
+                                        <!-- Excluir Vendedor -->
+                                        <button type="button" class="btn-action btn-action-delete"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ $vendedor->id }}"
+                                            title="Excluir Vendedor" aria-label="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -362,8 +395,7 @@
                                                         {{ $vendedor->cnpj }})?
                                                     </p>
                                                     <p class="text-danger small mb-0 fw-semibold">
-                                                        Atenção: A conta de acesso associada a este vendedor também
-                                                        será
+                                                        Atenção: A conta de acesso associada a este vendedor também será
                                                         excluída permanentemente.
                                                     </p>
                                                 </div>
@@ -391,10 +423,9 @@
                                     <div class="text-muted">
                                         <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
                                         <h6 class="fw-bold mb-1">Nenhum vendedor encontrado</h6>
-                                        <p class="small mb-3">Tente ajustar seus termos de busca ou cadastrar um
-                                            novo
+                                        <p class="small mb-3">Tente ajustar seus termos de busca ou cadastrar um novo
                                             vendedor.</p>
-                                        @if (request()->hasAny(['busca', 'status', 'status_conta']))
+                                        @if (request()->hasAny(['busca', 'situacao', 'status', 'status_aprovacao', 'status_conta', 'aprovacao', 'conta']))
                                             <a href="{{ route('admin.vendedores.index') }}"
                                                 class="btn btn-sm btn-outline-primary rounded-3">
                                                 Limpar Filtros

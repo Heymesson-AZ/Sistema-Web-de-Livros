@@ -173,11 +173,9 @@
                         <hr class="my-4 text-muted">
 
                         <!-- SEÇÃO 3: STATUS DE ACESSO E APROVAÇÃO -->
-                        <!-- SEÇÃO 3: SITUAÇÃO DA LOJA & ACESSO -->
                         <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                             <i class="bi bi-shield-check text-primary"></i>
-                            Status da Conta & Aprovação
-                            Situação da Loja & Acesso
+                            Status da Conta & Aprovação Cadastral
                         </h5>
 
                         <div class="row g-3 mb-4">
@@ -187,52 +185,47 @@
                                 <select name="status" class="form-select @error('status') is-invalid @enderror"
                                     required>
                                     <option value="ativo" {{ old('status', 'ativo') === 'ativo' ? 'selected' : '' }}>
-                                        Ativo</option>
+                                        Ativo (Permitir login)
+                                    </option>
                                     <option value="inativo" {{ old('status') === 'inativo' ? 'selected' : '' }}>
-                                        Inativo</option>
-                            <div class="col-12">
-                                <label class="form-label small fw-bold text-secondary">Situação Inicial da Loja <span class="text-danger">*</span></label>
-                                <select name="situacao" class="form-select @error('situacao') is-invalid @enderror" required>
-                                    <option value="aprovado" {{ old('situacao', 'aprovado') === 'aprovado' ? 'selected' : '' }}>
-                                        Aprovado & Ativo (Loja autorizada a operar, publicar livros e realizar vendas)
-                                    </option>
-                                    <option value="pendente" {{ old('situacao') === 'pendente' ? 'selected' : '' }}>
-                                        Pendente de Análise (Aguardando conferência de dados)
-                                    </option>
-                                    <option value="inativo" {{ old('situacao') === 'inativo' ? 'selected' : '' }}>
-                                        Inativo / Pausado (Loja cadastrada porém temporariamente inativa)
-                                    </option>
-                                    <option value="rejeitado" {{ old('situacao') === 'rejeitado' ? 'selected' : '' }}>
-                                        Rejeitado (Cadastro reprovado)
+                                        Inativo (Pausar acesso)
                                     </option>
                                 </select>
                                 @error('status')
-                                <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
-                                    A situação define atomicamente as permissões operacionais do lojista e o status da sua conta de usuário.
-                                </small>
-                                @error('situacao')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label class="form-label small fw-bold text-secondary">Status de Aprovação da Loja
+                                <label class="form-label small fw-bold text-secondary">Aprovação Cadastral da Loja
                                     <span class="text-danger">*</span></label>
                                 <select name="status_aprovacao"
                                     class="form-select @error('status_aprovacao') is-invalid @enderror" required>
                                     <option value="aprovado"
                                         {{ old('status_aprovacao', 'aprovado') === 'aprovado' ? 'selected' : '' }}>
-                                        Aprovado (Permite publicar e vender)</option>
+                                        Aprovado (Autorizado a operar)
+                                    </option>
                                     <option value="pendente"
-                                        {{ old('status_aprovacao') === 'pendente' ? 'selected' : '' }}>Pendente
-                                        (Aguardando análise)</option>
+                                        {{ old('status_aprovacao') === 'pendente' ? 'selected' : '' }}>
+                                        Pendente (Aguardando análise de documentos)
+                                    </option>
                                     <option value="rejeitado"
-                                        {{ old('status_aprovacao') === 'rejeitado' ? 'selected' : '' }}>Rejeitado
-                                        (Bloqueado)</option>
+                                        {{ old('status_aprovacao') === 'rejeitado' ? 'selected' : '' }}>
+                                        Rejeitado (Cadastro reprovado)
+                                    </option>
                                 </select>
                                 @error('status_aprovacao')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div class="col-12">
+                                <div class="p-3 bg-light rounded-3 small text-muted d-flex align-items-center gap-2">
+                                    <i class="bi bi-info-circle text-primary fs-5"></i>
+                                    <span><strong>Regra de Negócio:</strong> A loja só estará <strong>Apta para
+                                            Vender</strong> se a aprovação estiver como <em>Aprovado</em> e a conta de
+                                        acesso estiver <em>Ativa</em>.</span>
+                                </div>
                             </div>
                         </div>
 

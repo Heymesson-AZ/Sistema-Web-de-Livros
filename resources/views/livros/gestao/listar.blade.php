@@ -345,6 +345,13 @@
                                         class="badge {{ $livro->status_moderacao_badge_class }} rounded-pill px-2.5 py-1">
                                         {{ $livro->status_moderacao_rotulo }}
                                     </span>
+                                    @if ($livro->status_moderacao !== 'ativo' && $livro->motivo_moderacao)
+                                        <div class="mt-1 small text-danger text-truncate" style="max-width: 160px;"
+                                            title="{{ $livro->motivo_moderacao }}">
+                                            <i
+                                                class="bi bi-exclamation-triangle me-1"></i>{{ $livro->motivo_moderacao }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="actions-group justify-content-end">

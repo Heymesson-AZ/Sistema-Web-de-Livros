@@ -228,6 +228,7 @@
                                 </td>
                                 <td class="py-3 text-muted small">
                                     {{ $admin->created_at ? $admin->created_at->format('d/m/Y') : '-' }}
+                                </td>
                                 <td class="text-end pe-4 py-3">
                                     <div class="actions-group justify-content-end">
                                         <a href="{{ route('admin.administradores.show', $admin) }}"

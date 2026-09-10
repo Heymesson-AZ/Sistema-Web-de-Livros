@@ -102,11 +102,56 @@ class Vendedor extends Model
     }
 
     /**
-     * Situação unificada da loja e conta do vendedor.
+     * Determina se o vendedor está apto para vender e operar comercialmente.
+     * Requisitos estritos: aprovação cadastral 'aprovado' E status da conta de usuário 'ativo'.
+     */
+    public function isAptoParaVender(): bool
+    {
+        return $this->status_aprovacao === self::STATUS_APROVADO && $this->user?->status === 'ativo';
+    }
+
+    /**
+     * Rótulo descritivo da aprovação cadastral do vendedor.
+     */
+    public function getAprovacaoRotuloAttribute(): string
+    {
+        return match ($this->status_aprovacao) {
+            self::STATUS_PENDENTE => 'Em Análise',
+            self::STATUS_REJEITADO => 'Rejeitado',
+            default => 'Aprovado',
+        };
+    }
+
+    /**
+     * Classe CSS da aprovação cadastral.
+     */
+    public function getAprovacaoBadgeClassAttribute(): string
+    {
+        return match ($this->status_aprovacao) {
+            self::STATUS_PENDENTE => 'bg-warning-subtle text-warning-emphasis border border-warning-subtle',
+            self::STATUS_REJEITADO => 'bg-danger-subtle text-danger border border-danger-subtle',
+            default => 'bg-success-subtle text-success border border-success-subtle',
+        };
+    }
+
+    /**
+     * Ícone da aprovação cadastral.
+     */
+    public function getAprovacaoIconeAttribute(): string
+    {
+        return match ($this->status_aprovacao) {
+            self::STATUS_PENDENTE => 'bi-hourglass-split',
+            self::STATUS_REJEITADO => 'bi-x-circle-fill',
+            default => 'bi-check-circle-fill',
+        };
+    }
+
+    /**
+     * Situação consolidada da loja e aptidão de venda.
      */
     public function getSituacaoAttribute(): string
     {
-        if ($this->user?->isBanido()) {
+        if ($this->user?->isBanido() || $this->user?->status === 'banido') {
             return 'banido';
         }
         if ($this->status_aprovacao === self::STATUS_REJEITADO) {
@@ -115,28 +160,28 @@ class Vendedor extends Model
         if ($this->status_aprovacao === self::STATUS_PENDENTE) {
             return 'pendente';
         }
-        if ($this->user?->isInativo()) {
+        if ($this->user?->isInativo() || $this->user?->status === 'inativo') {
             return 'inativo';
         }
-        return 'aprovado';
+        return 'apto';
     }
 
     /**
-     * Rótulo descritivo da situação consolidada.
+     * Rótulo descritivo da situação consolidada / aptidão.
      */
     public function getSituacaoRotuloAttribute(): string
     {
         return match ($this->situacao) {
             'banido' => 'Banido',
-            'rejeitado' => 'Rejeitado',
+            'rejeitado' => 'Cadastro Rejeitado',
             'pendente' => 'Pendente de Análise',
             'inativo' => 'Inativo / Pausado',
-            default => 'Aprovado & Ativo',
+            default => 'Apto para Vender',
         };
     }
 
     /**
-     * Classe CSS de badge para a situação consolidada.
+     * Classe CSS de badge para a situação consolidada / aptidão.
      */
     public function getSituacaoBadgeClassAttribute(): string
     {
@@ -164,7 +209,30 @@ class Vendedor extends Model
     }
 
     /**
-     * Scope para filtrar vendedores por situação consolidada.
+     * Motivo textual detalhado caso o vendedor não esteja apto para vender.
+     */
+    public function getMotivoInaptoAttribute(): ?string
+    {
+        if ($this->isAptoParaVender()) {
+            return null;
+        }
+        if ($this->user?->status === 'banido') {
+            return 'Conta de acesso banida por infração disciplinar';
+        }
+        if ($this->status_aprovacao === self::STATUS_REJEITADO) {
+            return 'Cadastro reprovado pela auditoria administrativa';
+        }
+        if ($this->status_aprovacao === self::STATUS_PENDENTE) {
+            return 'Aguardando validação cadastral e fiscal';
+        }
+        if ($this->user?->status === 'inativo') {
+            return 'Conta temporariamente desativada ou pausada';
+        }
+        return 'Requisitos comerciais não atendidos';
+    }
+
+    /**
+     * Scope para filtrar vendedores por situação consolidada / aptidão.
      */
     public function scopeComSituacao($query, string $situacao)
     {
@@ -174,7 +242,7 @@ class Vendedor extends Model
                 ->whereHas('user', fn ($q) => $q->where('status', 'inativo')),
             'pendente' => $query->where('status_aprovacao', self::STATUS_PENDENTE),
             'rejeitado' => $query->where('status_aprovacao', self::STATUS_REJEITADO),
-            'aprovado' => $query->where('status_aprovacao', self::STATUS_APROVADO)
+            'apto', 'aprovado' => $query->where('status_aprovacao', self::STATUS_APROVADO)
                 ->whereHas('user', fn ($q) => $q->where('status', 'ativo')),
             default => $query,
         };

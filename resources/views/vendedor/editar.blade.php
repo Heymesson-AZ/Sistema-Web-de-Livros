@@ -181,11 +181,9 @@
                         <hr class="my-4 text-muted">
 
                         <!-- SEÇÃO 3: STATUS DE ACESSO E APROVAÇÃO -->
-                        <!-- SEÇÃO 3: SITUAÇÃO DA LOJA & ACESSO -->
                         <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                             <i class="bi bi-shield-check text-primary"></i>
-                            Status da Conta & Aprovação
-                            Situação da Loja & Acesso
+                            Status da Conta & Aprovação Cadastral
                         </h5>
 
                         <div class="row g-3 mb-4">
@@ -196,59 +194,61 @@
                                     required>
                                     <option value="ativo"
                                         {{ old('status', $vendedor->user?->status) === 'ativo' ? 'selected' : '' }}>
-                                        Ativo</option>
+                                        Ativo (Conta liberada para login)
+                                    </option>
                                     <option value="inativo"
                                         {{ old('status', $vendedor->user?->status) === 'inativo' ? 'selected' : '' }}>
-                                        Inativo</option>
+                                        Inativo (Conta pausada temporariamente)
+                                    </option>
                                     <option value="banido"
                                         {{ old('status', $vendedor->user?->status) === 'banido' ? 'selected' : '' }}>
-                                        Banido</option>
-                            <div class="col-12">
-                                <label class="form-label small fw-bold text-secondary">Situação Cadastral e Operacional <span class="text-danger">*</span></label>
-                                <select name="situacao" class="form-select @error('situacao') is-invalid @enderror" required>
-                                    <option value="aprovado" {{ old('situacao', $vendedor->situacao) === 'aprovado' ? 'selected' : '' }}>
-                                        Aprovado & Ativo (Loja autorizada a operar, publicar livros e realizar vendas)
-                                    </option>
-                                    <option value="pendente" {{ old('situacao', $vendedor->situacao) === 'pendente' ? 'selected' : '' }}>
-                                        Pendente de Análise (Aguardando conferência de dados e aprovação da moderação)
-                                    </option>
-                                    <option value="inativo" {{ old('situacao', $vendedor->situacao) === 'inativo' ? 'selected' : '' }}>
-                                        Inativo / Pausado (Operação pausada temporariamente pelo lojista ou administração)
-                                    </option>
-                                    <option value="rejeitado" {{ old('situacao', $vendedor->situacao) === 'rejeitado' ? 'selected' : '' }}>
-                                        Rejeitado (Cadastro reprovado na auditoria cadastral)
-                                    </option>
-                                    <option value="banido" {{ old('situacao', $vendedor->situacao) === 'banido' ? 'selected' : '' }}>
-                                        Banido (Acesso revogado, catálogo desativado por infração grave)
+                                        Banido (Acesso bloqueado por infração)
                                     </option>
                                 </select>
                                 @error('status')
-                                <small class="text-muted d-block mt-1" style="font-size: 11.5px;">
-                                    A alteração de situação sincroniza automaticamente as regras operacionais da loja e o estado da conta de acesso.
-                                </small>
-                                @error('situacao')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label class="form-label small fw-bold text-secondary">Status de Aprovação da Loja
+                                <label class="form-label small fw-bold text-secondary">Aprovação Cadastral da Loja
                                     <span class="text-danger">*</span></label>
                                 <select name="status_aprovacao"
                                     class="form-select @error('status_aprovacao') is-invalid @enderror" required>
                                     <option value="aprovado"
                                         {{ old('status_aprovacao', $vendedor->status_aprovacao) === 'aprovado' ? 'selected' : '' }}>
-                                        Aprovado (Permite publicar e vender)</option>
+                                        Aprovado (Autorizado a operar)
+                                    </option>
                                     <option value="pendente"
                                         {{ old('status_aprovacao', $vendedor->status_aprovacao) === 'pendente' ? 'selected' : '' }}>
-                                        Pendente (Aguardando análise)</option>
+                                        Pendente (Aguardando análise documental)
+                                    </option>
                                     <option value="rejeitado"
                                         {{ old('status_aprovacao', $vendedor->status_aprovacao) === 'rejeitado' ? 'selected' : '' }}>
-                                        Rejeitado (Bloqueado)</option>
+                                        Rejeitado (Cadastro reprovado)
+                                    </option>
                                 </select>
                                 @error('status_aprovacao')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div class="col-12">
+                                <div class="p-3 bg-light rounded-3 small text-muted d-flex align-items-center gap-2">
+                                    <i class="bi bi-info-circle text-primary fs-5"></i>
+                                    <span>
+                                        <strong>Situação Operacional:</strong>
+                                        @if ($vendedor->isAptoParaVender())
+                                            <span
+                                                class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 ms-1">Apto
+                                                para Vender</span>
+                                        @else
+                                            <span
+                                                class="badge {{ $vendedor->situacao_badge_class }} rounded-pill px-2 py-0.5 ms-1">{{ $vendedor->situacao_rotulo }}</span>
+                                            <span class="text-secondary ms-1">({{ $vendedor->motivo_inapto }})</span>
+                                        @endif
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -259,16 +259,19 @@
                                 <h6 class="fw-bold mb-0">Confirmação de Segurança do Administrador</h6>
                             </div>
                             <p class="text-muted small mb-2">
-                                Para autorizar esta alteração cadastral ou de status deste vendedor, digite a <strong>sua senha de administrador</strong>:
+                                Para autorizar esta alteração cadastral ou de status deste vendedor, digite a
+                                <strong>sua senha de administrador</strong>:
                             </p>
                             <div class="row">
                                 <div class="col-12 col-md-6">
                                     <div class="input-group input-group-sm">
-                                        <input type="password" name="senha_confirmacao_admin" id="senha_confirmacao_admin_vend"
+                                        <input type="password" name="senha_confirmacao_admin"
+                                            id="senha_confirmacao_admin_vend"
                                             class="form-control @error('senha_confirmacao_admin') is-invalid @enderror"
                                             placeholder="Digite sua senha de administrador" required>
                                         <button class="btn btn-outline-secondary" type="button"
-                                            data-toggle="password" data-target="#senha_confirmacao_admin_vend" title="Mostrar/Ocultar Senha">
+                                            data-toggle="password" data-target="#senha_confirmacao_admin_vend"
+                                            title="Mostrar/Ocultar Senha">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>

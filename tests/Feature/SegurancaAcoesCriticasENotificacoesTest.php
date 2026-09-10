@@ -271,4 +271,73 @@ class SegurancaAcoesCriticasENotificacoesTest extends TestCase
         $responseVendedor->assertSee('Catálogo da Minha Loja');
         $responseVendedor->assertSee('Publicar Novo Livro'); // Vendedor publica
     }
+
+    /**
+     * Valida as regras de negócio de aptidão para vender e cálculo de situação operacional.
+     */
+    public function test_aptidao_operacional_do_vendedor_regras_e_estados(): void
+    {
+        // 1. Aprovado e Ativo = Apto
+        $this->vendedor->status_aprovacao = Vendedor::STATUS_APROVADO;
+        $this->vendedorUser->status = 'ativo';
+        $this->vendedorUser->save();
+        $this->vendedor->save();
+
+        $this->assertTrue($this->vendedor->isAptoParaVender());
+        $this->assertNull($this->vendedor->motivo_inapto);
+
+        // 2. Aprovado mas Inativo = Inapto
+        $this->vendedorUser->status = 'inativo';
+        $this->vendedorUser->save();
+        $this->vendedor->refresh();
+
+        $this->assertFalse($this->vendedor->isAptoParaVender());
+        $this->assertStringContainsString('desativada', $this->vendedor->motivo_inapto);
+
+        // 3. Pendente mas Ativo = Inapto
+        $this->vendedorUser->status = 'ativo';
+        $this->vendedorUser->save();
+        $this->vendedor->status_aprovacao = Vendedor::STATUS_PENDENTE;
+        $this->vendedor->save();
+        $this->vendedor->refresh();
+
+        $this->assertFalse($this->vendedor->isAptoParaVender());
+        $this->assertStringContainsString('validação cadastral', $this->vendedor->motivo_inapto);
+    }
+
+    /**
+     * Valida que a página de detalhes do vendedor exibe a gestão e moderação do catálogo de livros da loja.
+     */
+    public function test_detalhes_do_vendedor_exibe_catalogo_e_moderacao_de_livros(): void
+    {
+        $livro = Livro::factory()->create([
+            'vendedor_id' => $this->vendedor->id,
+            'titulo' => 'Livro Loja Moderacao ' . rand(100, 999),
+            'status_moderacao' => Livro::STATUS_MODERACAO_ATIVO,
+        ]);
+
+        $response = $this->actingAs($this->adminUser)->get(route('admin.vendedores.show', $this->vendedor));
+        $response->assertStatus(200);
+        $response->assertSee('Catálogo de Livros da Loja');
+        $response->assertSee($livro->titulo);
+        $response->assertSee('Moderar');
+    }
+
+    /**
+     * Valida que a barra de filtros na página inicial fica visível para visitantes e usuários logados sem colapso.
+     */
+    public function test_barra_de_filtros_da_home_sempre_visivel(): void
+    {
+        $responseVisitante = $this->get(url('/'));
+        $responseVisitante->assertStatus(200);
+        $responseVisitante->assertSee('name="busca"', false);
+        $responseVisitante->assertSee('name="genero"', false);
+        $responseVisitante->assertSee('name="faixa_preco"', false);
+        $responseVisitante->assertDontSee('id="filtrosAvancadosCollapse"');
+
+        $responseLogado = $this->actingAs($this->clienteUser)->get(url('/'));
+        $responseLogado->assertStatus(200);
+        $responseLogado->assertSee('name="busca"', false);
+        $responseLogado->assertDontSee('id="filtrosAvancadosCollapse"');
+    }
 }

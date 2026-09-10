@@ -174,12 +174,6 @@
                 </div>
 
                 @auth
-                    <a href="{{ route('painel') }}"
-                        class="btn btn-outline-light w-100 mb-2 d-flex align-items-center justify-content-center gap-2 py-2 rounded-3 text-decoration-none font-monospace small">
-                        <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
-                        <span>Meu Painel & Perfil</span>
-                    </a>
-
                     <form method="POST" action="{{ route('sair') }}" class="w-100">
                         @csrf
                         <button class="logout-btn" type="submit">

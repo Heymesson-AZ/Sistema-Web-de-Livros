@@ -42,8 +42,8 @@
                             <div class="row">
                                 <!-- Nome -->
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label small fw-bold text-secondary">Nome Completo</label>
-                                    <input type="text" name="name" minlength="3" maxlength="100"
+                                    <label for="register_name" class="form-label small fw-bold">Nome Completo</label>
+                                    <input type="text" name="name" id="register_name" minlength="3" maxlength="100"
                                         class="form-control @error('name') is-invalid border-danger @enderror"
                                         value="{{ old('name') }}" placeholder="Seu nome completo (3 a 100 caracteres)"
                                         required autofocus>
@@ -56,8 +56,8 @@
 
                                 <!-- Email -->
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label small fw-bold text-secondary">E-mail</label>
-                                    <input type="email" name="email"
+                                    <label for="register_email" class="form-label small fw-bold">E-mail</label>
+                                    <input type="email" name="email" id="register_email"
                                         class="form-control @error('email') is-invalid border-danger @enderror"
                                         value="{{ old('email') }}" placeholder="seuemail@exemplo.com" required>
                                     <div class="invalid-feedback fw-semibold mt-1 text-danger small">
@@ -69,8 +69,8 @@
 
                                 <!-- CPF e Data Nascimento (Lado a Lado) -->
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label small fw-bold text-secondary">CPF</label>
-                                    <input type="text" name="cpf" id="cpf" data-mask="cpf" maxlength="14"
+                                    <label for="register_cpf" class="form-label small fw-bold">CPF</label>
+                                    <input type="text" name="cpf" id="register_cpf" data-mask="cpf" maxlength="14"
                                         class="form-control @error('cpf') is-invalid border-danger @enderror"
                                         value="{{ old('cpf') }}" placeholder="000.000.000-00" required>
                                     @error('cpf')
@@ -81,8 +81,8 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label small fw-bold text-secondary">Nascimento</label>
-                                    <input type="date" name="data_nascimento" id="data_nascimento"
+                                    <label for="register_data_nascimento" class="form-label small fw-bold">Nascimento</label>
+                                    <input type="date" name="data_nascimento" id="register_data_nascimento"
                                         max="{{ date('Y-m-d', strtotime('-18 years')) }}"
                                         class="form-control @error('data_nascimento') is-invalid border-danger @enderror"
                                         value="{{ old('data_nascimento') }}" required>
@@ -95,8 +95,8 @@
 
                                 <!-- Telefone -->
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label small fw-bold text-secondary">Telefone / Celular</label>
-                                    <input type="text" name="telefone" id="telefone" data-mask="telefone"
+                                    <label for="register_telefone" class="form-label small fw-bold">Telefone / Celular</label>
+                                    <input type="text" name="telefone" id="register_telefone" data-mask="telefone"
                                         maxlength="15"
                                         class="form-control @error('telefone') is-invalid border-danger @enderror"
                                         value="{{ old('telefone') }}" placeholder="(00) 00000-0000" required>
@@ -109,14 +109,14 @@
 
                                 <!-- Senhas -->
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label small fw-bold text-secondary">Senha</label>
+                                    <label for="register_password" class="form-label small fw-bold">Senha</label>
                                     <div class="input-group">
                                         <input type="password" name="password" id="register_password" minlength="8"
                                             class="form-control @error('password') is-invalid border-danger @enderror"
                                             placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
                                         <button class="btn btn-outline-secondary" type="button" data-toggle="password"
-                                            data-target="#register_password" title="Mostrar/Ocultar Senha"
-                                            aria-label="Mostrar/Ocultar Senha">
+                                            data-target="#register_password" title="Mostrar ou Ocultar Senha"
+                                            aria-label="Mostrar ou Ocultar Senha">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
@@ -128,7 +128,7 @@
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label small fw-bold text-secondary">Confirmar Senha</label>
+                                    <label for="register_password_confirmation" class="form-label small fw-bold">Confirmar Senha</label>
                                     <div class="input-group">
                                         <input type="password" name="password_confirmation"
                                             id="register_password_confirmation" minlength="8"
@@ -136,7 +136,7 @@
                                             placeholder="Repita a senha" required>
                                         <button class="btn btn-outline-secondary" type="button"
                                             data-toggle="password" data-target="#register_password_confirmation"
-                                            title="Mostrar/Ocultar Senha" aria-label="Mostrar/Ocultar Senha">
+                                            title="Mostrar ou Ocultar Senha" aria-label="Mostrar ou Ocultar Senha">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>

@@ -30,10 +30,11 @@
                         $isFavoritado = Auth::check() && $livro->isFavoritadoPor(Auth::user());
                     @endphp
                     <button type="button"
-                        class="position-absolute top-0 end-0 m-3 btn btn-light btn-sm rounded-circle shadow-sm p-1 z-2 border-0 d-flex align-items-center justify-content-center"
-                        style="width: 40px; height: 40px;" data-favorito-toggle
+                        class="btn-favorito-card position-absolute top-0 end-0 m-3 z-2"
+                        data-favorito-toggle
                         data-favorito-url="{{ route('favoritos.toggle', $livro) }}"
-                        title="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
+                        title="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}"
+                        aria-label="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
                         <i
                             class="bi {{ $isFavoritado ? 'bi-heart-fill text-danger' : 'bi-heart text-secondary' }} fs-5"></i>
                     </button>

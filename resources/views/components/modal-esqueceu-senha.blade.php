@@ -1,5 +1,5 @@
-<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
             <div class="modal-header border-0 pt-4 px-4 pb-2">
                 <div class="d-flex align-items-center gap-2">
@@ -7,9 +7,9 @@
                         style="width: 40px; height: 40px; background-color: #eff6ff; color: #2563eb;">
                         <i class="bi bi-shield-lock fs-5"></i>
                     </div>
-                    <h5 class="fw-bold mb-0">Recuperar Senha</h5>
+                    <h5 class="fw-bold mb-0" id="forgotPasswordModalLabel">Recuperar Senha</h5>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar modal"></button>
             </div>
             <div class="modal-body px-4 pb-4">
                 @if (session('status'))
@@ -63,12 +63,12 @@
                         <input type="hidden" name="formulario" value="recuperar_senha">
 
                         <div class="mb-3">
-                            <label class="form-label small fw-bold text-secondary">E-mail de Cadastro</label>
+                            <label for="forgot_email" class="form-label small fw-bold text-secondary">E-mail de Cadastro</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0 text-muted">
                                     <i class="bi bi-envelope"></i>
                                 </span>
-                                <input type="email" name="email"
+                                <input type="email" name="email" id="forgot_email"
                                     class="form-control border-start-0 ps-0 @error('email') is-invalid border-danger @enderror"
                                     value="{{ old('email') }}" placeholder="seuemail@exemplo.com" required autofocus>
                             </div>

@@ -14,14 +14,14 @@
                     <!-- Lado Direito (Formulário) -->
                     <div class="col-md-7 p-4 p-md-5 position-relative">
                         <button type="button" class="btn-close position-absolute top-0 end-0 m-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
+                            data-bs-dismiss="modal" aria-label="Fechar modal"></button>
 
-                        <h3 class="fw-bold mb-1">Entrar</h3>
+                        <h3 class="fw-bold mb-1" id="loginModalLabel">Entrar</h3>
                         <p class="text-muted mb-4 small">Acesse sua conta para continuar</p>
 
                         @if (session('status') && session('form_sucesso') !== 'recuperar_senha')
                             <div class="alert alert-success d-flex align-items-center py-2 px-3 mb-3 small border-0 shadow-sm"
-                                style="border-radius: 10px; background-color: #dcfce7; color: #15803d;">
+                                style="border-radius: 10px;">
                                 <i class="bi bi-check-circle-fill me-2 fs-6"></i>
                                 <div>{{ session('status') }}</div>
                             </div>
@@ -30,7 +30,7 @@
                         <!-- Banner de Erro Geral de Login -->
                         @if ($errors->any() && old('formulario') === 'login')
                             <div class="alert alert-danger d-flex align-items-center py-2 px-3 mb-3 small border-0 shadow-sm"
-                                style="border-radius: 10px; background-color: #fee2e2; color: #b91c1c;">
+                                style="border-radius: 10px;">
                                 <i class="bi bi-exclamation-triangle-fill me-2 fs-6"></i>
                                 <div>E-mail ou senha incorretos. Verifique os dados informados.</div>
                             </div>
@@ -42,8 +42,8 @@
 
                             <!-- E-mail -->
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">E-mail</label>
-                                <input type="email" name="email"
+                                <label for="login_email" class="form-label small fw-bold">E-mail</label>
+                                <input type="email" name="email" id="login_email"
                                     class="form-control @error('email') is-invalid border-danger @enderror"
                                     value="{{ old('email') }}" placeholder="Digite seu e-mail" required autofocus>
                                 <div class="invalid-feedback fw-semibold mt-1 text-danger small">
@@ -55,15 +55,15 @@
 
                             <!-- Senha -->
                             <div class="mb-3">
-                                <label class="form-label small fw-bold text-secondary">Senha</label>
+                                <label for="login_password" class="form-label small fw-bold">Senha</label>
                                 <div class="input-group">
-                                    <input type="password" name="password" id="password"
+                                    <input type="password" name="password" id="login_password"
                                         class="form-control @error('password') is-invalid border-danger @enderror"
                                         placeholder="Digite sua senha" required>
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword"
-                                        data-toggle="password" data-target="#password" title="Mostrar/Ocultar Senha"
-                                        aria-label="Mostrar/Ocultar Senha">
-                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword"
+                                        data-toggle="password" data-target="#login_password" title="Mostrar ou Ocultar Senha"
+                                        aria-label="Mostrar ou Ocultar Senha">
+                                        <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
                                 @error('password')

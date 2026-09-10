@@ -15,10 +15,32 @@
         <section id="catalogo" class="mb-5">
             <div class="row g-4">
 
-                <!-- SIDEBAR DE FILTROS (ESTILO AMAZON) -->
+                <!-- SIDEBAR DE FILTROS (MOBILE-FIRST COM TOGGLE SANFONADO NO CELULAR) -->
                 <aside class="col-12 col-lg-3">
-                    <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 85px; z-index: 10;">
-                        <div class="card-body p-4">
+                    @php
+                        $filtrosAtivosCount = collect(['busca', 'genero', 'categoria', 'editora', 'faixa_preco', 'preco_min', 'preco_max', 'em_estoque'])->filter(fn($f) => request()->filled($f))->count();
+                    @endphp
+
+                    <!-- Botão Expansível Exclusivo Mobile (< 992px) -->
+                    <div class="d-lg-none mb-3">
+                        <button class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center py-2.5 px-3 rounded-3 shadow-xs"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#filtrosMobileCollapse"
+                            aria-expanded="{{ $filtrosAtivosCount > 0 ? 'true' : 'false' }}" aria-controls="filtrosMobileCollapse">
+                            <span class="fw-semibold d-flex align-items-center gap-2">
+                                <i class="bi bi-funnel-fill"></i> Filtrar Catálogo
+                                @if ($filtrosAtivosCount > 0)
+                                    <span class="badge bg-primary text-white rounded-pill px-2" style="font-size: 11px;">
+                                        {{ $filtrosAtivosCount }} ativo(s)
+                                    </span>
+                                @endif
+                            </span>
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
+                    </div>
+
+                    <div class="collapse d-lg-block {{ $filtrosAtivosCount > 0 ? 'show' : '' }}" id="filtrosMobileCollapse">
+                        <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 85px; z-index: 10;">
+                            <div class="card-body p-4">
 
                             <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
                                 <h5 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
@@ -216,6 +238,7 @@
 
                         </div>
                     </div>
+                </div>
                 </aside>
 
                 <!-- GRID DE RESULTADOS & CABEÇALHO DO CATÁLOGO -->
@@ -350,7 +373,7 @@
                             </div>
                         </div>
                     @else
-                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-3 g-4 mb-4">
+                        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-2 g-sm-3 g-md-4 mb-4">
                             @foreach ($livros as $livro)
                                 <div class="col">
                                     <div
@@ -358,23 +381,24 @@
 
                                         <!-- CAPA DO LIVRO -->
                                         <div
-                                            class="position-relative bg-light text-center p-3 overflow-hidden book-cover-wrapper">
-                                            <a href="{{ route('livros.detalhes', $livro) }}">
+                                            class="position-relative bg-light text-center p-2 p-sm-3 overflow-hidden book-cover-wrapper">
+                                            <a href="{{ route('livros.detalhes', $livro) }}" aria-label="Ver detalhes de {{ $livro->titulo }}">
                                                 <img src="{{ $livro->url_capa }}" alt="{{ $livro->titulo }}"
                                                     class="img-fluid rounded-3 shadow-sm book-cover-img"
                                                     loading="lazy"
                                                     onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=450&q=80'">
                                             </a>
 
-                                            <!-- BOTÃO FAVORITAR -->
+                                            <!-- BOTÃO FAVORITAR ERGONÔMICO (A11Y) -->
                                             @php
                                                 $isFavoritado = Auth::check() && $livro->isFavoritadoPor(Auth::user());
                                             @endphp
                                             <button type="button"
-                                                class="position-absolute top-0 end-0 m-2 btn btn-light btn-sm rounded-circle shadow-sm p-1 z-2 border-0 d-flex align-items-center justify-content-center"
-                                                style="width: 32px; height: 32px;" data-favorito-toggle
+                                                class="btn-favorito-card position-absolute top-0 end-0 m-2 z-2"
+                                                data-favorito-toggle
                                                 data-favorito-url="{{ route('favoritos.toggle', $livro) }}"
-                                                title="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
+                                                title="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}"
+                                                aria-label="{{ $isFavoritado ? 'Remover dos favoritos' : 'Adicionar aos favoritos' }}">
                                                 <i
                                                     class="bi {{ $isFavoritado ? 'bi-heart-fill text-danger' : 'bi-heart text-secondary' }} fs-6"></i>
                                             </button>

@@ -748,13 +748,18 @@ body {
     }
 
     .search-box {
-        width: 170px;
-        height: 36px;
-        padding: 0 10px;
+        width: 160px;
+        max-width: 45vw;
+        height: 38px;
+        padding: 0 12px;
+        border-radius: 9999px;
+        transition: width 0.25s ease, box-shadow 0.25s ease;
     }
 
     .search-box:focus-within {
-        width: 200px;
+        width: 220px;
+        max-width: 60vw;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
     }
 
     .search-box input {

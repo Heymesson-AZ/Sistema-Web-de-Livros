@@ -139,9 +139,9 @@
                                         <form action="{{ route('carrinho.remover', $item) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-link text-danger p-1"
-                                                title="Remover item do carrinho">
-                                                <i data-lucide="trash" style="width: 17px; height: 17px;"></i>
+                                            <button type="submit" class="btn-action btn-action-delete"
+                                                title="Remover item do carrinho" aria-label="Remover item">
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </div>

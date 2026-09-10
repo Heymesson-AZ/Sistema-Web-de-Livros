@@ -349,9 +349,11 @@ class ClienteController extends Controller
         $user = $request->user();
 
         if ($user->temPedidosAtivos()) {
-            return back()->withErrors([
-                'DeleteUsuario' => 'Você possui pedidos em andamento e não pode excluir sua conta agora.'
-            ]);
+            return back()
+                ->withErrors([
+                    'DeleteUsuario' => 'Não é possível excluir sua conta: existem pedidos ativos, em processamento ou com pendências vinculadas a ela. Conclua ou cancele todos os pedidos antes de prosseguir.'
+                ], 'userDeletion')
+                ->with('error', 'Não é possível excluir sua conta: existem pedidos ativos ou pendências vinculadas a ela.');
         }
 
         Auth::logout();

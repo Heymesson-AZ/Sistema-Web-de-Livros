@@ -2,7 +2,8 @@
     <div class="dropdown user-dropdown-container">
         <button class="user-pill-btn dropdown-toggle border-0" type="button" id="userMenuDropdown" data-bs-toggle="dropdown"
             aria-expanded="false">
-            <img src="{{ Auth::user()->foto }}" alt="{{ Auth::user()->name }}" class="user-avatar-img">
+            <img src="{{ Auth::user()->foto }}" alt="{{ Auth::user()->name }}" class="user-avatar-img"
+                onerror="this.onerror=null;this.src='{{ Auth::user()->foto_padrao }}';">
             <span class="user-name-label d-none d-md-inline">{{ Auth::user()->primeiro_nome }}</span>
             <i data-lucide="chevron-down" class="dropdown-chevron-icon d-none d-md-inline"
                 style="width: 14px; height: 14px;"></i>
@@ -13,7 +14,8 @@
             <!-- Cabeçalho com dados e avatar do usuário -->
             <li class="user-dropdown-header p-3 border-bottom">
                 <div class="d-flex align-items-center gap-3">
-                    <img src="{{ Auth::user()->foto }}" alt="{{ Auth::user()->name }}" class="user-dropdown-avatar">
+                    <img src="{{ Auth::user()->foto }}" alt="{{ Auth::user()->name }}" class="user-dropdown-avatar"
+                        onerror="this.onerror=null;this.src='{{ Auth::user()->foto_padrao }}';">
                     <div class="user-dropdown-details overflow-hidden">
                         <div class="fw-bold text-dark text-truncate" style="max-width: 180px;"
                             title="{{ Auth::user()->name }}">
@@ -125,7 +127,8 @@
                 </li>
                 @if (Auth::user()->podeGerenciarCupons())
                     <li>
-                        <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{{ route('admin.cupons.index') }}">
+                        <a class="dropdown-item d-flex align-items-center gap-2 py-2"
+                            href="{{ route('admin.cupons.index') }}">
                             <i data-lucide="ticket" style="width: 16px; height: 16px;"></i>
                             <span>Cupons de Desconto</span>
                         </a>

@@ -53,6 +53,7 @@ class CupomController extends Controller
             'valor_desconto' => ['required', 'numeric', 'min:0.01'],
             'limite_uso' => ['nullable', 'integer', 'min:1'],
             'validade_cupom' => ['nullable', 'date', 'after_or_equal:today'],
+            'requer_concordancia' => ['nullable', 'boolean'],
         ], [
             'codigo.required' => 'O código do cupom é obrigatório.',
             'codigo.unique' => 'Já existe um cupom cadastrado com este código.',
@@ -60,6 +61,9 @@ class CupomController extends Controller
             'valor_desconto.required' => 'Informe o valor do desconto.',
             'validade_cupom.after_or_equal' => 'A validade não pode ser anterior a hoje.',
         ]);
+
+        $dados['tipo_origem'] = 'plataforma';
+        $dados['requer_concordancia'] = $request->boolean('requer_concordancia');
 
         Cupom::create($dados);
 
@@ -94,7 +98,10 @@ class CupomController extends Controller
             'valor_desconto' => ['required', 'numeric', 'min:0.01'],
             'limite_uso' => ['nullable', 'integer', 'min:1'],
             'validade_cupom' => ['nullable', 'date'],
+            'requer_concordancia' => ['nullable', 'boolean'],
         ]);
+
+        $dados['requer_concordancia'] = $request->boolean('requer_concordancia');
 
         $cupon->update($dados);
 

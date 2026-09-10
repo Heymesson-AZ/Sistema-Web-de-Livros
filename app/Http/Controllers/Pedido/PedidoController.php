@@ -111,7 +111,14 @@ class PedidoController extends Controller
             if ($codigoCupom) {
                 $cupom = Cupom::where('codigo', strtoupper($codigoCupom))->first();
                 if ($cupom && $cupom->isValido()) {
-                    $desconto = $cupom->calcularDesconto($subtotal);
+                    $resultadoCupom = $cupom->calcularDescontoParaItens($itens);
+                    if ($resultadoCupom['aplicavel']) {
+                        $desconto = $resultadoCupom['desconto'];
+                    } else {
+                        $cupom = null;
+                    }
+                } else {
+                    $cupom = null;
                 }
             }
 

@@ -242,9 +242,22 @@ function configurarFavoritosToggle() {
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute("content");
 
+        // Desabilita temporariamente para evitar cliques duplos
+        botao.style.pointerEvents = "none";
+        const icone = botao.querySelector("i");
+        if (icone) {
+            icone.style.transition =
+                "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            icone.style.transform = "scale(1.3)";
+        }
+
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
             const resposta = await fetch(url, {
                 method: "POST",
+                signal: controller.signal,
                 headers: {
                     "Content-Type": "application/json",
                     Accept: "application/json",
@@ -252,16 +265,33 @@ function configurarFavoritosToggle() {
                     "X-Requested-With": "XMLHttpRequest",
                 },
             });
+            clearTimeout(timeoutId);
 
             if (resposta.status === 401) {
+                // Usuário não autenticado: abre modal de login se existir na página
+                const modalLoginEl = document.getElementById("loginModal");
+                if (modalLoginEl && window.bootstrap?.Modal) {
+                    const modalInstance =
+                        window.bootstrap.Modal.getOrCreateInstance(
+                            modalLoginEl,
+                        );
+                    modalInstance.show();
+                    return;
+                }
                 window.location.href = "/entrar";
                 return;
             }
 
-            if (!resposta.ok) throw new Error("Erro na requisição");
+            if (resposta.status === 419) {
+                alert("Sua sessão expirou. Recarregando a página...");
+                window.location.reload();
+                return;
+            }
+
+            if (!resposta.ok)
+                throw new Error("Erro na requisição ao favoritar");
 
             const dados = await resposta.json();
-            const icone = botao.querySelector("i");
 
             if (dados.favoritado) {
                 if (icone) {
@@ -277,19 +307,29 @@ function configurarFavoritosToggle() {
                 // Se estiver na aba de favoritos do painel, remove o card com transição suave
                 const cardFavorito = botao.closest("[data-favorito-item]");
                 if (cardFavorito) {
-                    cardFavorito.remove();
+                    cardFavorito.style.transition = "all 0.3s ease";
+                    cardFavorito.style.opacity = "0";
+                    cardFavorito.style.transform = "scale(0.95)";
+                    setTimeout(() => cardFavorito.remove(), 300);
                 }
             }
 
-            // Atualiza contadores de favoritos na navbar se existirem
+            // Atualiza contadores de favoritos na navbar e menu se existirem
             const badges = document.querySelectorAll(
-                "[data-contador-favoritos]",
+                "[data-contador-favoritos], .badge-count-favoritos",
             );
             badges.forEach((badge) => {
                 badge.textContent = dados.total_favoritos;
             });
         } catch (erro) {
             console.error("Erro ao favoritar:", erro);
+        } finally {
+            botao.style.pointerEvents = "auto";
+            if (icone) {
+                setTimeout(() => {
+                    icone.style.transform = "scale(1)";
+                }, 200);
+            }
         }
     });
 }

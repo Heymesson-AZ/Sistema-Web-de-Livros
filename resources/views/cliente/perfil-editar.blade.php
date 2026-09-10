@@ -137,6 +137,16 @@
                                 Esta ação excluirá sua conta permanentemente.
                             </p>
 
+                            @if ($errors->userDeletion->has('DeleteUsuario') || $errors->has('DeleteUsuario') || session('error'))
+                                <div
+                                    class="alert alert-danger border-0 rounded-3 shadow-sm d-flex align-items-center gap-2 mb-3">
+                                    <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                                    <div class="small">
+                                        {{ $errors->userDeletion->first('DeleteUsuario') ?: ($errors->first('DeleteUsuario') ?: session('error')) }}
+                                    </div>
+                                </div>
+                            @endif
+
                             <form method="POST" action="{{ route('cliente.perfil.deletar') }}">
                                 @csrf
                                 @method('DELETE')

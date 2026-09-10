@@ -136,12 +136,13 @@
                 </div>
 
                 <div class="col-6 col-md-1 d-flex gap-1">
-                    <button type="submit" class="btn btn-primary w-100" title="Filtrar">
+                    <button type="submit" class="btn-search-submit w-100 px-2" title="Filtrar Administradores"
+                        aria-label="Filtrar">
                         <i class="bi bi-filter"></i>
                     </button>
                     @if (request()->hasAny(['busca', 'departamento', 'cargo', 'status']))
-                        <a href="{{ route('admin.administradores.index') }}" class="btn btn-outline-secondary"
-                            title="Limpar Filtros">
+                        <a href="{{ route('admin.administradores.index') }}" class="btn-search-clear"
+                            title="Limpar Filtros" aria-label="Limpar Filtros">
                             <i class="bi bi-x-lg"></i>
                         </a>
                     @endif
@@ -227,118 +228,100 @@
                                 </td>
                                 <td class="py-3 text-muted small">
                                     {{ $admin->created_at ? $admin->created_at->format('d/m/Y') : '-' }}
-                                </td>
                                 <td class="text-end pe-4 py-3">
-                                    <div class="d-flex justify-content-end gap-1">
+                                    <div class="actions-group justify-content-end">
                                         <a href="{{ route('admin.administradores.show', $admin) }}"
-                                            class="btn btn-sm btn-outline-secondary" title="Ver Detalhes">
-                                            class="btn btn-sm btn-outline-secondary rounded-3 d-inline-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;"
-                                            title="Ver Detalhes" aria-label="Visualizar">
+                                            class="btn-action btn-action-view" title="Ver Detalhes"
+                                            aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         @if (Auth::user()->podeGerenciarAdministradores() || Auth::id() === $admin->user_id)
-                                             <a href="{{ route('admin.administradores.edit', $admin) }}"
-                                                 class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
-                                                 title="Editar Administrador">
-                                                 <i class="bi bi-pencil-square"></i>
-                                                 <span>Editar</span>
-                                             </a>
-                                         @endif
                                             <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
                                             <a href="{{ route('admin.administradores.edit', $admin) }}"
-                                                class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
-                                                style="width: 32px; height: 32px;"
-                                                title="Editar Administrador" aria-label="Editar">
-                                                <i class="bi bi-pencil-square fs-6"></i>
+                                                class="btn-action btn-action-edit" title="Editar Administrador"
+                                                aria-label="Editar">
+                                                <i class="bi bi-pencil-square"></i>
                                             </a>
                                         @endif
 
-                                         @if (Auth::id() !== $admin->user_id && Auth::user()->podeGerenciarAdministradores())
-                                             <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
-                                                 title="Excluir" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ $admin->id }}">
                                         @if (Auth::id() !== $admin->user_id && Auth::user()->podeGerenciarAdministradores())
-                                            <button type="button"
-                                                class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
-                                                style="width: 32px; height: 32px;"
+                                            <button type="button" class="btn-action btn-action-delete"
                                                 title="Excluir Administrador" aria-label="Excluir"
-                                                data-bs-toggle="modal" data-bs-target="#deleteModal{{ $admin->id }}">
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal{{ $admin->id }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         @endif
                                     </div>
 
-                                            <!-- Modal de Confirmação de Exclusão -->
-                                            <div class="modal fade" id="deleteModal{{ $admin->id }}"
-                                                tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content border-0 shadow-lg rounded-4">
-                                                        <div class="modal-header border-0 pt-4 px-4">
-                                                            <div class="rounded-circle d-flex align-items-center justify-content-center me-2"
-                                                                style="width: 40px; height: 40px; background-color: #fef2f2; color: #dc2626;">
-                                                                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-                                                            </div>
-                                                            <h5 class="fw-bold mb-0">Confirmar Exclusão</h5>
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body px-4 py-3 text-start">
-                                                            <p class="text-muted mb-2">
-                                                                Tem certeza de que deseja excluir o administrador
-                                                                <strong>{{ $admin->user->name }}</strong>?
-                                                            </p>
-                                                            <p class="small text-danger mb-0">
-                                                                <i class="bi bi-info-circle me-1"></i> Esta ação
-                                                                removerá o acesso executivo e a conta do usuário do
-                                                                sistema.
-                                                            </p>
-                                                        </div>
-                                                        <div class="modal-footer border-0 px-4 pb-4">
-                                                            <button type="button"
-                                                                class="btn btn-light rounded-3 px-3"
-                                                                data-bs-dismiss="modal">Cancelar</button>
-                                                            <form method="POST"
-                                                                action="{{ route('admin.administradores.destroy', $admin) }}">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit"
-                                                                    class="btn btn-danger rounded-3 px-3">
-                                                                    Excluir Administrador
-                                                                </button>
-                                                            </form>
-                                                        </div>
+                                    <!-- Modal de Confirmação de Exclusão -->
+                                    <div class="modal fade" id="deleteModal{{ $admin->id }}" tabindex="-1"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                                <div class="modal-header border-0 pt-4 px-4">
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                        style="width: 40px; height: 40px; background-color: #fef2f2; color: #dc2626;">
+                                                        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
                                                     </div>
+                                                    <h5 class="fw-bold mb-0">Confirmar Exclusão</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body px-4 py-3 text-start">
+                                                    <p class="text-muted mb-2">
+                                                        Tem certeza de que deseja excluir o administrador
+                                                        <strong>{{ $admin->user->name }}</strong>?
+                                                    </p>
+                                                    <p class="small text-danger mb-0">
+                                                        <i class="bi bi-info-circle me-1"></i> Esta ação
+                                                        removerá o acesso executivo e a conta do usuário do
+                                                        sistema.
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer border-0 px-4 pb-4">
+                                                    <button type="button" class="btn btn-light rounded-3 px-3"
+                                                        data-bs-dismiss="modal">Cancelar</button>
+                                                    <form method="POST"
+                                                        action="{{ route('admin.administradores.destroy', $admin) }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger rounded-3 px-3">
+                                                            Excluir Administrador
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
-                                        @else
-                                            <button type="button" class="btn btn-sm btn-outline-secondary disabled"
-                                                title="Você não pode excluir sua própria conta">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        @endif
+                                        </div>
                                     </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center py-5">
-                                    <div class="py-4">
-                                        <i class="bi bi-search text-muted fs-1 mb-3 d-block"></i>
-                                        <h5 class="text-secondary fw-semibold">Nenhum administrador encontrado</h5>
-                                        <p class="text-muted small">Tente ajustar os termos de busca ou filtros
-                                            aplicados.</p>
-                                        @if (request()->hasAny(['busca', 'departamento', 'cargo', 'status']))
-                                            <a href="{{ route('admin.administradores.index') }}"
-                                                class="btn btn-sm btn-outline-primary rounded-3">
-                                                Limpar Filtros
-                                            </a>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+                                @else
+                                    <button type="button" class="btn btn-sm btn-outline-secondary disabled"
+                                        title="Você não pode excluir sua própria conta">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                        @endif
+            </div>
+            </td>
+            </tr>
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <div class="py-4">
+                            <i class="bi bi-search text-muted fs-1 mb-3 d-block"></i>
+                            <h5 class="text-secondary fw-semibold">Nenhum administrador encontrado</h5>
+                            <p class="text-muted small">Tente ajustar os termos de busca ou filtros
+                                aplicados.</p>
+                            @if (request()->hasAny(['busca', 'departamento', 'cargo', 'status']))
+                                <a href="{{ route('admin.administradores.index') }}"
+                                    class="btn btn-sm btn-outline-primary rounded-3">
+                                    Limpar Filtros
+                                </a>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+                </tbody>
                 </table>
             </div>
 
@@ -350,5 +333,5 @@
             @endif
         </div>
 
-    </div>
-</x-layouts.principal>
+        </div>
+    </x-layouts.principal>

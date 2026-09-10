@@ -12,7 +12,9 @@ use App\Http\Controllers\Cliente\FavoritoController;
 use App\Http\Controllers\Livro\LivroPublicoController;
 use App\Http\Controllers\Painel\PainelController;
 use App\Http\Controllers\Pedido\PedidoController;
+use App\Http\Controllers\Vendedor\CupomVendedorController;
 use App\Http\Controllers\Vendedor\LivroVendedorController;
+use App\Http\Controllers\Vendedor\PedidoVendedorController;
 use App\Http\Controllers\Vendedor\VendedorController;
 use Illuminate\Support\Facades\Route;
 
@@ -94,6 +96,19 @@ Route::middleware(['auth', 'checkTipo:vendedor'])->group(function () {
         // CRUD de Livros do Vendedor
         Route::resource('livros', LivroVendedorController::class)
             ->names('vendedor.livros');
+
+        // Gestão de Pedidos Recebidos
+        Route::get('/pedidos', [PedidoVendedorController::class, 'index'])->name('vendedor.pedidos.index');
+        Route::get('/pedidos/{pedido}', [PedidoVendedorController::class, 'show'])->name('vendedor.pedidos.show');
+        Route::patch('/pedidos/{pedido}/status', [PedidoVendedorController::class, 'atualizarStatus'])->name('vendedor.pedidos.status');
+
+        // Gestão de Clientes da Loja
+        Route::get('/clientes', [VendedorController::class, 'clientes'])->name('vendedor.clientes.index');
+
+        // Cupons da Loja & Campanhas de Incentivo
+        Route::post('/cupons/{cupom}/aderir', [CupomVendedorController::class, 'aderirCampanha'])->name('vendedor.cupons.aderir');
+        Route::post('/cupons/{cupom}/desistir', [CupomVendedorController::class, 'desistirCampanha'])->name('vendedor.cupons.desistir');
+        Route::resource('cupons', CupomVendedorController::class)->names('vendedor.cupons');
     });
 });
 

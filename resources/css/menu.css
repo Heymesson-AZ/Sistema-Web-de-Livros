@@ -217,11 +217,13 @@ body {
 .user-avatar-img {
     width: 32px;
     height: 32px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid rgba(255, 255, 255, 0.25);
     background: #3b82f6;
     flex-shrink: 0;
+    display: inline-block;
 }
 
 .dropdown-chevron-icon {
@@ -267,11 +269,13 @@ body {
 .user-dropdown-avatar {
     width: 46px;
     height: 46px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #fff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     flex-shrink: 0;
+    display: inline-block;
 }
 
 .user-dropdown-menu .dropdown-item {

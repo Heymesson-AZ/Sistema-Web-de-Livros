@@ -43,13 +43,6 @@ class VendedorController extends Controller
             });
         }
 
-        // Filtro por Status de Aprovação
-        if ($status = $request->input('status')) {
-            $query->where('status_aprovacao', $status);
-        }
-
-        // Filtro por Status da Conta de Usuário
-        if ($statusConta = $request->input('status_conta')) {
         // Filtro por Situação Unificada da Loja
         $situacao = $request->input('situacao') ?? $request->input('status');
         if ($situacao && in_array($situacao, ['aprovado', 'pendente', 'inativo', 'rejeitado', 'banido'])) {
@@ -64,9 +57,6 @@ class VendedorController extends Controller
 
         // Indicadores (KPIs)
         $totalVendedores = Vendedor::count();
-        $totalAprovados = Vendedor::where('status_aprovacao', 'aprovado')->count();
-        $totalPendentes = Vendedor::where('status_aprovacao', 'pendente')->count();
-        $totalRejeitados = Vendedor::where('status_aprovacao', 'rejeitado')->count();
         $totalAprovados = Vendedor::comSituacao('aprovado')->count();
         $totalPendentes = Vendedor::comSituacao('pendente')->count();
         $totalRejeitados = Vendedor::comSituacao('rejeitado')->count();
@@ -78,7 +68,6 @@ class VendedorController extends Controller
             'totalAprovados' => $totalAprovados,
             'totalPendentes' => $totalPendentes,
             'totalRejeitados' => $totalRejeitados,
-            'statusSelecionado' => $status,
             'totalBanidos' => $totalBanidos,
             'situacaoSelecionada' => $situacao,
             'statusSelecionado' => $situacao,
@@ -102,7 +91,6 @@ class VendedorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
             'situacao' => ['nullable', 'string', Rule::in(['aprovado', 'pendente', 'inativo', 'rejeitado', 'banido'])],
             'status' => ['nullable', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
             'status_aprovacao' => ['nullable', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
@@ -112,7 +100,6 @@ class VendedorController extends Controller
             'nome_fantasia' => ['required', 'string', 'max:255'],
             'inscricao_estadual' => ['required', 'string', 'max:50'],
             'telefone_comercial' => ['nullable', 'string', 'max:20'],
-            'status_aprovacao' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
         ], [
             'name.required' => 'O nome do responsável é obrigatório.',
             'email.required' => 'O e-mail é obrigatório.',
@@ -131,7 +118,6 @@ class VendedorController extends Controller
             'status_aprovacao.in' => 'Selecione um status de aprovação válido.',
         ]);
 
-        DB::transaction(function () use ($request) {
         $situacao = $request->input('situacao');
         if (!$situacao) {
             if ($request->status === 'banido') {
@@ -166,7 +152,6 @@ class VendedorController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'tipo' => 'vendedor',
-                'status' => $request->status,
                 'status' => $userStatus,
                 'foto_perfil' => $fotoPath,
                 'email_verified_at' => now(),
@@ -179,7 +164,6 @@ class VendedorController extends Controller
                 'razao_social' => $request->razao_social,
                 'nome_fantasia' => $request->nome_fantasia,
                 'inscricao_estadual' => $request->inscricao_estadual,
-                'status_aprovacao' => $request->status_aprovacao,
                 'status_aprovacao' => $statusAprovacao,
             ]);
         });
@@ -223,7 +207,6 @@ class VendedorController extends Controller
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user?->id)],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'status' => ['required', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
             'situacao' => ['nullable', 'string', Rule::in(['aprovado', 'pendente', 'inativo', 'rejeitado', 'banido'])],
             'status' => ['nullable', 'string', Rule::in(['ativo', 'inativo', 'banido'])],
             'status_aprovacao' => ['nullable', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
@@ -234,7 +217,6 @@ class VendedorController extends Controller
             'nome_fantasia' => ['required', 'string', 'max:255'],
             'inscricao_estadual' => ['required', 'string', 'max:50'],
             'telefone_comercial' => ['nullable', 'string', 'max:20'],
-            'status_aprovacao' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
             'senha_confirmacao_admin' => [
                 'required',
                 'string',
@@ -262,7 +244,6 @@ class VendedorController extends Controller
             'status_aprovacao.in' => 'Selecione um status válido.',
         ]);
 
-        DB::transaction(function () use ($request, $vendedor, $user) {
         $situacao = $request->input('situacao');
         if (!$situacao) {
             if ($request->status === 'banido') {
@@ -290,7 +271,6 @@ class VendedorController extends Controller
             $userData = [
                 'name' => $request->name,
                 'email' => $request->email,
-                'status' => $request->status,
                 'status' => $userStatus,
             ];
 
@@ -318,7 +298,6 @@ class VendedorController extends Controller
                 'razao_social' => $request->razao_social,
                 'nome_fantasia' => $request->nome_fantasia,
                 'inscricao_estadual' => $request->inscricao_estadual,
-                'status_aprovacao' => $request->status_aprovacao,
                 'status_aprovacao' => $statusAprovacao,
             ]);
         });
@@ -337,13 +316,9 @@ class VendedorController extends Controller
         }
 
         $request->validate([
-            'status' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado'])],
             'status' => ['required', 'string', Rule::in(['pendente', 'aprovado', 'rejeitado', 'banido'])],
         ]);
 
-        $vendedor->update([
-            'status_aprovacao' => $request->status,
-        ]);
         $statusAlvo = $request->status;
         [$userStatus, $statusAprovacao] = match ($statusAlvo) {
             'banido' => ['banido', 'rejeitado'],
@@ -363,15 +338,12 @@ class VendedorController extends Controller
         });
 
         $mensagens = [
-            'aprovado' => 'Vendedor aprovado com sucesso! Agora ele pode publicar livros e realizar vendas.',
-            'rejeitado' => 'O cadastro do vendedor foi rejeitado.',
             'aprovado' => 'Vendedor aprovado com sucesso! Agora a loja está autorizada e ativa para vendas.',
             'rejeitado' => 'O cadastro do vendedor foi rejeitado e o acesso foi suspenso.',
             'banido' => 'O vendedor foi banido por infração.',
             'pendente' => 'O status do vendedor foi retornado para pendente de análise.',
         ];
 
-        return back()->with('status', $mensagens[$request->status] ?? 'Status alterado com sucesso!');
         return back()->with('status', $mensagens[$request->status] ?? 'Situação alterada com sucesso!');
     }
 
@@ -506,9 +478,11 @@ class VendedorController extends Controller
         $user = $request->user();
 
         if ($user->temPedidosAtivos()) {
-            return back()->withErrors([
-                'DeleteUsuario' => 'Você possui pedidos em andamento e não pode excluir sua conta agora.'
-            ]);
+            return back()
+                ->withErrors([
+                    'DeleteUsuario' => 'Não é possível excluir sua conta: existem pedidos ativos, em processamento ou com pendências vinculadas à sua loja. Conclua ou cancele todos os pedidos antes de prosseguir.'
+                ], 'userDeletion')
+                ->with('error', 'Não é possível excluir sua conta de vendedor: existem pedidos ativos ou pendências vinculadas.');
         }
 
         Auth::logout();
@@ -646,6 +620,8 @@ class VendedorController extends Controller
         $livrosCount = $vendedor->livros()->count();
         $pedidosCount = $vendedor->pedidos()->count();
         $avaliacoesCount = $vendedor->avaliacoes()->count();
+        $clientesCount = \App\Models\Cliente::whereHas('pedidos', fn($q) => $q->where('vendedor_id', $vendedor->id))->count();
+        $cuponsCount = $vendedor->cupons()->count();
 
         return view('vendedor.painel', [
             'user' => $user,
@@ -653,7 +629,40 @@ class VendedorController extends Controller
             'livrosCount' => $livrosCount,
             'pedidosCount' => $pedidosCount,
             'avaliacoesCount' => $avaliacoesCount,
+            'clientesCount' => $clientesCount,
+            'cuponsCount' => $cuponsCount,
         ]);
+    }
+
+    /**
+     * Exibir lista de clientes que compraram livros desta loja.
+     */
+    public function clientes(Request $request): View|RedirectResponse
+    {
+        $vendedor = $request->user()->vendedor;
+        if (!$vendedor || !$vendedor->isAprovado()) {
+            return redirect()->route('vendedor.painel')->with('error', 'Sua loja precisa estar aprovada para visualizar clientes.');
+        }
+
+        $query = \App\Models\Cliente::whereHas('pedidos', function ($q) use ($vendedor) {
+            $q->where('vendedor_id', $vendedor->id);
+        })->with(['user', 'pedidos' => function ($q) use ($vendedor) {
+            $q->where('vendedor_id', $vendedor->id)->with('entrega');
+        }])->withCount(['pedidos' => function ($q) use ($vendedor) {
+            $q->where('vendedor_id', $vendedor->id);
+        }]);
+
+        if ($request->filled('busca')) {
+            $busca = trim($request->busca);
+            $query->whereHas('user', function ($u) use ($busca) {
+                $u->where('name', 'like', "%{$busca}%")
+                  ->orWhere('email', 'like', "%{$busca}%");
+            });
+        }
+
+        $clientes = $query->paginate(12)->withQueryString();
+
+        return view('vendedor.clientes.index', compact('vendedor', 'clientes'));
     }
 
     // =========================================================================

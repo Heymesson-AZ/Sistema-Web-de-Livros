@@ -246,11 +246,18 @@ class Livro extends Model
     }
 
     /**
-     * Scope para buscar livros com estoque e ativos no catálogo.
+     * Scope para buscar livros com estoque e ativos no catálogo de vendedores aprovados e ativos.
      */
     public function scopeDisponiveis($query)
     {
-        return $query->where('quantidade', '>', 0)->where('status_moderacao', self::STATUS_MODERACAO_ATIVO);
+        return $query->where('quantidade', '>', 0)
+                     ->where('status_moderacao', self::STATUS_MODERACAO_ATIVO)
+                     ->whereHas('vendedor', function ($sub) {
+                         $sub->where('status_aprovacao', 'aprovado')
+                             ->whereHas('user', function ($u) {
+                                 $u->where('status', 'ativo');
+                             });
+                     });
     }
 
     /**

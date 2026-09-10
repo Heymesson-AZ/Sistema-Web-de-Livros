@@ -3,6 +3,7 @@
 @import "./carrosel.css";
 @import "./catalogo.css";
 @import "./site-footer.css";
+@import "./botoes-acoes.css";
 
 @tailwind base;
 @tailwind components;

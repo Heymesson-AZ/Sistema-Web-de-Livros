@@ -118,70 +118,81 @@
         <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
             <form method="GET" action="{{ route('admin.vendedores.index') }}" class="row g-2 align-items-center">
                 <div class="col-12 col-md-5">
-                <div class="col-12 col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-muted">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" name="busca" class="form-control border-start-0 ps-0"
-                            placeholder="Buscar por nome, e-mail, CNPJ ou razão social..."
-                            value="{{ request('busca') }}">
+                    <div class="col-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="busca" class="form-control border-start-0 ps-0"
+                                placeholder="Buscar por nome, e-mail, CNPJ ou razão social..."
+                                value="{{ request('busca') }}">
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-6 col-md-3">
-                    <select name="status" class="form-select">
-                        <option value="">Aprovação (Todos)</option>
-                        <option value="aprovado" {{ request('status') === 'aprovado' ? 'selected' : '' }}>Aprovados
-                        </option>
-                        <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendentes
-                        </option>
-                        <option value="rejeitado" {{ request('status') === 'rejeitado' ? 'selected' : '' }}>Rejeitados
-                        </option>
-                <div class="col-12 col-md-4">
-                    <select name="situacao" class="form-select">
-                        <option value="">Situação da Loja (Todas)</option>
-                        <option value="aprovado" {{ ($situacaoSelecionada ?? request('status')) === 'aprovado' ? 'selected' : '' }}>Aprovados & Ativos</option>
-                        <option value="pendente" {{ ($situacaoSelecionada ?? request('status')) === 'pendente' ? 'selected' : '' }}>Pendentes de Análise</option>
-                        <option value="inativo" {{ ($situacaoSelecionada ?? request('status')) === 'inativo' ? 'selected' : '' }}>Inativos / Pausados</option>
-                        <option value="rejeitado" {{ ($situacaoSelecionada ?? request('status')) === 'rejeitado' ? 'selected' : '' }}>Rejeitados</option>
-                        <option value="banido" {{ ($situacaoSelecionada ?? request('status')) === 'banido' ? 'selected' : '' }}>Banidos</option>
-                    </select>
-                </div>
+                    <div class="col-6 col-md-3">
+                        <select name="status" class="form-select">
+                            <option value="">Aprovação (Todos)</option>
+                            <option value="aprovado" {{ request('status') === 'aprovado' ? 'selected' : '' }}>Aprovados
+                            </option>
+                            <option value="pendente" {{ request('status') === 'pendente' ? 'selected' : '' }}>Pendentes
+                            </option>
+                            <option value="rejeitado" {{ request('status') === 'rejeitado' ? 'selected' : '' }}>
+                                Rejeitados
+                            </option>
+                            <div class="col-12 col-md-4">
+                                <select name="situacao" class="form-select">
+                                    <option value="">Situação da Loja (Todas)</option>
+                                    <option value="aprovado"
+                                        {{ ($situacaoSelecionada ?? request('status')) === 'aprovado' ? 'selected' : '' }}>
+                                        Aprovados & Ativos</option>
+                                    <option value="pendente"
+                                        {{ ($situacaoSelecionada ?? request('status')) === 'pendente' ? 'selected' : '' }}>
+                                        Pendentes de Análise</option>
+                                    <option value="inativo"
+                                        {{ ($situacaoSelecionada ?? request('status')) === 'inativo' ? 'selected' : '' }}>
+                                        Inativos / Pausados</option>
+                                    <option value="rejeitado"
+                                        {{ ($situacaoSelecionada ?? request('status')) === 'rejeitado' ? 'selected' : '' }}>
+                                        Rejeitados</option>
+                                    <option value="banido"
+                                        {{ ($situacaoSelecionada ?? request('status')) === 'banido' ? 'selected' : '' }}>
+                                        Banidos</option>
+                                </select>
+                            </div>
 
-                <div class="col-6 col-md-2">
-                    <select name="status_conta" class="form-select">
-                        <option value="">Conta (Todas)</option>
-                        <option value="ativo" {{ request('status_conta') === 'ativo' ? 'selected' : '' }}>Ativo
-                        </option>
-                        <option value="inativo" {{ request('status_conta') === 'inativo' ? 'selected' : '' }}>Inativo
-                        </option>
-                        <option value="banido" {{ request('status_conta') === 'banido' ? 'selected' : '' }}>Banido
-                        </option>
-                    </select>
-                </div>
+                            <div class="col-6 col-md-2">
+                                <select name="status_conta" class="form-select">
+                                    <option value="">Conta (Todas)</option>
+                                    <option value="ativo" {{ request('status_conta') === 'ativo' ? 'selected' : '' }}>
+                                        Ativo
+                                    </option>
+                                    <option value="inativo"
+                                        {{ request('status_conta') === 'inativo' ? 'selected' : '' }}>Inativo
+                                    </option>
+                                    <option value="banido"
+                                        {{ request('status_conta') === 'banido' ? 'selected' : '' }}>Banido
+                                    </option>
+                                </select>
+                            </div>
 
-                <div class="col-12 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">
-                        <i class="bi bi-filter me-1"></i> Filtrar
-                    </button>
-                    @if (request()->hasAny(['busca', 'status', 'status_conta']))
-                    @if (request()->hasAny(['busca', 'situacao', 'status', 'status_conta']))
-                        <a href="{{ route('admin.vendedores.index') }}" class="btn btn-outline-secondary"
-                            title="Limpar Filtros">
-                            <i class="bi bi-x-lg"></i>
-                        </a>
-                    @endif
-                </div>
+                            <div class="col-12 col-md-2 d-flex gap-2">
+                                <button type="submit" class="btn-search-submit flex-grow-1">
+                                    <i class="bi bi-filter me-1"></i> Filtrar
+                                </button>
+                                @if (request()->hasAny(['busca', 'situacao', 'status', 'status_conta']))
+                                    <a href="{{ route('admin.vendedores.index') }}" class="btn-search-clear"
+                                        title="Limpar Filtros" aria-label="Limpar Filtros">
+                                        <i class="bi bi-x-lg"></i>
+                                    </a>
+                                @endif
+                            </div>
             </form>
         </div>
 
         <!-- TABELA DE VENDEDORES -->
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light text-secondary text-uppercase small" style="letter-spacing: 0.5px;">
                     <thead class="table-light border-bottom">
                         <tr>
                             <th class="ps-4 py-3">Loja / Empresa</th>
@@ -240,8 +251,10 @@
                                             <i class="bi bi-x-circle-fill me-1"></i> Rejeitado
                                         </span>
                                     @endif
-                                    <span class="badge {{ $vendedor->situacao_badge_class }} rounded-pill px-3 py-1 fw-semibold">
-                                        <i class="bi {{ $vendedor->situacao_icone }} me-1"></i> {{ $vendedor->situacao_rotulo }}
+                                    <span
+                                        class="badge {{ $vendedor->situacao_badge_class }} rounded-pill px-3 py-1 fw-semibold">
+                                        <i class="bi {{ $vendedor->situacao_icone }} me-1"></i>
+                                        {{ $vendedor->situacao_rotulo }}
                                     </span>
                                 </td>
 
@@ -275,7 +288,7 @@
                                 </td>
 
                                 <td class="pe-4 py-3 text-end">
-                                    <div class="btn-group gap-1">
+                                    <div class="actions-group justify-content-end">
                                         <!-- Ações rápidas de aprovação/rejeição -->
                                         @if ($vendedor->status_aprovacao !== 'aprovado')
                                             <form method="POST"
@@ -285,13 +298,9 @@
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="aprovado">
                                                 <button type="submit"
-                                                    class="btn btn-sm btn-outline-success rounded-3"
-                                                    title="Aprovar Vendedor">
+                                                    class="btn-action btn-action-approve" title="Aprovar Vendedor"
+                                                    aria-label="Aprovar">
                                                     <i class="bi bi-check-lg"></i>
-                                                    class="btn btn-sm btn-outline-success rounded-3 d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 32px; height: 32px;"
-                                                    title="Aprovar Vendedor" aria-label="Aprovar">
-                                                    <i class="bi bi-check-lg fs-6"></i>
                                                 </button>
                                             </form>
                                         @endif
@@ -303,45 +312,31 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="rejeitado">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-3"
-                                                    title="Rejeitar Vendedor">
                                                 <button type="submit"
-                                                    class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
-                                                    style="width: 32px; height: 32px;"
-                                                    title="Rejeitar Vendedor" aria-label="Rejeitar">
+                                                    class="btn-action btn-action-reject" title="Rejeitar Vendedor"
+                                                    aria-label="Rejeitar">
                                                     <i class="bi bi-x-lg"></i>
                                                 </button>
                                             </form>
                                         @endif
 
                                         <a href="{{ route('admin.vendedores.show', $vendedor) }}"
-                                            class="btn btn-sm btn-outline-secondary rounded-3"
-                                            title="Visualizar Detalhes">
-                                            class="btn btn-sm btn-outline-secondary rounded-3 d-inline-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;"
-                                            title="Visualizar Detalhes" aria-label="Visualizar">
+                                            class="btn-action btn-action-view" title="Visualizar Detalhes"
+                                            aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
                                         <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
                                         <a href="{{ route('admin.vendedores.edit', $vendedor) }}"
-                                            class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
-                                            title="Editar Vendedor">
+                                            class="btn-action btn-action-edit" title="Editar Vendedor"
+                                            aria-label="Editar">
                                             <i class="bi bi-pencil-square"></i>
-                                            <span>Editar</span>
-                                            class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;"
-                                            title="Editar Vendedor" aria-label="Editar">
-                                            <i class="bi bi-pencil-square fs-6"></i>
                                         </a>
 
-                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
                                         <button type="button"
-                                            class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal{{ $vendedor->id }}"
-                                            title="Excluir Vendedor">
-                                            title="Excluir Vendedor" aria-label="Excluir">
+                                            class="btn-action btn-action-delete" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal{{ $vendedor->id }}" title="Excluir Vendedor"
+                                            aria-label="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -367,7 +362,8 @@
                                                         {{ $vendedor->cnpj }})?
                                                     </p>
                                                     <p class="text-danger small mb-0 fw-semibold">
-                                                        Atenção: A conta de acesso associada a este vendedor também será
+                                                        Atenção: A conta de acesso associada a este vendedor também
+                                                        será
                                                         excluída permanentemente.
                                                     </p>
                                                 </div>
@@ -395,7 +391,8 @@
                                     <div class="text-muted">
                                         <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
                                         <h6 class="fw-bold mb-1">Nenhum vendedor encontrado</h6>
-                                        <p class="small mb-3">Tente ajustar seus termos de busca ou cadastrar um novo
+                                        <p class="small mb-3">Tente ajustar seus termos de busca ou cadastrar um
+                                            novo
                                             vendedor.</p>
                                         @if (request()->hasAny(['busca', 'status', 'status_conta']))
                                             <a href="{{ route('admin.vendedores.index') }}"

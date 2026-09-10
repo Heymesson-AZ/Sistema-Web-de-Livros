@@ -95,7 +95,36 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
     /**
-     * Retorna a URL da foto de perfil ou um avatar padrão.
+     * Retorna um avatar vetorial SVG embutido em Data URI com as iniciais do usuário.
+     * Funciona 100% offline, com zero requisições externas, sem risco de timeout ou bloqueios.
+     */
+    public function getFotoPadraoAttribute(): string
+    {
+        $nome = trim((string) ($this->name ?: 'U'));
+        $partes = preg_split('/\s+/', $nome);
+        $iniciais = mb_strtoupper(mb_substr($partes[0] ?? 'U', 0, 1, 'UTF-8'), 'UTF-8');
+        if (isset($partes[1]) && !empty($partes[1])) {
+            $iniciais .= mb_strtoupper(mb_substr($partes[1], 0, 1, 'UTF-8'), 'UTF-8');
+        }
+
+        $svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128' width='128' height='128'>"
+            . "<defs>"
+            . "<linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'>"
+            . "<stop offset='0%' stop-color='#2563eb'/>"
+            . "<stop offset='100%' stop-color='#1d4ed8'/>"
+            . "</linearGradient>"
+            . "</defs>"
+            . "<circle cx='64' cy='64' r='64' fill='url(%23grad)'/>"
+            . "<text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' fill='#ffffff' font-family='sans-serif' font-size='48' font-weight='bold'>"
+            . htmlspecialchars($iniciais, ENT_QUOTES, 'UTF-8')
+            . "</text>"
+            . "</svg>";
+
+        return 'data:image/svg+xml;utf8,' . rawurlencode($svg);
+    }
+
+    /**
+     * Retorna a URL da foto de perfil ou o avatar vetorial seguro padrão.
      */
     public function getFotoAttribute(): string
     {
@@ -103,8 +132,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return asset('storage/' . $this->foto_perfil);
         }
 
-        // Retorna um avatar gerado automaticamente com as iniciais do nome do usuário
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+        return $this->foto_padrao;
     }
 
     public function isCliente()
@@ -214,23 +242,55 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
+    /**
+     * Verifica se o usuário possui pedidos ativos, pendências financeiras ou problemas em aberto
+     * que impedem a exclusão da própria conta.
+     */
     public function temPedidosAtivos(): bool
     {
-        // Definimos quais status bloqueiam a exclusão
-        $statusAtivos = ['pendente', 'processando', 'enviado'];
+        // Status que representam pedidos em andamento, problemas, disputas ou pendências
+        $statusBloqueantes = [
+            'pendente',
+            'processando',
+            'enviado',
+            'em_disputa',
+            'reclamacao',
+            'devolucao',
+            'aguardando_pagamento',
+        ];
 
-        if ($this->tipo === 'cliente') {
-            // Verifica se o cliente tem algum pedido nesses status
-            return $this->cliente->pedidos()
-                ->whereIn('status', $statusAtivos)
+        // 1. Como cliente (comprador)
+        if ($this->cliente) {
+            $temComoCliente = $this->cliente->pedidos()
+                ->whereIn('status', $statusBloqueantes)
                 ->exists();
+
+            if ($temComoCliente) {
+                return true;
+            }
         }
 
-        if ($this->tipo === 'vendedor') {
-            // Verifica se o vendedor tem algum pedido nesses status
-            return $this->vendedor->pedidos()
-                ->whereIn('status', $statusAtivos)
+        // 2. Como vendedor (lojista)
+        if ($this->vendedor) {
+            // Pedidos atribuídos diretamente à loja
+            $temComoVendedor = $this->vendedor->pedidos()
+                ->whereIn('status', $statusBloqueantes)
                 ->exists();
+
+            if ($temComoVendedor) {
+                return true;
+            }
+
+            // Pedidos que contenham itens vinculados aos livros deste vendedor
+            $temItensEmPedidosAtivos = PedidoItem::whereHas('livro', function ($q) {
+                $q->where('vendedor_id', $this->vendedor->id);
+            })->whereHas('pedido', function ($q) use ($statusBloqueantes) {
+                $q->whereIn('status', $statusBloqueantes);
+            })->exists();
+
+            if ($temItensEmPedidosAtivos) {
+                return true;
+            }
         }
 
         return false;

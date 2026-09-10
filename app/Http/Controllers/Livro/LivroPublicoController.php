@@ -15,19 +15,15 @@ class LivroPublicoController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Livros em destaque para o Carrossel (sempre exibido no topo)
+        // 1. Livros em destaque para o Carrossel (somente disponíveis em estoque)
         $destaques = Livro::disponiveis()
             ->with(['autor', 'genero', 'vendedor'])
             ->latest()
             ->take(12)
             ->get();
 
-        if ($destaques->isEmpty()) {
-            $destaques = Livro::ativos()->with(['autor', 'genero', 'vendedor'])->take(12)->get();
-        }
-
-        // 2. Consulta de livros do catálogo aplicando filtros (busca, gênero, faixa de preço, estoque, ordem)
-        $livros = Livro::query()
+        // 2. Consulta de livros do catálogo aplicando filtros (somente títulos disponíveis em estoque)
+        $livros = Livro::disponiveis()
             ->with(['autor', 'genero', 'editora', 'vendedor'])
             ->filtrar($request->all())
             ->paginate(12)

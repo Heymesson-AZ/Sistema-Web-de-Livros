@@ -117,12 +117,12 @@
                 </div>
 
                 <div class="col-12 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-grow-1">
+                    <button type="submit" class="btn-search-submit flex-grow-1">
                         <i class="bi bi-filter me-1"></i> Filtrar
                     </button>
                     @if (request()->hasAny(['busca', 'status']))
-                        <a href="{{ route('admin.clientes.index') }}" class="btn btn-outline-secondary"
-                            title="Limpar Filtros">
+                        <a href="{{ route('admin.clientes.index') }}" class="btn-search-clear" title="Limpar Filtros"
+                            aria-label="Limpar Filtros">
                             <i class="bi bi-x-lg"></i>
                         </a>
                     @endif
@@ -205,35 +205,23 @@
                                 </td>
 
                                 <td class="pe-4 py-3 text-end">
-                                    <div class="btn-group gap-1">
+                                    <div class="actions-group justify-content-end">
                                         <a href="{{ route('admin.clientes.show', $cliente) }}"
-                                            class="btn btn-sm btn-outline-secondary rounded-3"
-                                            title="Visualizar Detalhes">
-                                            class="btn btn-sm btn-outline-secondary rounded-3 d-inline-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;"
-                                            title="Visualizar Detalhes" aria-label="Visualizar">
+                                            class="btn-action btn-action-view" title="Visualizar Detalhes"
+                                            aria-label="Visualizar">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
                                         <!-- BOTÃO DE EDIÇÃO PADRONIZADO (ICON-ONLY EM DESTAQUE) -->
                                         <a href="{{ route('admin.clientes.edit', $cliente) }}"
-                                            class="btn btn-sm btn-primary rounded-3 text-white fw-semibold shadow-sm px-2.5 py-1 d-inline-flex align-items-center gap-1"
-                                            title="Editar Cliente">
+                                            class="btn-action btn-action-edit" title="Editar Cliente"
+                                            aria-label="Editar">
                                             <i class="bi bi-pencil-square"></i>
-                                            <span>Editar</span>
-                                            class="btn btn-sm btn-primary rounded-3 text-white shadow-sm d-inline-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;"
-                                            title="Editar Cliente" aria-label="Editar">
-                                            <i class="bi bi-pencil-square fs-6"></i>
                                         </a>
 
-                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-3"
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-danger rounded-3 d-inline-flex align-items-center justify-content-center"
-                                            style="width: 32px; height: 32px;"
+                                        <button type="button" class="btn-action btn-action-delete"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteClienteModal{{ $cliente->id }}"
-                                            title="Excluir Cliente">
                                             title="Excluir Cliente" aria-label="Excluir">
                                             <i class="bi bi-trash"></i>
                                         </button>

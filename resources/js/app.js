@@ -81,7 +81,7 @@ window.previsualizarImagem = function (
             campoInput.value = "";
             return;
         }
-
+        // Pré-visualiza a imagem no elemento de destino
         const leitor = new FileReader();
         leitor.onload = function (e) {
             const imagemElemento = document.getElementById(idPrevisualizacao);

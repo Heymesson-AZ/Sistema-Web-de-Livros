@@ -185,4 +185,19 @@ class Vendedor extends Model
     {
         return $this->hasMany(Pedido::class);
     }
+
+    // Cupons exclusivos criados pela loja do vendedor
+    public function cupons()
+    {
+        return $this->hasMany(Cupom::class, 'vendedor_id');
+    }
+
+    // Campanhas promocionais de incentivo da plataforma às quais o lojista aderiu
+    public function campanhasAderidas()
+    {
+        return $this->belongsToMany(Cupom::class, 'cupom_vendedor_adesao')
+                    ->wherePivot('concordou', true)
+                    ->withPivot('concordou', 'data_adesao')
+                    ->withTimestamps();
+    }
 }

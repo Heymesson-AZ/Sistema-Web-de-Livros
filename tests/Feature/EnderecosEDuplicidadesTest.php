@@ -49,14 +49,12 @@ class EnderecosEDuplicidadesTest extends TestCase
             'email' => 'admin@teste.com',
         ]);
 
-        $vendedorUser = User::factory()->create([
         $this->vendedorUser = User::factory()->create([
             'tipo' => 'vendedor',
             'name' => 'Livraria Central',
             'email' => 'vendedor@teste.com',
         ]);
         $this->vendedor = Vendedor::create([
-            'user_id' => $vendedorUser->id,
             'user_id' => $this->vendedorUser->id,
             'cnpj' => '12345678000199',
             'razao_social' => 'Livraria Central LTDA',
@@ -195,7 +193,6 @@ class EnderecosEDuplicidadesTest extends TestCase
         ]);
 
         // Tentativa de cadastrar outro livro com o mesmo ISBN
-        $response = $this->actingAs($this->adminUser)->post(route('admin.livros.store'), [
         $response = $this->actingAs($this->vendedorUser)->post(route('vendedor.livros.store'), [
             'titulo' => 'Dom Casmurro Edição 2',
             'isbn' => '978-85-359-0277-8', // Com formatação (o mutator/controller normaliza e detecta)
@@ -226,7 +223,6 @@ class EnderecosEDuplicidadesTest extends TestCase
         ]);
 
         // Tentativa de cadastrar o mesmo título para o mesmo autor com ISBN diferente
-        $response = $this->actingAs($this->adminUser)->post(route('admin.livros.store'), [
         $response = $this->actingAs($this->vendedorUser)->post(route('vendedor.livros.store'), [
             'titulo' => 'Memórias Póstumas de Brás Cubas',
             'isbn' => '9788535900002',
@@ -244,7 +240,6 @@ class EnderecosEDuplicidadesTest extends TestCase
 
     public function test_sanitizacao_de_preco_formatado_em_reais(): void
     {
-        $response = $this->actingAs($this->adminUser)->post(route('admin.livros.store'), [
         $response = $this->actingAs($this->vendedorUser)->post(route('vendedor.livros.store'), [
             'titulo' => 'Esaú e Jacó',
             'isbn' => '9788535901111',
@@ -257,7 +252,6 @@ class EnderecosEDuplicidadesTest extends TestCase
             'vendedor_id' => $this->vendedor->id,
         ]);
 
-        $response->assertRedirect(route('admin.livros.index'));
         $response->assertRedirect(route('vendedor.livros.index'));
         $this->assertDatabaseHas('livros', [
             'titulo' => 'Esaú e Jacó',

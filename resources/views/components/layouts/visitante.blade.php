@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Universo de Papel</title>
 
     {{-- Favicon --}}
@@ -14,9 +15,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
 @php
     $modalAutomatico = '';
-    if (old('formulario') === 'registro' || $errors->hasAny(['name', 'cpf', 'data_nascimento', 'telefone', 'password_confirmation'])) {
+    if (
+        old('formulario') === 'registro' ||
+        $errors->hasAny(['name', 'cpf', 'data_nascimento', 'telefone', 'password_confirmation'])
+    ) {
         $modalAutomatico = 'registerModal';
     } elseif (old('formulario') === 'recuperar_senha' || session('form_sucesso') === 'recuperar_senha') {
         $modalAutomatico = 'forgotPasswordModal';
@@ -25,7 +30,7 @@
     }
 @endphp
 
-<body @if($modalAutomatico) data-auth-modal="{{ $modalAutomatico }}" @endif>
+<body @if ($modalAutomatico) data-auth-modal="{{ $modalAutomatico }}" @endif>
 
     <!-- NAVBAR -->
     <nav class="topbar">

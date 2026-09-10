@@ -29,7 +29,13 @@ class CarrinhoController extends Controller
         if ($codigoCupom) {
             $cupom = Cupom::where('codigo', strtoupper($codigoCupom))->first();
             if ($cupom && $cupom->isValido()) {
-                $desconto = $cupom->calcularDesconto($subtotal);
+                $resultadoCupom = $cupom->calcularDescontoParaItens($itens);
+                if ($resultadoCupom['aplicavel']) {
+                    $desconto = $resultadoCupom['desconto'];
+                } else {
+                    session()->forget('cupom_codigo');
+                    $cupom = null;
+                }
             } else {
                 session()->forget('cupom_codigo');
                 $cupom = null;
@@ -196,6 +202,13 @@ class CarrinhoController extends Controller
 
         if (!$cupom || !$cupom->isValido()) {
             return redirect()->route('carrinho.index')->with('error', 'Cupom inválido, expirado ou com limite de usos atingido.');
+        }
+
+        $itens = $this->obterItensCarrinho();
+        $resultadoCupom = $cupom->calcularDescontoParaItens($itens);
+
+        if (!$resultadoCupom['aplicavel']) {
+            return redirect()->route('carrinho.index')->with('error', $resultadoCupom['motivo']);
         }
 
         session(['cupom_codigo' => $cupom->codigo]);

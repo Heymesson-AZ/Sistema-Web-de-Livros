@@ -40,23 +40,29 @@
                             <div class="col-12 col-md-6">
                                 <label class="form-label small fw-semibold">Tipo de Desconto:</label>
                                 <select name="tipo_desconto" class="form-select" required>
-                                    <option value="percentual" {{ old('tipo_desconto', $cupom->tipo_desconto) === 'percentual' ? 'selected' : '' }}>Percentual (%)</option>
-                                    <option value="valor_fixo" {{ old('tipo_desconto', $cupom->tipo_desconto) === 'valor_fixo' ? 'selected' : '' }}>Valor Fixo (R$)</option>
+                                    <option value="percentual"
+                                        {{ old('tipo_desconto', $cupom->tipo_desconto) === 'percentual' ? 'selected' : '' }}>
+                                        Percentual (%)</option>
+                                    <option value="valor_fixo"
+                                        {{ old('tipo_desconto', $cupom->tipo_desconto) === 'valor_fixo' ? 'selected' : '' }}>
+                                        Valor Fixo (R$)</option>
                                 </select>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label small fw-semibold">Valor do Desconto:</label>
-                                <input type="number" step="0.01" min="0.01" name="valor_desconto" class="form-control"
-                                    value="{{ old('valor_desconto', $cupom->valor_desconto) }}" required>
+                                <input type="number" step="0.01" min="0.01" name="valor_desconto"
+                                    class="form-control" value="{{ old('valor_desconto', $cupom->valor_desconto) }}"
+                                    required>
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-4">
+                        <div class="row g-3 mb-3">
                             <div class="col-12 col-md-6">
                                 <label class="form-label small fw-semibold">Limite de Usos:</label>
                                 <input type="number" min="1" name="limite_uso" class="form-control"
                                     value="{{ old('limite_uso', $cupom->limite_uso) }}">
-                                <div class="form-text" style="font-size: 11px;">Usos atuais: <strong>{{ $cupom->usos_atuais }}</strong></div>
+                                <div class="form-text" style="font-size: 11px;">Usos atuais:
+                                    <strong>{{ $cupom->usos_atuais }}</strong></div>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label small fw-semibold">Data de Validade:</label>
@@ -65,8 +71,22 @@
                             </div>
                         </div>
 
+                        <div class="form-check form-switch mb-4 p-3 bg-light rounded-3">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" name="requer_concordancia"
+                                value="1" id="switchConcordanciaEdit"
+                                {{ old('requer_concordancia', $cupom->requer_concordancia) ? 'checked' : '' }}>
+                            <label class="form-check-label fw-semibold text-dark" for="switchConcordanciaEdit">
+                                <i class="bi bi-hand-thumbs-up me-1 text-primary"></i> Campanha Promocional de Incentivo
+                                (Sujeita a concordância dos lojistas)
+                            </label>
+                            <div class="text-muted small ms-4">
+                                Quando ativado, os lojistas poderão aderir à campanha em seus painéis.
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.cupons.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                            <a href="{{ route('admin.cupons.index') }}"
+                                class="btn btn-outline-secondary btn-sm rounded-pill px-3">
                                 Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold">
@@ -81,4 +101,3 @@
 
     </div>
 </x-layouts.principal>
-
